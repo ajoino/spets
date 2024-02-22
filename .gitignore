@@ -1,0 +1,47 @@
+.bdep/
+
+# Local default options files.
+#
+.build2/local/
+
+# Compiler/linker output.
+#
+*.d
+*.t
+*.i
+*.i.*
+*.ii
+*.ii.*
+*.o
+*.obj
+*.gcm
+*.pcm
+*.ifc
+*.so
+*.dylib
+*.dll
+*.a
+*.lib
+*.exp
+*.pdb
+*.ilk
+*.exe
+*.exe.dlls/
+*.exe.manifest
+*.pc
+
+
+########
+# CMake
+########
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps

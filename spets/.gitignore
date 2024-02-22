@@ -1,0 +1,5 @@
+spets
+
+# Testscript output directory (can be symlink).
+#
+test-spets
