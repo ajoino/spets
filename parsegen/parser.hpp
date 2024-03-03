@@ -25,6 +25,10 @@ protected:
         return this->func_name < rhs.func_name;
       }
     }
+
+    inline constexpr bool operator==(const MemoKey& rhs) const {
+        return (this->func_name == rhs.func_name && this->pos == rhs.pos);
+    }
     friend std::ostream &operator<<(std::ostream &os, const MemoKey &mk) {
       return os << "(" << mk.pos << ", " << mk.func_name << ")";
     }
@@ -85,6 +89,14 @@ protected:
                               const int pos) {
     std::cout << "Calling memoization routine for rule : " << func_name << " at pos: " << pos << "\n";
     auto key = MemoKey(func_name, pos);
+    for (const auto &[k, m] : memo) {
+      std::cout << "\t" << k << " -> " << m;
+      if (key == k) {
+        std::cout << " <- currently under consideration\n";
+      } else {
+        std::cout << "\n";
+      }
+    }
 
     if (!memo.contains(key)) {
       std::cout << "Memoization cache is empty.\n";
