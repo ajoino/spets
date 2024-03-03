@@ -62,7 +62,9 @@ class Parser {
     std::vector<std::shared_ptr<LR>> lr_stack;
 
 protected:
-
+    Token get_token() {
+        return tokenizer.get_token();
+    }
     // std::map<int, std::map<std::string, std::pair<std::optional<Node>, int>>>
     //     memos;
     struct MemoKey {
@@ -70,10 +72,10 @@ protected:
         int pos;
 
         inline constexpr bool operator<(const MemoKey& rhs) const {
-            if (this->func_name == rhs.func_name) {
-                return this->pos < rhs.pos;
-            } else {
+            if (this->pos == rhs.pos) {
                 return this->func_name < rhs.func_name;
+            } else {
+                return this->pos < rhs.pos;
             }
         }
 

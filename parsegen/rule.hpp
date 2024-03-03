@@ -2,18 +2,21 @@
 
 #include <string>
 #include <vector>
+#include <optional>
+
+struct Alt { 
+    std::vector<std::string> items;
+    std::optional<std::string> action;
+};
+
 
 struct Rule {
     std::string name;
-    std::vector<std::vector<std::string>> alts;
+    std::vector<Alt> alts;
 
     inline constexpr bool operator<(const Rule& rhs) const {
         return this->name < rhs.name;
     }
 };
 
-struct Alt { 
-    std::vector<std::string> items;
-    std::string action;
-};
 

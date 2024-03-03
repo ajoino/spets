@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <format>
 
 #include "lexer.hpp"
 #include "parser.hpp"
@@ -33,14 +34,18 @@ public:
         int pos = mark();
         if (auto name = expect(TokenType::NAME)) {
             if (expect(":") && skip_ws()) {
-                auto alt = alternative();
-                if (!alt.empty()) {
-                    auto alts = std::vector<std::vector<std::string>>{alt};
+                auto maybe_alt = alternative();
+                if (!maybe_alt) {
+                    throw "Empty alternative not allowed";
+                }
+                auto alt = maybe_alt.value();
+                if (!alt.items.empty()) {
+                    auto alts = std::vector<Alt>{alt};
                     skip_ws();
                     int apos = mark();
-                    while (expect("|") && skip_ws() && !(alt = alternative()).empty()) {
+                    while (expect("|") && skip_ws() && (maybe_alt = alternative()) && !maybe_alt.value().items.empty()) {
                         skip_ws();
-                        alts.push_back(alt);
+                        alts.push_back(maybe_alt.value());
                         apos = mark();
                     }
                     reset(apos);
@@ -54,7 +59,7 @@ public:
         return {};
     }
 
-    std::vector<std::string> alternative() {
+    std::optional<Alt> alternative() {
         std::cout << "\"alternative\" at pos: " << mark() << "\n";
         std::vector<std::string> items{};
         while (auto item = this->item()) {
@@ -62,7 +67,36 @@ public:
             items.push_back(item.value());
             skip_ws();
         }
-        return items;
+        if (items.empty()) {
+            return {};
+        }
+        // return items;
+        std::string action = "";
+        int pos = mark();
+        if (expect("{")) {
+            skip_ws();
+            int level = 0;
+            std::vector<std::string> action_tokens{};
+            while (true) {
+                std::string token = get_token().value;
+                if (token == "{") {
+                    level++;
+                } else if (token == "}") {
+                    level--;
+                    if (level < 0) {
+                        break;
+                    }
+                }
+                action_tokens.push_back(token);
+            }
+            action = action_tokens[0];
+            for (auto at = action_tokens.begin() + 1; at != action_tokens.end(); at++) {
+                action.append(*at);
+            }
+        }
+        skip_ws();
+        std::cout << "leaving alternative at pos: " << mark() << " having parsed: " << std::format("{}", items) << " and action: " << action << "\n";
+        return Alt{items, action};
     }
 
     std::optional<std::string> item() {
@@ -92,6 +126,13 @@ std::ostream& operator<<(std::ostream& stream, const std::vector<std::vector<std
     stream << "]";
     return stream;
 };
+
+std::ostream& operator<<(std::ostream& os, const std::vector<Alt>& alts) {
+    for (const auto& alt : alts) {
+        os << "Alt(" << std::format("{}", alt.items) << ")";
+    }
+    return os;
+}
 
 std::ostream& operator<<(std::ostream& stream, const Rule& rule) {
     return stream << "    Rule(\"" << rule.name << "\", " << rule.alts << ")";
@@ -130,15 +171,6 @@ bool all_upper(const std::string& s) {
     return true;
 }
 
-bool is_left_recursive(const Rule& rule) {
-    for (const auto& alt : rule.alts) {
-        if (alt[0] == rule.name) {
-            return true;
-        }
-    }
-    return false;
-}
-
 std::stringstream generate_parser_class(std::vector<Rule> rules) {
     std::stringstream stream;
     stream << R"preamble(#include <optional>
@@ -152,7 +184,6 @@ std::stringstream generate_parser_class(std::vector<Rule> rules) {
 )preamble";
     stream << "class Toyparser : public Parser {\npublic:\n";
     for (const auto& rule : rules) {
-        bool is_lr = is_left_recursive(rule);
 
         stream << "    std::optional<Node> " << rule.name << "() {\n\n";
 
@@ -165,7 +196,7 @@ std::stringstream generate_parser_class(std::vector<Rule> rules) {
         std::vector<std::string> vars;
         for (const auto& alt : rule.alts) {
             std::vector<std::string> items;
-            for (const auto& item : alt) {
+            for (const auto& item : alt.items) {
                 std::string var_name = str_tolower(item);
                 if (!(item.starts_with("'") || item.starts_with("\"")) && !in_vector(vars, var_name)) {
                     if (all_upper(item)) {
@@ -176,13 +207,13 @@ std::stringstream generate_parser_class(std::vector<Rule> rules) {
                     vars.push_back(item);
                 }
             }
-            stream << "                std::cout << \"\\n### " << rule.name << ": ";
-            for (const auto& item : alt) {
+            stream << "            std::cout << \"\\n### " << rule.name << ": ";
+            for (const auto& item : alt.items) {
                 stream << str_tolower(item) << " ";
             }
             stream << "\\n\\n\";\n";
             stream << "            if (true\n";
-            for (const auto& item : alt) {
+            for (const auto& item : alt.items) {
                 if (item.starts_with("'") || item.starts_with("\"")) {
                     std::string string_item_inner{item.begin() + 1, item.end() - 1};
                     stream << "                && expect(\"" << string_item_inner << "\")\n";
@@ -227,13 +258,8 @@ std::stringstream generate_parser_class(std::vector<Rule> rules) {
 
         stream << "        };\n\n";
 
-        // if (is_lr) {
-        //     stream << "        return memoize_left_rec(\"" << rule.name <<
-        //     "\", inner_func);\n";
-        // } else {
         stream << "        std::cout << \"Parsing " << rule.name << "\\n\";\n";
         stream << "        return memoize(\"" << rule.name << "\", inner_func, mark());\n";
-        // }
 
         stream << "    }\n\n";
     }
@@ -277,6 +303,7 @@ int main(int argc, char** argv) {
     GrammarParser p{t};
 
     auto rules = p.grammar();
+    std::cout << rules.value();
     // if (rules) {
     //   std::cout << rules.value() << "\n\n\n";
     //   std::cout << generate_parser_class(rules.value()).str();
