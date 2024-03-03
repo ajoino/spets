@@ -5,6 +5,8 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <cstdint>
+#include <iomanip>
 
 #include "grammar_parser.hpp"
 #include "lexer.hpp"
@@ -62,10 +64,14 @@ public:
 
     void put(const std::string& input) { stream << std::string(" ", indentation) << input; }
 
-    void generate_item(const std::string& item, std::vector<std::string>& items) {
+    void generate_item(const std::string& item, std::vector<std::string>& items, uint16_t& token_counter) {
         if (item.starts_with("'") || item.starts_with("\"")) {
             std::string string_item_inner{item.begin() + 1, item.end() - 1};
-            stream << "                && expect(\"" << string_item_inner << "\")\n";
+            auto token_id = std::string{"token_"} + std::to_string(token_counter);
+            stream << "                && (" << token_id << " = expect(\"" << string_item_inner << "\"))\n";
+            token_counter++;
+            auto node_string = std::format("Node(\"token\", {})", token_id + ".value().value");
+            items.push_back(node_string);
         } else {
             auto var = str_tolower(item);
             if (in_vector(items, var)) {
@@ -83,10 +89,20 @@ public:
 
     void generate_alt(const Alt& alt, const Rule& rule, std::vector<std::string>& vars) {
         std::vector<std::string> items;
+        uint16_t token_counter = 0;
         for (const auto& item : alt.items) {
             std::string var_name = str_tolower(item);
-            if (!(item.starts_with("'") || item.starts_with("\"")) && !in_vector(vars, var_name)) {
-                if (all_upper(item)) {
+            auto token_name = std::string{"token_"} + std::to_string(token_counter);
+            if (!in_vector(vars, var_name)) {
+                if ((item.starts_with("'") || item.starts_with("\""))) {
+                    if (in_vector(vars, token_name)) {
+                        continue;
+                    }
+                    stream << "            std::optional<Token> " << token_name << ";\n";
+                    token_counter++;
+                    vars.push_back(token_name);
+                    continue;
+                } else if (all_upper(item)) {
                     stream << "            std::optional<Token> " << var_name << ";\n";
                 } else {
                     stream << "            std::optional<Node> " << var_name << ";\n";
@@ -99,14 +115,15 @@ public:
             stream << str_tolower(item) << " ";
         }
         stream << "\\n\\n\";\n";
+        token_counter = 0;
         stream << "            if (true\n";
         for (const auto& item : alt.items) {
-            generate_item(item, items);
+            generate_item(item, items, token_counter);
         }
         stream << "            ){\n";
 
         for (const auto& item : items) {
-            stream << "                std::cout << \"" << item << ": \" << " << item << " << \"\\n\";\n";
+            stream << "                std::cout << " << std::quoted(item + ": ") << " << " << item << " << \"\\n\";\n";
         }
         // stream << "                std::cout << "
         stream << "                return Node{\"" << rule.name << "\", {";

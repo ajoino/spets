@@ -64,27 +64,30 @@ public:
         auto inner_func = [&, this]() -> std::optional<Node> {
             int pos = mark();
             std::optional<Node> expr;
+            std::optional<Token> token_0;
             std::optional<Node> term;
             std::cout << "\n### expr: expr '+' term \n\n";
             if (true
                 && (expr = this->expr())
-                && expect("+")
+                && (token_0 = expect("+"))
                 && (term = this->term())
             ){
                 std::cout << "expr.value(): " << expr.value() << "\n";
+                std::cout << "Node(\"token\", token_0.value().value): " << Node("token", token_0.value().value) << "\n";
                 std::cout << "term.value(): " << term.value() << "\n";
-                return Node{"expr", {expr.value(), term.value()}};
+                return Node{"expr", {expr.value(), Node("token", token_0.value().value), term.value()}};
             }
             reset(pos);
             std::cout << "\n### expr: expr '-' term \n\n";
             if (true
                 && (expr = this->expr())
-                && expect("-")
+                && (token_0 = expect("-"))
                 && (term = this->term())
             ){
                 std::cout << "expr.value(): " << expr.value() << "\n";
+                std::cout << "Node(\"token\", token_0.value().value): " << Node("token", token_0.value().value) << "\n";
                 std::cout << "term.value(): " << term.value() << "\n";
-                return Node{"expr", {expr.value(), term.value()}};
+                return Node{"expr", {expr.value(), Node("token", token_0.value().value), term.value()}};
             }
             reset(pos);
             std::cout << "\n### expr: term \n\n";
@@ -110,27 +113,30 @@ public:
         auto inner_func = [&, this]() -> std::optional<Node> {
             int pos = mark();
             std::optional<Node> term;
+            std::optional<Token> token_0;
             std::optional<Node> atom;
             std::cout << "\n### term: term '*' atom \n\n";
             if (true
                 && (term = this->term())
-                && expect("*")
+                && (token_0 = expect("*"))
                 && (atom = this->atom())
             ){
                 std::cout << "term.value(): " << term.value() << "\n";
+                std::cout << "Node(\"token\", token_0.value().value): " << Node("token", token_0.value().value) << "\n";
                 std::cout << "atom.value(): " << atom.value() << "\n";
-                return Node{"term", {term.value(), atom.value()}};
+                return Node{"term", {term.value(), Node("token", token_0.value().value), atom.value()}};
             }
             reset(pos);
             std::cout << "\n### term: term '/' atom \n\n";
             if (true
                 && (term = this->term())
-                && expect("/")
+                && (token_0 = expect("/"))
                 && (atom = this->atom())
             ){
                 std::cout << "term.value(): " << term.value() << "\n";
+                std::cout << "Node(\"token\", token_0.value().value): " << Node("token", token_0.value().value) << "\n";
                 std::cout << "atom.value(): " << atom.value() << "\n";
-                return Node{"term", {term.value(), atom.value()}};
+                return Node{"term", {term.value(), Node("token", token_0.value().value), atom.value()}};
             }
             reset(pos);
             std::cout << "\n### term: atom \n\n";
@@ -155,15 +161,19 @@ public:
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<Node> {
             int pos = mark();
+            std::optional<Token> token_0;
             std::optional<Node> expr;
+            std::optional<Token> token_1;
             std::cout << "\n### atom: '(' expr ')' \n\n";
             if (true
-                && expect("(")
+                && (token_0 = expect("("))
                 && (expr = this->expr())
-                && expect(")")
+                && (token_1 = expect(")"))
             ){
+                std::cout << "Node(\"token\", token_0.value().value): " << Node("token", token_0.value().value) << "\n";
                 std::cout << "expr.value(): " << expr.value() << "\n";
-                return Node{"atom", {expr.value()}};
+                std::cout << "Node(\"token\", token_1.value().value): " << Node("token", token_1.value().value) << "\n";
+                return Node{"atom", {Node("token", token_0.value().value), expr.value(), Node("token", token_1.value().value)}};
             }
             reset(pos);
             std::optional<Token> name;
