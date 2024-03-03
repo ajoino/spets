@@ -18,10 +18,10 @@ include_directories(${PROJECT_SOURCE_DIR})
 add_executable(spetsc spets/spetsc.cpp parsegen/lexer.cpp)
 target_include_directories(spetsc PRIVATE ${PROJECT_SOURCE_DIR})
 
-add_executable(pgen parsegen/pgen_guido.cpp parsegen/lexer.cpp)
+add_executable(pgen parsegen/pgen_guido.cpp parsegen/lexer.cpp parsegen/parser.cpp parsegen/grammar_parser.cpp)
 target_include_directories(pgen PRIVATE ${PROJECT_SOURCE_DIR})
 
-add_executable(parser parsegen/generated_parser.cpp parsegen/lexer.cpp)
+add_executable(parser parsegen/generated_parser.cpp parsegen/parser.cpp parsegen/lexer.cpp)
 target_include_directories(parser PRIVATE ${PROJECT_SOURCE_DIR})
 
 add_custom_target(build_parser
