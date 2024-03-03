@@ -46,19 +46,21 @@ bool all_upper(const std::string& s) {
 
 class Generator {
     std::stringstream stream;
-    std::string indentation;
-    std::string prev_indentation;
+    uint indentation = 0;
 
 public:
 
     void inc_indentation() noexcept {
-        prev_indentation = indentation;
-        indentation.append("    ");
+        indentation++;
     }
 
-    void dec_indentation() { indentation = prev_indentation; }
+    void dec_indentation() {
+        if (indentation > 0) {
+            indentation--;
+        }
+    }
 
-    void put(const std::string& input) { stream << indentation << input; }
+    void put(const std::string& input) { stream << std::string(" ", indentation) << input; }
 
     void generate_item(const std::string& item, std::vector<std::string>& items) {
         if (item.starts_with("'") || item.starts_with("\"")) {
