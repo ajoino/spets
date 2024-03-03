@@ -5,10 +5,13 @@
 #include <optional>
 #include <set>
 #include <variant>
+#include <algorithm>
 
 #include "lexer.hpp"
 #include "node.hpp"
 
+namespace rr = std::ranges;
+// namespace rv = rr::views;
 std::ostream& operator<<(std::ostream& os, std::optional<Node> maybe_node) {
     if (maybe_node) {
         return os << maybe_node.value();
@@ -114,6 +117,33 @@ protected:
                 return grow_lr(rule_name, func, pos, k, h);
             }
         }
+    }
+
+    MemoValue recall(const std::string& rule_name, std::function<std::optional<Node>()> func, const int pos) {
+        auto key = MemoKey(rule_name, pos);
+        // If not growing a seed parse, just return what is stored
+        // in the memo table.
+        if (!heads.contains(pos)) {
+            return memo[key];
+        }
+
+        // Do not evaluate any rule that is not involved in this
+        // left recursion
+        auto& h = heads[pos];
+        if (!memo.contains(key) && (rule_name == h.rule || h.involved_set.contains(rule_name))) {
+            return MemoValue{std::nullopt, pos};
+        }
+
+        if (h.eval_set.contains(rule_name)) {
+            std::vector<std::string> diff_vec{};
+            std::ranges::set_difference(h.eval_set, std::set{rule_name}, std::back_inserter(diff_vec));
+            h.eval_set = std::set(std::make_move_iterator(diff_vec.begin()), std::make_move_iterator(diff_vec.end()));
+
+            auto res = func();
+            memo[key].res = res;
+            memo[key].endpos = pos;
+        }
+        return memo[key];
     }
 
     std::optional<Node>
