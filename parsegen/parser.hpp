@@ -24,6 +24,9 @@ protected:
         return this->func_name < rhs.func_name;
       }
     }
+    friend std::ostream &operator<<(std::ostream &os, const MemoKey &mk) {
+      return os << "(" << mk.pos << ", " << mk.func_name << ")";
+    }
   };
 
   struct LR {
