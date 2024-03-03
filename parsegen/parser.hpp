@@ -87,7 +87,7 @@ protected:
         return true;
     }
 
-    void setup_lr(std::string& rule_name, LR& L) {
+    void setup_lr(const std::string& rule_name, LR& L) {
         if (!L.head) {
             L.head = Head(rule_name, {}, {});
         }
@@ -96,6 +96,23 @@ protected:
             s->head = L.head;
             L.head->involved_set.insert(s->rule);
             s = std::move(s->next);
+        }
+    }
+
+    std::optional<Node> lr_answer(
+        const std::string& rule_name, std::function<std::optional<Node>()> func, const int pos, const MemoKey& k
+    ) {
+        auto get_lr_res = [&, this]() { return std::get<std::shared_ptr<LR>>(memo[k].res); };
+        auto h = get_lr_res()->head.value();
+        if (h.rule != rule_name) {
+            return get_lr_res()->seed;
+        } else {
+            memo[k].res = get_lr_res()->seed;
+            if (!std::get<std::optional<Node>>(memo[k].res)) {
+                return {};
+            } else {
+                return grow_lr(rule_name, func, pos, k, h);
+            }
         }
     }
 
