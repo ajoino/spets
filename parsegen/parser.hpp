@@ -6,6 +6,7 @@
 #include <optional>
 #include <ranges>
 #include <set>
+#include <utility>
 #include <variant>
 
 #include "lexer.hpp"
@@ -57,16 +58,6 @@ class Parser {
         }
     };
 
-    Tokenizer tokenizer;
-    std::map<int, Head> heads;
-    std::vector<std::shared_ptr<LR>> lr_stack;
-
-protected:
-    Token get_token() {
-        return tokenizer.get_token();
-    }
-    // std::map<int, std::map<std::string, std::pair<std::optional<Node>, int>>>
-    //     memos;
     struct MemoKey {
         std::string func_name;
         int pos;
@@ -74,9 +65,8 @@ protected:
         inline constexpr bool operator<(const MemoKey& rhs) const {
             if (this->pos == rhs.pos) {
                 return this->func_name < rhs.func_name;
-            } else {
-                return this->pos < rhs.pos;
             }
+            return this->pos < rhs.pos;
         }
 
         inline constexpr bool operator==(const MemoKey& rhs) const {
@@ -106,7 +96,15 @@ protected:
         }
     };
 
+    Tokenizer tokenizer;
+    std::map<int, Head> heads;
+    std::vector<std::shared_ptr<LR>> lr_stack;
+
     std::map<MemoKey, MemoValue> memo;
+
+protected:
+
+    Token get_token() { return tokenizer.get_token(); }
 
     bool skip_ws() {
         if (expect(TokenType::WHITESPACE)) {}
@@ -128,24 +126,22 @@ protected:
     }
 
     std::optional<Node> lr_answer(
-        const std::string& rule_name, std::function<std::optional<Node>()> func, const int pos, const MemoKey& k
+        const std::string& rule_name, const std::function<std::optional<Node>()>& func, const int pos, const MemoKey& k
     ) {
         std::cout << "Calling lr_answer for rule: " << rule_name << " at pos: " << pos << "\n";
         auto get_lr_res = [&, this]() { return std::get<std::shared_ptr<LR>>(memo[k].res); };
         auto h = get_lr_res()->head.value();
         if (h.rule != rule_name) {
             return get_lr_res()->seed;
-        } else {
-            memo[k].res = get_lr_res()->seed;
-            if (!std::get<std::optional<Node>>(memo[k].res)) {
-                return {};
-            } else {
-                return grow_lr(rule_name, func, pos, k, h);
-            }
         }
+        memo[k].res = get_lr_res()->seed;
+        if (!std::get<std::optional<Node>>(memo[k].res)) {
+            return {};
+        }
+        return grow_lr(rule_name, func, pos, k, h);
     }
 
-    void recall(const std::string& rule_name, std::function<std::optional<Node>()> func, const int pos) {
+    void recall(const std::string& rule_name, const std::function<std::optional<Node>()>& func, const int pos) {
         auto key = MemoKey(rule_name, pos);
         // If not growing a seed parse, just return what is stored
         // in the memo table.
@@ -173,12 +169,11 @@ protected:
             memo[key].res = res;
             memo[key].endpos = mark();
         }
-
-        return;
     }
 
     std::optional<Node> grow_lr(
-        const std::string& func_name, std::function<std::optional<Node>()> func, const int pos, MemoKey K, const Head& H
+        const std::string& func_name, const std::function<std::optional<Node>()>& func, const int pos, const MemoKey& K,
+        const Head& H
     ) {
         std::cout << "Calling `grow_lr` for rule: " << func_name << " at pos: " << pos << "\n";
         heads[pos] = H;
@@ -198,7 +193,7 @@ protected:
     }
 
     std::optional<Node>
-    memoize(const std::string& func_name, std::function<std::optional<Node>()> func, const int pos) {
+    memoize(const std::string& func_name, const std::function<std::optional<Node>()>& func, const int pos) {
         std::cout << "Calling memoization routine for rule: " << func_name << " at pos: " << pos << "\n";
         auto key = MemoKey(func_name, pos);
         // memo[key] = recall(func_name, func, pos);
@@ -235,39 +230,27 @@ protected:
             if (std::get<std::shared_ptr<LR>>(memo[key].res)->head) {
                 std::get<std::shared_ptr<LR>>(memo[key].res)->seed = res.value();
                 return lr_answer(func_name, func, pos, key);
-            } else {
-                memo[key].res = res;
-                return res;
             }
-            // memo[key].res = res;
-            // memo[key].endpos = mark();
-            // std::cout << "\tendpos: " << memo[key].endpos << "\n";
-            // if (lr->detected && res != std::nullopt) {
-            //     std::cout << "Left recursion detected in rule: " << func_name << " at pos: " << pos << "\n";
-            //     return grow_lr(func_name, func, pos, key, NULL);
-            // } else {
-            //     std::cout << "No left recursion detected in rule: " << func_name << " at pos: " << pos << "\n";
-            //     return res;
-            // }
-        } else {
-            std::cout << "Resetting pos to " << memo[key].endpos << "\n";
-            reset(memo[key].endpos);
-            std::cout << "pos is now: " << mark() << "\n";
-            if (std::holds_alternative<std::shared_ptr<LR>>(memo[key].res)) {
-                // std::cout << "LR before: " << std::get<std::shared_ptr<LR>>(memo[key].res)->detected << "\n";
-                // std::get<std::shared_ptr<LR>>(memo[key].res)->detected = true;
-                // std::cout << "LR after: " << std::get<std::shared_ptr<LR>>(memo[key].res)->detected << "\n";
-                // return std::nullopt;
-                setup_lr(func_name, std::get<std::shared_ptr<LR>>(memo[key].res));
-                return std::get<std::shared_ptr<LR>>(memo[key].res)->seed;
-            }
-            return std::get<std::optional<Node>>(memo[key].res);
+            memo[key].res = res;
+            return res;
         }
+        std::cout << "Resetting pos to " << memo[key].endpos << "\n";
+        reset(memo[key].endpos);
+        std::cout << "pos is now: " << mark() << "\n";
+        if (std::holds_alternative<std::shared_ptr<LR>>(memo[key].res)) {
+            // std::cout << "LR before: " << std::get<std::shared_ptr<LR>>(memo[key].res)->detected << "\n";
+            // std::get<std::shared_ptr<LR>>(memo[key].res)->detected = true;
+            // std::cout << "LR after: " << std::get<std::shared_ptr<LR>>(memo[key].res)->detected << "\n";
+            // return std::nullopt;
+            setup_lr(func_name, std::get<std::shared_ptr<LR>>(memo[key].res));
+            return std::get<std::shared_ptr<LR>>(memo[key].res)->seed;
+        }
+        return std::get<std::optional<Node>>(memo[key].res);
     }
 
 public:
 
-    Parser(Tokenizer t) : tokenizer{t}, heads{}, lr_stack{} {};
+    Parser(const Tokenizer& t) : tokenizer{t} {};
 
     using ParseMethod = std::function<std::optional<Node>()>;
 
@@ -280,10 +263,9 @@ public:
         if (token.type == t) {
             std::cout << "Parsed token: " << token << "\n";
             return tokenizer.get_token();
-        } else {
-            std::cout << "Peeked token: " << token << ", requested token type: " << token_type_to_string(t) << "\n";
-            return {};
         }
+        std::cout << "Peeked token: " << token << ", requested token type: " << token_type_to_string(t) << "\n";
+        return {};
     }
 
     std::optional<Token> expect(const std::string& s) {
@@ -291,9 +273,8 @@ public:
         if (token.value == s) {
             std::cout << "Parsed token: " << token << "\n";
             return tokenizer.get_token();
-        } else {
-            std::cout << "Peeked token: " << token << ", string to match \"" << s << "\"\n";
-            return {};
         }
+        std::cout << "Peeked token: " << token << ", string to match \"" << s << "\"\n";
+        return {};
     }
 };
