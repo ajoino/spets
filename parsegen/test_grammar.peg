@@ -1,6 +1,7 @@
 start: statement
 statement: expr statement_end
-expr: expr '+' term | expr '-' term | term
-term: term '*' atom | term '/' atom | atom
-atom: NAME | NUMBER
+expr: atom1 '+' atom2 | atom3
+atom1: NAME | NUMBER
+atom2: NAME | NUMBER
+atom3: NAME | NUMBER
 statement_end: NEWLINE | SEMICOLON
