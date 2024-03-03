@@ -169,7 +169,7 @@ protected:
 
             auto res = func();
             memo[key].res = res;
-            memo[key].endpos = pos;
+            memo[key].endpos = mark();
         }
 
         return;
@@ -182,7 +182,7 @@ protected:
         heads[pos] = H;
         while (true) {
             reset(pos);
-            heads[pos].eval_set = heads[pos].involved_set;
+            heads[pos].eval_set = std::set<std::string>{heads[pos].involved_set.begin(), heads[pos].involved_set.end()};
             auto res = func();
             if (res == std::nullopt || mark() <= memo[K].endpos) {
                 break;
@@ -197,7 +197,7 @@ protected:
 
     std::optional<Node>
     memoize(const std::string& func_name, std::function<std::optional<Node>()> func, const int pos) {
-        std::cout << "Calling memoization routine for rule : " << func_name << " at pos: " << pos << "\n";
+        std::cout << "Calling memoization routine for rule: " << func_name << " at pos: " << pos << "\n";
         auto key = MemoKey(func_name, pos);
         // memo[key] = recall(func_name, func, pos);
         recall(func_name, func, pos);
@@ -248,7 +248,9 @@ protected:
             //     return res;
             // }
         } else {
+            std::cout << "Resetting pos to " << memo[key].endpos << "\n";
             reset(memo[key].endpos);
+            std::cout << "pos is now: " << mark() << "\n";
             if (std::holds_alternative<std::shared_ptr<LR>>(memo[key].res)) {
                 // std::cout << "LR before: " << std::get<std::shared_ptr<LR>>(memo[key].res)->detected << "\n";
                 // std::get<std::shared_ptr<LR>>(memo[key].res)->detected = true;

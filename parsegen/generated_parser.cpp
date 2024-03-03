@@ -37,16 +37,16 @@ public:
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<Node> {
             int pos = mark();
-            std::optional<Node> atom;
+            std::optional<Node> expr;
             std::optional<Node> statement_end;
-                std::cout << "\n### statement: atom statement_end \n\n";
+                std::cout << "\n### statement: expr statement_end \n\n";
             if (true
-                && (atom = this->atom())
+                && (expr = this->expr())
                 && (statement_end = this->statement_end())
             ){
-                std::cout << "atom.value(): " << atom.value() << "\n";
+                std::cout << "expr.value(): " << expr.value() << "\n";
                 std::cout << "statement_end.value(): " << statement_end.value() << "\n";
-                return Node{"statement", {atom.value(), statement_end.value()}};
+                return Node{"statement", {expr.value(), statement_end.value()}};
             }
             reset(pos);
             std::cout << "No parse found for statement\n";
@@ -55,6 +55,98 @@ public:
 
         std::cout << "Parsing statement\n";
         return memoize("statement", inner_func, mark());
+    }
+
+    std::optional<Node> expr() {
+
+        // inner_func does the actual parsing but is called later by
+        // to enable memoization
+        auto inner_func = [&, this]() -> std::optional<Node> {
+            int pos = mark();
+            std::optional<Node> expr;
+            std::optional<Node> term;
+                std::cout << "\n### expr: expr '+' term \n\n";
+            if (true
+                && (expr = this->expr())
+                && expect("+")
+                && (term = this->term())
+            ){
+                std::cout << "expr.value(): " << expr.value() << "\n";
+                std::cout << "term.value(): " << term.value() << "\n";
+                return Node{"expr", {expr.value(), term.value()}};
+            }
+            reset(pos);
+                std::cout << "\n### expr: expr '-' term \n\n";
+            if (true
+                && (expr = this->expr())
+                && expect("-")
+                && (term = this->term())
+            ){
+                std::cout << "expr.value(): " << expr.value() << "\n";
+                std::cout << "term.value(): " << term.value() << "\n";
+                return Node{"expr", {expr.value(), term.value()}};
+            }
+            reset(pos);
+                std::cout << "\n### expr: term \n\n";
+            if (true
+                && (term = this->term())
+            ){
+                std::cout << "term.value(): " << term.value() << "\n";
+                return Node{"expr", {term.value()}};
+            }
+            reset(pos);
+            std::cout << "No parse found for expr\n";
+            return {};
+        };
+
+        std::cout << "Parsing expr\n";
+        return memoize("expr", inner_func, mark());
+    }
+
+    std::optional<Node> term() {
+
+        // inner_func does the actual parsing but is called later by
+        // to enable memoization
+        auto inner_func = [&, this]() -> std::optional<Node> {
+            int pos = mark();
+            std::optional<Node> term;
+            std::optional<Node> atom;
+                std::cout << "\n### term: term '*' atom \n\n";
+            if (true
+                && (term = this->term())
+                && expect("*")
+                && (atom = this->atom())
+            ){
+                std::cout << "term.value(): " << term.value() << "\n";
+                std::cout << "atom.value(): " << atom.value() << "\n";
+                return Node{"term", {term.value(), atom.value()}};
+            }
+            reset(pos);
+                std::cout << "\n### term: term '/' atom \n\n";
+            if (true
+                && (term = this->term())
+                && expect("/")
+                && (atom = this->atom())
+            ){
+                std::cout << "term.value(): " << term.value() << "\n";
+                std::cout << "atom.value(): " << atom.value() << "\n";
+                return Node{"term", {term.value(), atom.value()}};
+            }
+            reset(pos);
+                std::cout << "\n### term: atom \n\n";
+            if (true
+                && (atom = this->atom())
+            ){
+                std::cout << "atom.value(): " << atom.value() << "\n";
+                return Node{"term", {atom.value()}};
+            }
+            reset(pos);
+            std::cout << "No parse found for term\n";
+            return {};
+        };
+
+        std::cout << "Parsing term\n";
+        return memoize("term", inner_func, mark());
     }
 
     std::optional<Node> atom() {
@@ -79,6 +171,17 @@ public:
             ){
                 std::cout << "number.value().value: " << number.value().value << "\n";
                 return Node{"atom", {number.value().value}};
+            }
+            reset(pos);
+            std::optional<Node> expr;
+                std::cout << "\n### atom: '(' expr ')' \n\n";
+            if (true
+                && expect("(")
+                && (expr = this->expr())
+                && expect(")")
+            ){
+                std::cout << "expr.value(): " << expr.value() << "\n";
+                return Node{"atom", {expr.value()}};
             }
             reset(pos);
             std::cout << "No parse found for atom\n";

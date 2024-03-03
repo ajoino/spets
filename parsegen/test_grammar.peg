@@ -2,5 +2,5 @@ start: statement
 statement: expr statement_end
 expr: expr '+' term | expr '-' term | term
 term: term '*' atom | term '/' atom | atom
-atom: NAME | NUMBER
+atom: NAME | NUMBER | '(' expr ')'
 statement_end: NEWLINE | SEMICOLON
