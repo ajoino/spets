@@ -38,6 +38,8 @@ const char *token_type_to_string(TokenType t) noexcept {
     return "PIPE";
   case TokenType::STAR:
     return "STAR";
+  case TokenType::SLASH:
+    return "SLASH";
   case TokenType::INDENT:
     return "INDENT";
   case TokenType::UNINDENT:
@@ -219,6 +221,8 @@ ScanResult scan_token(Lexer &lexer) {
     return {Token::from_lexer(TokenType::PIPE, lexer), lexer};
   case '*':
     return {Token::from_lexer(TokenType::STAR, lexer), lexer};
+  case '/':
+    return {Token::from_lexer(TokenType::SLASH, lexer), lexer};
   }
 
   if (auto res = ctre::starts_with<"([_a-zA-Z][_a-zA-Z0-9]*)|([<>*+=/\\-|]+)">(
@@ -229,8 +233,7 @@ ScanResult scan_token(Lexer &lexer) {
     }
     return ScanResult{Token::from_lexer(TokenType::NAME, lexer), lexer};
   } else if (auto res = ctre::starts_with<
-                 "(\"\"\"[\\w+\\-*/()=:]*\"\"\")|('''[\\w+\\-*/"
-                 "()=:]*''')|(\"[\\w+\\-*/()=:]*\")|('[\\w+\\-*/()=:]*')">(
+                 "(\"\"\"[\\w+\\-*/()=:]*\"\"\")|('''[\\w+\\-*/()=:]*''')|(\"[\\w+\\-*/()=:]*\")|('[\\w+\\-*/()=:]*')">(
                  lexer.start, lexer.end)) {
     // String literals
     std::cout << "res: " << res << "\n";
