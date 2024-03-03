@@ -13,7 +13,7 @@ public:
         // inner_func does the actual parsing but is called later by
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<Node> {
-           int pos = mark();
+            int pos = mark();
             std::optional<Node> statement;
                 std::cout << "\n### start: statement \n\n";
             if (true
@@ -36,7 +36,7 @@ public:
         // inner_func does the actual parsing but is called later by
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<Node> {
-           int pos = mark();
+            int pos = mark();
             std::optional<Node> expr;
             std::optional<Node> statement_end;
                 std::cout << "\n### statement: expr statement_end \n\n";
@@ -62,26 +62,37 @@ public:
         // inner_func does the actual parsing but is called later by
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<Node> {
-           int pos = mark();
-            std::optional<Node> atom1;
-            std::optional<Node> atom2;
-                std::cout << "\n### expr: atom1 '+' atom2 \n\n";
+            int pos = mark();
+            std::optional<Node> expr;
+            std::optional<Node> term;
+                std::cout << "\n### expr: expr '+' term \n\n";
             if (true
-                && (atom1 = this->atom1())
+                && (expr = this->expr())
                 && expect("+")
-                && (atom2 = this->atom2())
+                && (term = this->term())
             ){
-                std::cout << "atom1.value(): " << atom1.value() << "\n";
-                std::cout << "atom2.value(): " << atom2.value() << "\n";
-                return Node{"expr", {atom1.value(), atom2.value()}};
+                std::cout << "expr.value(): " << expr.value() << "\n";
+                std::cout << "term.value(): " << term.value() << "\n";
+                return Node{"expr", {expr.value(), term.value()}};
             }
-            std::optional<Node> atom3;
-                std::cout << "\n### expr: atom3 \n\n";
+            reset(pos);
+                std::cout << "\n### expr: expr '-' term \n\n";
             if (true
-                && (atom3 = this->atom3())
+                && (expr = this->expr())
+                && expect("-")
+                && (term = this->term())
             ){
-                std::cout << "atom3.value(): " << atom3.value() << "\n";
-                return Node{"expr", {atom3.value()}};
+                std::cout << "expr.value(): " << expr.value() << "\n";
+                std::cout << "term.value(): " << term.value() << "\n";
+                return Node{"expr", {expr.value(), term.value()}};
+            }
+            reset(pos);
+                std::cout << "\n### expr: term \n\n";
+            if (true
+                && (term = this->term())
+            ){
+                std::cout << "term.value(): " << term.value() << "\n";
+                return Node{"expr", {term.value()}};
             }
             reset(pos);
             std::cout << "No parse found for expr\n";
@@ -92,97 +103,93 @@ public:
         return memoize("expr", inner_func, mark());
     }
 
-    std::optional<Node> atom1() {
+    std::optional<Node> term() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<Node> {
-           int pos = mark();
-            std::optional<Token> name;
-                std::cout << "\n### atom1: name \n\n";
+            int pos = mark();
+            std::optional<Node> term;
+            std::optional<Node> atom;
+                std::cout << "\n### term: term '*' atom \n\n";
             if (true
-                && (name = expect(TokenType::NAME))
+                && (term = this->term())
+                && expect("*")
+                && (atom = this->atom())
             ){
-                std::cout << "name.value().value: " << name.value().value << "\n";
-                return Node{"atom1", {name.value().value}};
-            }
-            std::optional<Token> number;
-                std::cout << "\n### atom1: number \n\n";
-            if (true
-                && (number = expect(TokenType::NUMBER))
-            ){
-                std::cout << "number.value().value: " << number.value().value << "\n";
-                return Node{"atom1", {number.value().value}};
+                std::cout << "term.value(): " << term.value() << "\n";
+                std::cout << "atom.value(): " << atom.value() << "\n";
+                return Node{"term", {term.value(), atom.value()}};
             }
             reset(pos);
-            std::cout << "No parse found for atom1\n";
+                std::cout << "\n### term: term '/' atom \n\n";
+            if (true
+                && (term = this->term())
+                && expect("/")
+                && (atom = this->atom())
+            ){
+                std::cout << "term.value(): " << term.value() << "\n";
+                std::cout << "atom.value(): " << atom.value() << "\n";
+                return Node{"term", {term.value(), atom.value()}};
+            }
+            reset(pos);
+                std::cout << "\n### term: atom \n\n";
+            if (true
+                && (atom = this->atom())
+            ){
+                std::cout << "atom.value(): " << atom.value() << "\n";
+                return Node{"term", {atom.value()}};
+            }
+            reset(pos);
+            std::cout << "No parse found for term\n";
             return {};
         };
 
-        std::cout << "Parsing atom1\n";
-        return memoize("atom1", inner_func, mark());
+        std::cout << "Parsing term\n";
+        return memoize("term", inner_func, mark());
     }
 
-    std::optional<Node> atom2() {
+    std::optional<Node> atom() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<Node> {
-           int pos = mark();
+            int pos = mark();
             std::optional<Token> name;
-                std::cout << "\n### atom2: name \n\n";
+                std::cout << "\n### atom: name \n\n";
             if (true
                 && (name = expect(TokenType::NAME))
             ){
                 std::cout << "name.value().value: " << name.value().value << "\n";
-                return Node{"atom2", {name.value().value}};
+                return Node{"atom", {name.value().value}};
             }
+            reset(pos);
             std::optional<Token> number;
-                std::cout << "\n### atom2: number \n\n";
+                std::cout << "\n### atom: number \n\n";
             if (true
                 && (number = expect(TokenType::NUMBER))
             ){
                 std::cout << "number.value().value: " << number.value().value << "\n";
-                return Node{"atom2", {number.value().value}};
+                return Node{"atom", {number.value().value}};
             }
             reset(pos);
-            std::cout << "No parse found for atom2\n";
+            std::optional<Node> expr;
+                std::cout << "\n### atom: '(' expr ')' \n\n";
+            if (true
+                && expect("(")
+                && (expr = this->expr())
+                && expect(")")
+            ){
+                std::cout << "expr.value(): " << expr.value() << "\n";
+                return Node{"atom", {expr.value()}};
+            }
+            reset(pos);
+            std::cout << "No parse found for atom\n";
             return {};
         };
 
-        std::cout << "Parsing atom2\n";
-        return memoize("atom2", inner_func, mark());
-    }
-
-    std::optional<Node> atom3() {
-
-        // inner_func does the actual parsing but is called later by
-        // to enable memoization
-        auto inner_func = [&, this]() -> std::optional<Node> {
-           int pos = mark();
-            std::optional<Token> name;
-                std::cout << "\n### atom3: name \n\n";
-            if (true
-                && (name = expect(TokenType::NAME))
-            ){
-                std::cout << "name.value().value: " << name.value().value << "\n";
-                return Node{"atom3", {name.value().value}};
-            }
-            std::optional<Token> number;
-                std::cout << "\n### atom3: number \n\n";
-            if (true
-                && (number = expect(TokenType::NUMBER))
-            ){
-                std::cout << "number.value().value: " << number.value().value << "\n";
-                return Node{"atom3", {number.value().value}};
-            }
-            reset(pos);
-            std::cout << "No parse found for atom3\n";
-            return {};
-        };
-
-        std::cout << "Parsing atom3\n";
-        return memoize("atom3", inner_func, mark());
+        std::cout << "Parsing atom\n";
+        return memoize("atom", inner_func, mark());
     }
 
     std::optional<Node> statement_end() {
@@ -190,7 +197,7 @@ public:
         // inner_func does the actual parsing but is called later by
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<Node> {
-           int pos = mark();
+            int pos = mark();
             std::optional<Token> newline;
                 std::cout << "\n### statement_end: newline \n\n";
             if (true
@@ -199,6 +206,7 @@ public:
                 std::cout << "newline.value().value: " << newline.value().value << "\n";
                 return Node{"statement_end", {newline.value().value}};
             }
+            reset(pos);
             std::optional<Token> semicolon;
                 std::cout << "\n### statement_end: semicolon \n\n";
             if (true
