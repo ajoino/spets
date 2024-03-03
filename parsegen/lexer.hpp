@@ -17,6 +17,7 @@ enum class TokenType {
   DOT,
   BANG,
   PIPE,
+  STAR,
   INDENT,
   UNINDENT,
   NEWLINE,

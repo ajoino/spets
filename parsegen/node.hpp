@@ -3,8 +3,11 @@
 #include <string>
 #include <vector>
 #include <ostream>
+#include <iostream>
 
 #include "lexer.hpp"
+struct Node;
+inline std::ostream &operator<<(std::ostream &os, const Node &n);
 
 struct Node {
   std::string node_type;
@@ -14,7 +17,7 @@ struct Node {
   Node(std::string nt, std::string t, std::vector<Node> chdn) = delete;
   Node(std::string nt, std::string t) : node_type(nt), text(t), children{} {};
   Node(std::string nt, std::vector<Node> chdn) : node_type{nt}, text{}, children{} {
-    for (const auto& child : children) {
+    for (const auto child : chdn) {
         add_child(child);
     }
   }

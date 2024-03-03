@@ -1,7 +1,9 @@
-statement: assignment | expr | if_statement
+start: statement
+statement: assignment statement_end | expr statement_end | if_statement statement_end
 expr: expr '+' term | expr '-' term | term
 term: term '*' atom | term '/' atom | atom
 atom: NAME | NUMBER | '(' expr ')'
 assignment: target '=' expr
 target: NAME
+statement_end: NEWLINE | SEMICOLON
 if_statement: 'if' expr ':' statement

@@ -32,6 +32,8 @@ const char *token_type_to_string(TokenType t) noexcept {
     return "BANG";
   case TokenType::PIPE:
     return "PIPE";
+  case TokenType::STAR:
+    return "STAR";
   case TokenType::INDENT:
     return "INDENT";
   case TokenType::UNINDENT:
@@ -207,9 +209,11 @@ ScanResult scan_token(Lexer &lexer) {
     return {Token::from_lexer(TokenType::BANG, lexer), lexer};
   case '|':
     return {Token::from_lexer(TokenType::PIPE, lexer), lexer};
+  case '*':
+    return {Token::from_lexer(TokenType::STAR, lexer), lexer};
   }
 
-  if (auto res = ctre::starts_with<"([_a-zA-Z][_a-zA-Z0-9]*)|([<>*+/\\-|]+)">(
+  if (auto res = ctre::starts_with<"([_a-zA-Z][_a-zA-Z0-9]*)|([<>*+=/\\-|]+)">(
           lexer.start, lexer.end)) {
     // Identifiers
     for (int i = 1; i < res.size(); i++) {

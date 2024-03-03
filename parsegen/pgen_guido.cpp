@@ -158,24 +158,13 @@ std::stringstream generate_parser_class(std::vector<Rule> rules) {
   stream << "class Toyparser : public Parser {\npublic:\n";
   for (const auto &rule : rules) {
     bool is_lr = is_left_recursive(rule);
-    stream << "    std::optional<Node> " << rule.name << "() {\n";
-    stream << "        int pos = mark();\n";
-    stream << "        std::map<std::string, std::pair<std::optional<Node>, int>> memo;\n";
-    stream << "        if (!memos.contains(pos)) { memo = memos[pos] = {};} else { memo = memos[pos]; }\n";
-    stream << "        std::string key = \"" << rule.name << "\";\n";
-    stream << "        if (memo.contains(key)) {\n";
-    stream << "             auto [res, endpos] = memo[key];\n";
-    stream << "             reset(endpos);\n";
-    stream << "             return res;\n";
-    if (is_lr) {
-        stream << "        } else {\n";
-        stream << "            auto [lastres, lastpos] = memo[key] = std::pair<std::optional<Node>, int>{std::nullopt, pos};\n";
-        // stream << "            memo[key] = {std::nullopt, lastpos};\n";
-        stream << "        }\n";
-    } else {
-        stream << "        }\n";
-    }
 
+    stream << "    std::optional<Node> " << rule.name << "() {\n\n";
+
+    stream << "        // inner_func does the actual parsing but is called later by\n";
+    stream << "        // to enable memoization\n";
+    stream << "        auto inner_func = [&, this]() -> std::optional<Node> {\n";
+    stream << "           int pos = mark();\n";
     std::vector<std::string> vars;
     for (const auto &alt : rule.alts) {
       std::vector<std::string> items;
@@ -184,18 +173,23 @@ std::stringstream generate_parser_class(std::vector<Rule> rules) {
         if (!(item.starts_with("'") || item.starts_with("\"")) &&
             !in_vector(vars, var_name)) {
           if (all_upper(item)) {
-            stream << "        std::optional<Token> " << var_name << ";\n";
+            stream << "            std::optional<Token> " << var_name << ";\n";
           } else {
-            stream << "        std::optional<Node> " << var_name << ";\n";
+            stream << "            std::optional<Node> " << var_name << ";\n";
           }
           vars.push_back(item);
         }
       }
-      stream << "        if (true\n";
+      stream << "                std::cout << \"\\n### " << rule.name << ": ";
+      for (const auto &item : alt) {
+         stream << str_tolower(item) << " ";
+      }
+      stream << "\\n\\n\";\n";
+      stream << "            if (true\n";
       for (const auto &item : alt) {
         if (item.starts_with("'") || item.starts_with("\"")) {
           std::string string_item_inner{item.begin() + 1, item.end() - 1};
-          stream << "            && expect(\"" << string_item_inner << "\")\n";
+          stream << "                && expect(\"" << string_item_inner << "\")\n";
         } else {
           auto var = str_tolower(item);
           if (in_vector(items, var)) {
@@ -203,31 +197,49 @@ std::stringstream generate_parser_class(std::vector<Rule> rules) {
           }
           if (all_upper(item)) {
             items.push_back(var + ".value().value");
-            stream << "            && (" << var
+            stream << "                && (" << var
                    << " = expect(TokenType::" << item << "))\n";
           } else {
             items.push_back(var + ".value()");
-            stream << "            && (" << var << " = this->" << item
+            stream << "                && (" << var << " = this->" << item
                    << "())\n";
           }
         }
       }
-      stream << "        ){\n";
-      stream << "            Node res(\"" << rule.name << "\", {";
+      stream << "            ){\n";
+      // stream << "                std::cout << \"";
+      // for (const auto& item : items) {
+      //   stream << item << " ";
+      // }
+      // stream << "\"\\n;\n";
+
+      for (int i = 0; i < items.size(); i++) {
+        stream << "                std::cout << \"" << items[i] << ": \" << " << items[i] << " << \"\\n\";\n";
+      }
+      // stream << "                std::cout << "
+      stream << "                return Node{\"" << rule.name << "\", {";
       for (int i = 0; i < items.size(); i++) {
         stream << items[i];
         if (i != items.size() - 1) {
           stream << ", ";
         }
       }
-      stream << "});\n";
-      stream << "            int endpos = mark();\n";
-      stream << "            memo[key] = {res, endpos};\n";
-      stream << "            return res;\n";
-      stream << "        }\n";
+      stream << "}};\n";
+      stream << "            }\n";
     }
-    stream << "        reset(pos);\n";
-    stream << "        return {};\n";
+    stream << "            reset(pos);\n";
+    stream << "            std::cout << \"No parse found for " << rule.name << "\\n\";\n";
+    stream << "            return {};\n";
+
+    stream << "        };\n\n";
+
+    // if (is_lr) {
+    //     stream << "        return memoize_left_rec(\"" << rule.name << "\", inner_func);\n";
+    // } else {
+        stream << "        std::cout << \"Parsing " << rule.name << "\\n\";\n";
+        stream << "        return memoize(\"" << rule.name << "\", inner_func, mark());\n";
+    // }
+
     stream << "    }\n\n";
   }
   stream << "};\n\n\n";
@@ -243,9 +255,13 @@ int main(int argc, char**argv) {
 
   Toyparser p{t};
 
-  auto nodes = p.statement();
+  auto nodes = p.start();
   if (nodes) {
     std::cout << nodes.value() << "\n";
+    std::cout << "number of children " << nodes.value().children.size() << "\n";
+    for (const auto& child : nodes.value().children) {
+        std::cout << child << "\n";
+    }
   } else {
     std::cout << "Could not parse content.\n";
   }
