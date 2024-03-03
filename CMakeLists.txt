@@ -5,7 +5,7 @@ project(spets)
 
 # set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_COMPILER clang++-17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++23 -stdlib=libc++")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++23 -stdlib=libc++ -g")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_compile_options(-fsanitize=address)
