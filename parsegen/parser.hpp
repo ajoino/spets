@@ -3,6 +3,7 @@
 #include <map>
 #include <optional>
 #include <variant>
+#include <memory>
 
 #include "lexer.hpp"
 #include "node.hpp"
@@ -34,8 +35,21 @@ protected:
   };
 
   struct MemoValue {
-    std::variant<LR, std::optional<Node>> res;
+    std::variant<std::shared_ptr<LR>, std::optional<Node>> res;
     int endpos;
+    friend std::ostream &operator<<(std::ostream &os, const MemoValue &mv) {
+      os << "(";
+      if (std::holds_alternative<std::shared_ptr<LR>>(mv.res)) {
+        os << (std::get<std::shared_ptr<LR>>(mv.res)->detected ? "LR(true)"
+                                                               : "LR(false)");
+      } else if (auto r = std::get<std::optional<Node>>(mv.res)) {
+        os << r.value();
+      } else {
+        os << "std::nullopt";
+      }
+      os << ", " << mv.endpos << ")";
+      return os;
+    }
   };
 
   std::map<MemoKey, MemoValue> memo;
@@ -74,7 +88,7 @@ protected:
 
     if (!memo.contains(key)) {
       std::cout << "Memoization cache is empty.\n";
-      LR lr(false);
+      auto lr = std::make_shared<LR>(false);
       memo[key] = MemoValue(lr, pos);
       std::cout << "Calling parsing function for rule: " << func_name << " at pos: " << pos << "\n";
       auto res = func();
@@ -87,7 +101,7 @@ protected:
       memo[key].res = res;
       memo[key].endpos = mark();
       std::cout << "\tendpos: " << memo[key].endpos << "\n";
-      if (lr.detected && res != std::nullopt) {
+      if (lr->detected && res != std::nullopt) {
         std::cout << "Left recursion detected in rule: " << func_name << " at pos: " << pos << "\n";
         return grow_lr(func_name, func, pos, key, NULL);
       } else {
@@ -96,11 +110,11 @@ protected:
       }
     } else {
       reset(memo[key].endpos);
-      if (std::holds_alternative<LR>(memo[key].res)) {
-        std::cout << "LR before: " << std::get<LR>(memo[key].res).detected
+      if (std::holds_alternative<std::shared_ptr<LR>>(memo[key].res)) {
+        std::cout << "LR before: " << std::get<std::shared_ptr<LR>>(memo[key].res)->detected
                   << "\n";
-        std::get<LR>(memo[key].res).detected = true;
-        std::cout << "LR after: " << std::get<LR>(memo[key].res).detected
+        std::get<std::shared_ptr<LR>>(memo[key].res)->detected = true;
+        std::cout << "LR after: " << std::get<std::shared_ptr<LR>>(memo[key].res)->detected
                   << "\n";
         return std::nullopt;
       }
