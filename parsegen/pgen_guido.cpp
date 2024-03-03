@@ -64,8 +64,12 @@ public:
         stream << indentation << input;
     }
 
-    std::stringstream& generate_parser(const std::vector<Rule>& rules) {
-        // std::stringstream stream;
+    std::stringstream& generate_parser(const std::optional<std::vector<Rule>>& maybe_rules) {
+        if (!maybe_rules) {
+            std::cout << "Cannot generate parser from no rules.\n";
+            return stream;
+        }
+        auto rules = maybe_rules.value();
         stream << R"preamble(#include <optional>
 #include <fstream>
 #include <optional>
@@ -180,120 +184,6 @@ int main(int argc, char**argv) {
     }
 };
 
-std::stringstream generate_parser_class(const std::vector<Rule>& rules) {
-    std::stringstream stream;
-    stream << R"preamble(#include <optional>
-#include <fstream>
-#include <optional>
-
-#include "node.hpp"
-#include "lexer.hpp"
-#include "parser.hpp"
-    
-)preamble";
-    stream << "class Toyparser : public Parser {\npublic:\n";
-    for (const auto& rule : rules) {
-
-        stream << "    std::optional<Node> " << rule.name << "() {\n\n";
-
-        stream << "        // inner_func does the actual parsing but is called "
-                  "later by\n";
-        stream << "        // to enable memoization\n";
-        stream << "        auto inner_func = [&, this]() -> "
-                  "std::optional<Node> {\n";
-        stream << "            int pos = mark();\n";
-        std::vector<std::string> vars;
-        for (const auto& alt : rule.alts) {
-            std::vector<std::string> items;
-            for (const auto& item : alt.items) {
-                std::string var_name = str_tolower(item);
-                if (!(item.starts_with("'") || item.starts_with("\"")) && !in_vector(vars, var_name)) {
-                    if (all_upper(item)) {
-                        stream << "            std::optional<Token> " << var_name << ";\n";
-                    } else {
-                        stream << "            std::optional<Node> " << var_name << ";\n";
-                    }
-                    vars.push_back(item);
-                }
-            }
-            stream << "            std::cout << \"\\n### " << rule.name << ": ";
-            for (const auto& item : alt.items) {
-                stream << str_tolower(item) << " ";
-            }
-            stream << "\\n\\n\";\n";
-            stream << "            if (true\n";
-            for (const auto& item : alt.items) {
-                if (item.starts_with("'") || item.starts_with("\"")) {
-                    std::string string_item_inner{item.begin() + 1, item.end() - 1};
-                    stream << "                && expect(\"" << string_item_inner << "\")\n";
-                } else {
-                    auto var = str_tolower(item);
-                    if (in_vector(items, var)) {
-                        var += std::to_string(items.size());
-                    }
-                    if (all_upper(item)) {
-                        items.push_back(var + ".value().value");
-                        stream << "                && (" << var << " = expect(TokenType::" << item << "))\n";
-                    } else {
-                        items.push_back(var + ".value()");
-                        stream << "                && (" << var << " = this->" << item << "())\n";
-                    }
-                }
-            }
-            stream << "            ){\n";
-
-            for (const auto& item : items) {
-                stream << "                std::cout << \"" << item << ": \" << " << item << " << \"\\n\";\n";
-            }
-            // stream << "                std::cout << "
-            stream << "                return Node{\"" << rule.name << "\", {";
-            for (int i = 0; i < items.size(); i++) {
-                stream << items[i];
-                if (i != items.size() - 1) {
-                    stream << ", ";
-                }
-            }
-            stream << "}};\n";
-            stream << "            }\n";
-            stream << "            reset(pos);\n";
-        }
-        stream << "            std::cout << \"No parse found for " << rule.name << "\\n\";\n";
-        stream << "            return {};\n";
-
-        stream << "        };\n\n";
-
-        stream << "        std::cout << \"Parsing " << rule.name << "\\n\";\n";
-        stream << "        return memoize(\"" << rule.name << "\", inner_func, mark());\n";
-
-        stream << "    }\n\n";
-    }
-    stream << "};\n\n\n";
-
-    stream << R"main_func(
-int main(int argc, char**argv) {
-  std::fstream fin{argv[1], std::fstream::in};
-  std::string content((std::istreambuf_iterator<char>(fin)),
-                      (std::istreambuf_iterator<char>()));
-  fin.close();
-    
-  Tokenizer t{content};
-
-  Toyparser p{t};
-
-  auto nodes = p.start();
-  if (nodes) {
-    std::cout << nodes.value() << "\n";
-    std::cout << "number of children " << nodes.value().children.size() << "\n";
-    for (const auto& child : nodes.value().children) {
-        std::cout << child << "\n";
-    }
-  } else {
-    std::cout << "Could not parse content.\n";
-  }
-}
-    )main_func";
-    return stream;
-}
 
 int main(int argc, char** argv) {
     auto args = std::span(argv, size_t(argc));
@@ -310,7 +200,7 @@ int main(int argc, char** argv) {
     if (rules) {
         std::cout << rules.value();
         std::fstream fout{"parsegen/generated_parser.cpp", std::fstream::out};
-        fout << generate_parser_class(rules.value()).str();
+        fout << Generator().generate_parser(rules).rdbuf();
         return 0;
     }
     std::cout << "Could not generated parser.\n";
