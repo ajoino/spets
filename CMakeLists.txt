@@ -18,7 +18,7 @@ include_directories(${PROJECT_SOURCE_DIR})
 add_executable(spetsc spets/spetsc.cpp parsegen/lexer.cpp)
 target_include_directories(spetsc PRIVATE ${PROJECT_SOURCE_DIR})
 
-add_executable(pgen parsegen/pgen_guido.cpp parsegen/peg_parser.cpp parsegen/lexer.cpp)
+add_executable(pgen parsegen/pgen_guido.cpp parsegen/lexer.cpp)
 target_include_directories(pgen PRIVATE ${PROJECT_SOURCE_DIR})
 
 add_executable(parser parsegen/generated_parser.cpp parsegen/lexer.cpp)

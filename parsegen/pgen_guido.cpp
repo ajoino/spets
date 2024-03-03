@@ -12,11 +12,6 @@
 class GrammarParser : public Parser {
 public:
 
-    bool skip_ws() {
-        expect(TokenType::WHITESPACE);
-        return true;
-    }
-
     std::optional<std::vector<Rule>> grammar() {
         std::cout << "\"grammar\" at pos: " << mark() << "\n";
         int pos = mark();

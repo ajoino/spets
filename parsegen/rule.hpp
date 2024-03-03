@@ -12,3 +12,8 @@ struct Rule {
     }
 };
 
+struct Alt { 
+    std::vector<std::string> items;
+    std::string action;
+};
+

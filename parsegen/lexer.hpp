@@ -11,6 +11,8 @@ enum class TokenType {
   WHITESPACE,
   LPAREN,
   RPAREN,
+  LCURL,
+  RCURL,
   DOUBLEQUOTE,
   COMMA,
   SEMICOLON,

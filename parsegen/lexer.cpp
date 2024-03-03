@@ -20,6 +20,10 @@ const char *token_type_to_string(TokenType t) noexcept {
     return "LPAREN";
   case TokenType::RPAREN:
     return "RPAREN";
+  case TokenType::LCURL:
+    return "LCURL";
+  case TokenType::RCURL:
+    return "RCURL";
   case TokenType::DOUBLEQUOTE:
     return "DOUBLEQUOTE";
   case TokenType::COMMA:
@@ -199,6 +203,10 @@ ScanResult scan_token(Lexer &lexer) {
     return {Token::from_lexer(TokenType::LPAREN, lexer), lexer};
   case ')':
     return {Token::from_lexer(TokenType::RPAREN, lexer), lexer};
+  case '{':
+    return {Token::from_lexer(TokenType::LCURL, lexer), lexer};
+  case '}':
+    return {Token::from_lexer(TokenType::RCURL, lexer), lexer};
   case ',':
     return {Token::from_lexer(TokenType::COMMA, lexer), lexer};
   case ':':
