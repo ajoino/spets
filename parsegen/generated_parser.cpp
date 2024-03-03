@@ -76,20 +76,23 @@ public:
                 return Node{"expr", {expr.value(), term.value()}};
             }
             reset(pos);
-            std::optional<Node> /;
-            std::cout << "\n### expr: expr '-' term / term \n\n";
+            std::cout << "\n### expr: expr '-' term \n\n";
             if (true
                 && (expr = this->expr())
                 && expect("-")
                 && (term = this->term())
-                && (/ = this->/())
-                && (term = this->term())
             ){
                 std::cout << "expr.value(): " << expr.value() << "\n";
                 std::cout << "term.value(): " << term.value() << "\n";
-                std::cout << "/.value(): " << /.value() << "\n";
+                return Node{"expr", {expr.value(), term.value()}};
+            }
+            reset(pos);
+            std::cout << "\n### expr: term \n\n";
+            if (true
+                && (term = this->term())
+            ){
                 std::cout << "term.value(): " << term.value() << "\n";
-                return Node{"expr", {expr.value(), term.value(), /.value(), term.value()}};
+                return Node{"expr", {term.value()}};
             }
             reset(pos);
             std::cout << "No parse found for expr\n";
@@ -108,27 +111,34 @@ public:
             int pos = mark();
             std::optional<Node> term;
             std::optional<Node> atom;
-            std::optional<Node> /;
-            std::cout << "\n### term: term '*' atom / term '/' atom / atom \n\n";
+            std::cout << "\n### term: term '*' atom \n\n";
             if (true
                 && (term = this->term())
                 && expect("*")
                 && (atom = this->atom())
-                && (/ = this->/())
+            ){
+                std::cout << "term.value(): " << term.value() << "\n";
+                std::cout << "atom.value(): " << atom.value() << "\n";
+                return Node{"term", {term.value(), atom.value()}};
+            }
+            reset(pos);
+            std::cout << "\n### term: term '/' atom \n\n";
+            if (true
                 && (term = this->term())
                 && expect("/")
-                && (atom = this->atom())
-                && (/ = this->/())
                 && (atom = this->atom())
             ){
                 std::cout << "term.value(): " << term.value() << "\n";
                 std::cout << "atom.value(): " << atom.value() << "\n";
-                std::cout << "/.value(): " << /.value() << "\n";
-                std::cout << "term.value(): " << term.value() << "\n";
+                return Node{"term", {term.value(), atom.value()}};
+            }
+            reset(pos);
+            std::cout << "\n### term: atom \n\n";
+            if (true
+                && (atom = this->atom())
+            ){
                 std::cout << "atom.value(): " << atom.value() << "\n";
-                std::cout << "/.value(): " << /.value() << "\n";
-                std::cout << "atom.value(): " << atom.value() << "\n";
-                return Node{"term", {term.value(), atom.value(), /.value(), term.value(), atom.value(), /.value(), atom.value()}};
+                return Node{"term", {atom.value()}};
             }
             reset(pos);
             std::cout << "No parse found for term\n";
@@ -146,25 +156,32 @@ public:
         auto inner_func = [&, this]() -> std::optional<Node> {
             int pos = mark();
             std::optional<Node> expr;
-            std::optional<Node> /;
-            std::optional<Token> name;
-            std::optional<Token> number;
-            std::cout << "\n### atom: '(' expr ')' / name / number \n\n";
+            std::cout << "\n### atom: '(' expr ')' \n\n";
             if (true
                 && expect("(")
                 && (expr = this->expr())
                 && expect(")")
-                && (/ = this->/())
-                && (name = expect(TokenType::NAME))
-                && (/ = this->/())
-                && (number = expect(TokenType::NUMBER))
             ){
                 std::cout << "expr.value(): " << expr.value() << "\n";
-                std::cout << "/.value(): " << /.value() << "\n";
+                return Node{"atom", {expr.value()}};
+            }
+            reset(pos);
+            std::optional<Token> name;
+            std::cout << "\n### atom: name \n\n";
+            if (true
+                && (name = expect(TokenType::NAME))
+            ){
                 std::cout << "name.value().value: " << name.value().value << "\n";
-                std::cout << "/.value(): " << /.value() << "\n";
+                return Node{"atom", {name.value().value}};
+            }
+            reset(pos);
+            std::optional<Token> number;
+            std::cout << "\n### atom: number \n\n";
+            if (true
+                && (number = expect(TokenType::NUMBER))
+            ){
                 std::cout << "number.value().value: " << number.value().value << "\n";
-                return Node{"atom", {expr.value(), /.value(), name.value().value, /.value(), number.value().value}};
+                return Node{"atom", {number.value().value}};
             }
             reset(pos);
             std::cout << "No parse found for atom\n";
@@ -182,18 +199,21 @@ public:
         auto inner_func = [&, this]() -> std::optional<Node> {
             int pos = mark();
             std::optional<Token> newline;
-            std::optional<Node> /;
-            std::optional<Token> semicolon;
-            std::cout << "\n### statement_end: newline / semicolon \n\n";
+            std::cout << "\n### statement_end: newline \n\n";
             if (true
                 && (newline = expect(TokenType::NEWLINE))
-                && (/ = this->/())
-                && (semicolon = expect(TokenType::SEMICOLON))
             ){
                 std::cout << "newline.value().value: " << newline.value().value << "\n";
-                std::cout << "/.value(): " << /.value() << "\n";
+                return Node{"statement_end", {newline.value().value}};
+            }
+            reset(pos);
+            std::optional<Token> semicolon;
+            std::cout << "\n### statement_end: semicolon \n\n";
+            if (true
+                && (semicolon = expect(TokenType::SEMICOLON))
+            ){
                 std::cout << "semicolon.value().value: " << semicolon.value().value << "\n";
-                return Node{"statement_end", {newline.value().value, /.value(), semicolon.value().value}};
+                return Node{"statement_end", {semicolon.value().value}};
             }
             reset(pos);
             std::cout << "No parse found for statement_end\n";

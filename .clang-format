@@ -1,0 +1,23 @@
+---
+IndentWidth: 4
+---
+Language: Cpp
+Standard: Latest
+AccessModifierOffset: -4
+AlignAfterOpenBracket: BlockIndent
+AlignEscapedNewlines: Right
+AllowShortBlocksOnASingleLine: Empty
+AllowShortEnumsOnASingleLine: true
+BinPackArguments: true
+BinPackParameters: true
+BreakBeforeBinaryOperators: All
+BreakBeforeConceptDeclarations: Always
+BreakConstructorInitializers: AfterColon
+ColumnLimit: 120
+EmptyLineAfterAccessModifier: Always
+IndentRequiresClause: true
+InsertNewlineAtEOF: true
+PointerAlignment: Left
+RequiresExpressionIndentation: OuterScope
+SeparateDefinitionBlocks: Always
+SpaceAfterTemplateKeyword: true

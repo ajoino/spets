@@ -1,0 +1,10 @@
+Checks: 'bugprone-*,
+           -bugprone-easily-swappable-parameters
+         clang-analyzer-*,
+         concurrency-*,
+         cppcoreguidelines-*,
+         modernize-*
+           -modernize-use-trailing-return-type,
+         readability-*,
+           -readability-function-cognitive-complexity,
+           -readability-identifier-length,'

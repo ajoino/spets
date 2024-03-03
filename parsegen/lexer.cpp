@@ -6,8 +6,8 @@
 #include "ctre.hpp"
 #include <parsegen/lexer.hpp>
 
-const char *token_type_to_string(TokenType t) noexcept {
-  switch (t) {
+const char *token_type_to_string(TokenType tok) noexcept {
+  switch (tok) {
   case TokenType::NAME:
     return "NAME";
   case TokenType::STRING:
@@ -233,7 +233,7 @@ ScanResult scan_token(Lexer &lexer) {
     }
     return ScanResult{Token::from_lexer(TokenType::NAME, lexer), lexer};
   } else if (auto res = ctre::starts_with<
-                 "(\"\"\"[\\w+\\-*/()=:]*\"\"\")|('''[\\w+\\-*/()=:]*''')|(\"[\\w+\\-*/()=:]*\")|('[\\w+\\-*/()=:]*')">(
+                 R"(("""[\w+\-*/()=:]*""")|('''[\w+\-*/()=:]*''')|("[\w+\-*/()=:]*")|('[\w+\-*/()=:]*'))">(
                  lexer.start, lexer.end)) {
     // String literals
     std::cout << "res: " << res << "\n";

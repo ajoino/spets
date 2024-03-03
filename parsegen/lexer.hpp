@@ -27,26 +27,22 @@ enum class TokenType {
   ENDOFFILE,
   ERROR,
 };
-const char *token_type_to_string(TokenType t) noexcept;
+const char *token_type_to_string(TokenType tok) noexcept;
 
 struct Lexer {
   std::string::iterator start;
   std::string::iterator end;
   std::string::iterator current;
-  int line;
-  int column;
+  int line{};
+  int column{};
   std::vector<int> indent_depth_stack;
 
   Lexer(std::string &buffer)
-      : start(buffer.begin()), end(buffer.end()), current(buffer.begin()),
-        line(1), column(1){};
+      : start(buffer.begin()), end(buffer.end()), current(buffer.begin()) {};
 
   ~Lexer() = default;
 
-  Lexer(const Lexer &other)
-      : start(other.start), end(other.end), current(other.current),
-        line(other.line), column(other.column),
-        indent_depth_stack(other.indent_depth_stack){};
+  Lexer(const Lexer &other) = default;
   Lexer &operator=(const Lexer &other) {
     this->start = other.start;
     this->end = other.end;
@@ -63,7 +59,7 @@ struct Lexer {
   const bool is_at_end(); // { return current == end; }
   const char advance();
   const char peek();
-  const std::string match(const std::string_view s);
+  const std::string match(std::string_view s);
 
   void push_indent(int steps);
   const int get_indent();
@@ -72,7 +68,7 @@ struct Lexer {
 
 struct Token {
   TokenType type;
-  const std::string value;
+  std::string value;
   int line;
   int column;
 
@@ -99,12 +95,12 @@ ScanResult scan_token(Lexer &lexer);
 class Tokenizer {
   Lexer lexer;
   std::vector<Token> tokens;
-  int pos;
+  int pos{};
 
 public:
-  Tokenizer(Lexer lexer) : lexer{lexer}, tokens{}, pos{0} {};
+  Tokenizer(Lexer lexer) : lexer{lexer} {};
 
-  int mark() const { return pos; }
+  [[nodiscard]] int mark() const { return pos; }
   void reset(int new_pos) { pos = new_pos; }
 
   Token get_token() {
