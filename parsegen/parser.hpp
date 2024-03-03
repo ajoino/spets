@@ -90,14 +90,14 @@ protected:
         return true;
     }
 
-    void setup_lr(const std::string& rule_name, LR& L) {
-        if (!L.head) {
-            L.head = Head(rule_name, {}, {});
+    void setup_lr(const std::string& rule_name, std::shared_ptr<LR>& L) {
+        if (!L->head) {
+            L->head = Head(rule_name, {}, {});
         }
         auto& s = lr_stack;
-        while (s->head != L.head) {
-            s->head = L.head;
-            L.head->involved_set.insert(s->rule);
+        while (s->head != L->head) {
+            s->head = L->head;
+            L->head->involved_set.insert(s->rule);
             s = std::move(s->next);
         }
     }
@@ -168,6 +168,7 @@ protected:
     std::optional<Node>
     memoize(const std::string& func_name, std::function<std::optional<Node>()> func, const int pos) {
         std::cout << "Calling memoization routine for rule : " << func_name << " at pos: " << pos << "\n";
+        auto m = recall(func_name, func, pos);
         auto key = MemoKey(func_name, pos);
         for (const auto& [k, m] : memo) {
             std::cout << "\t" << k << " -> " << m;
@@ -180,34 +181,50 @@ protected:
 
         if (!memo.contains(key)) {
             std::cout << "Memoization cache is empty.\n";
-            auto lr = std::make_shared<LR>(false);
+            // Create a new LR and push it onto the rule invocation stack.
+            auto lr = std::make_shared<LR>(std::nullopt, func_name, std::nullopt, lr_stack);
+
+            // Memoize lr and evaluate parsing function
+            m = MemoValue(lr, pos);
             memo[key] = MemoValue(lr, pos);
             std::cout << "Calling parsing function for rule: " << func_name << " at pos: " << pos << "\n";
             auto res = func();
             std::cout << "Result of calling parsing function for rule: " << func_name << " at pos: " << pos << "\n\t";
+            // Pop lr off the rule invocation stack
+            lr_stack = std::move(lr_stack->next);
+            m.endpos = mark();
+            memo[key].endpos = mark();
             if (res) {
                 std::cout << res.value() << "\n";
             } else {
                 std::cout << "std::nullopt"
                           << "\n";
             }
-            memo[key].res = res;
-            memo[key].endpos = mark();
-            std::cout << "\tendpos: " << memo[key].endpos << "\n";
-            if (lr->detected && res != std::nullopt) {
-                std::cout << "Left recursion detected in rule: " << func_name << " at pos: " << pos << "\n";
-                return grow_lr(func_name, func, pos, key, NULL);
+            if (lr->head) {
+                lr->seed = res.value();
+                return lr_answer(func_name, func, pos, key);
             } else {
-                std::cout << "No left recursion detected in rule: " << func_name << " at pos: " << pos << "\n";
+                memo[key].res = res;
                 return res;
             }
+            // memo[key].res = res;
+            // memo[key].endpos = mark();
+            // std::cout << "\tendpos: " << memo[key].endpos << "\n";
+            // if (lr->detected && res != std::nullopt) {
+            //     std::cout << "Left recursion detected in rule: " << func_name << " at pos: " << pos << "\n";
+            //     return grow_lr(func_name, func, pos, key, NULL);
+            // } else {
+            //     std::cout << "No left recursion detected in rule: " << func_name << " at pos: " << pos << "\n";
+            //     return res;
+            // }
         } else {
             reset(memo[key].endpos);
             if (std::holds_alternative<std::shared_ptr<LR>>(memo[key].res)) {
-                std::cout << "LR before: " << std::get<std::shared_ptr<LR>>(memo[key].res)->detected << "\n";
-                std::get<std::shared_ptr<LR>>(memo[key].res)->detected = true;
-                std::cout << "LR after: " << std::get<std::shared_ptr<LR>>(memo[key].res)->detected << "\n";
-                return std::nullopt;
+                // std::cout << "LR before: " << std::get<std::shared_ptr<LR>>(memo[key].res)->detected << "\n";
+                // std::get<std::shared_ptr<LR>>(memo[key].res)->detected = true;
+                // std::cout << "LR after: " << std::get<std::shared_ptr<LR>>(memo[key].res)->detected << "\n";
+                // return std::nullopt;
+                setup_lr(func_name, std::get<std::shared_ptr<LR>>(memo[key].res));
             }
             return std::get<std::optional<Node>>(memo[key].res);
         }
