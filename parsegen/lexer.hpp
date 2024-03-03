@@ -2,121 +2,113 @@
 #define __LEXER_H__
 
 #include <string>
+#include <utility>
 #include <vector>
 
 enum class TokenType {
-  NAME,
-  STRING,
-  NUMBER,
-  WHITESPACE,
-  LPAREN,
-  RPAREN,
-  LCURL,
-  RCURL,
-  DOUBLEQUOTE,
-  COMMA,
-  SEMICOLON,
-  DOT,
-  BANG,
-  PIPE,
-  STAR,
-  SLASH,
-  INDENT,
-  UNINDENT,
-  NEWLINE,
-  ENDOFFILE,
-  ERROR,
+    NAME,
+    STRING,
+    NUMBER,
+    WHITESPACE,
+    LPAREN,
+    RPAREN,
+    LCURL,
+    RCURL,
+    DOUBLEQUOTE,
+    COMMA,
+    SEMICOLON,
+    DOT,
+    BANG,
+    PIPE,
+    STAR,
+    SLASH,
+    INDENT,
+    UNINDENT,
+    NEWLINE,
+    ENDOFFILE,
+    ERROR,
 };
-const char *token_type_to_string(TokenType tok) noexcept;
+const char* token_type_to_string(TokenType tok) noexcept;
 
 struct Lexer {
-  std::string::iterator start;
-  std::string::iterator end;
-  std::string::iterator current;
-  int line{};
-  int column{};
-  std::vector<int> indent_depth_stack;
+    std::string::iterator start;
+    std::string::iterator end;
+    std::string::iterator current;
+    int line{};
+    int column{};
+    std::vector<int> indent_depth_stack;
 
-  Lexer(std::string &buffer)
-      : start(buffer.begin()), end(buffer.end()), current(buffer.begin()) {};
+    Lexer(std::string& buffer) : start(buffer.begin()), end(buffer.end()), current(buffer.begin()){};
 
-  ~Lexer() = default;
+    ~Lexer() = default;
 
-  Lexer(const Lexer &other) = default;
-  Lexer &operator=(const Lexer &other) {
-    this->start = other.start;
-    this->end = other.end;
-    this->current = other.current;
-    this->line = other.line;
-    this->column = other.column;
-    this->indent_depth_stack = other.indent_depth_stack;
-    return *this;
-  }
+    Lexer(const Lexer& other) = default;
+    Lexer& operator=(const Lexer& other) = default;
 
-  Lexer(const Lexer &&) = delete;
-  Lexer &operator=(const Lexer &&) = delete;
+    Lexer(const Lexer&&) = delete;
+    Lexer& operator=(const Lexer&&) = delete;
 
-  const bool is_at_end(); // { return current == end; }
-  const char advance();
-  const char peek();
-  const std::string match(std::string_view s);
+    [[nodiscard]] bool is_at_end() const;
+    char advance();
+    [[nodiscard]] char peek() const;
 
-  void push_indent(int steps);
-  const int get_indent();
-  const int pop_indent();
+    void push_indent(int steps);
+    [[nodiscard]] int get_indent() const;
+    int pop_indent();
 };
 
 struct Token {
-  TokenType type;
-  std::string value;
-  int line;
-  int column;
+    TokenType type;
+    std::string value;
+    int line;
+    int column;
 
-  Token(const TokenType &token_type, const std::string &value, const int line,
-        const int column)
-      : type(token_type), value(value), line(line), column(column){};
-  Token(const Token &new_token) = default;
-  Token operator=(Token other) {
-    return Token{other.type, other.value, other.line, other.column};
-  }
-  Token &operator=(Token &other) { return other; };
+    Token(const TokenType& token_type, std::string value, const int line, const int column) :
+        type(token_type), value(std::move(value)), line(line), column(column){};
+    Token(const Token& new_token) = default;
+    Token& operator=(const Token& other) = default;
+    Token(Token&&) = default;
+    Token& operator=(Token&&) = default;
+    ~Token() = default;
 
-  static Token from_lexer(TokenType type, Lexer &lexer) noexcept;
-  friend std::ostream &operator<<(std::ostream &os, Token const &t);
+    static Token from_lexer(TokenType type, Lexer& lexer) noexcept;
+    friend std::ostream& operator<<(std::ostream& os, Token const& t);
 };
 
 struct ScanResult {
-  Token token;
-  Lexer lexer;
+    Token token;
+    Lexer lexer;
 };
 
-ScanResult scan_token(Lexer &lexer);
+ScanResult scan_token(Lexer& lexer);
 
 class Tokenizer {
-  Lexer lexer;
-  std::vector<Token> tokens;
-  int pos{};
+    Lexer lexer;
+    std::vector<Token> tokens;
+    int pos{};
 
 public:
-  Tokenizer(Lexer lexer) : lexer{lexer} {};
 
-  [[nodiscard]] int mark() const { return pos; }
-  void reset(int new_pos) { pos = new_pos; }
+    Tokenizer(const Lexer& lexer) : lexer{lexer} {};
 
-  Token get_token() {
-    Token token = peek_token();
-    pos += 1;
-    return token;
-  }
+    [[nodiscard]] int mark() const { return pos; }
 
-  Token peek_token() {
-    if (pos == tokens.size()) {
-      auto scan_result = scan_token(lexer);
-      lexer = scan_result.lexer;
-      tokens.push_back(scan_result.token);
+    void reset(int new_pos) { pos = new_pos; }
+
+    Token get_token() {
+        Token token = peek_token();
+        pos += 1;
+        return token;
     }
-    return tokens[pos];
-  }
+
+    Token peek_token() {
+        if (pos == tokens.size()) {
+            auto scan_result = scan_token(lexer);
+            lexer = scan_result.lexer;
+            tokens.push_back(scan_result.token);
+        }
+        return tokens[pos];
+    }
 };
 
 #endif // !__LEXER_H__

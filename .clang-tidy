@@ -7,4 +7,5 @@ Checks: 'bugprone-*,
            -modernize-use-trailing-return-type,
          readability-*,
            -readability-function-cognitive-complexity,
-           -readability-identifier-length,'
+           -readability-identifier-length,
+         performance-*,'
