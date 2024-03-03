@@ -2,6 +2,7 @@
 #include <iostream>
 #include <map>
 #include <optional>
+#include <variant>
 
 #include "lexer.hpp"
 #include "node.hpp"
@@ -25,8 +26,12 @@ protected:
     }
   };
 
+  struct LR {
+    bool detected;
+  };
+
   struct MemoValue {
-    std::optional<Node> res;
+    std::variant<LR, std::optional<Node>> res;
     int endpos;
   };
 
@@ -38,20 +43,65 @@ protected:
     return true;
   }
 
+  std::optional<Node> grow_lr(const std::string &func_name,
+                              std::function<std::optional<Node>()> func,
+                              const int pos, MemoKey K, int *H) {
+    std::cout << "Calling `grow_lr` for rule: " << func_name << " at pos: " << pos << "\n";
+    // More to come
+    while (true) {
+      reset(pos);
+      // More to come
+      auto res = func();
+      if (res == std::nullopt || mark() <= memo[K].endpos) {
+        break;
+      }
+      memo[K].res = res;
+      memo[K].endpos = mark();
+    }
+    // More to come
+    reset(memo[K].endpos);
+    return std::get<std::optional<Node>>(memo[K].res);
+  }
+
   std::optional<Node> memoize(const std::string &func_name,
                               std::function<std::optional<Node>()> func,
                               const int pos) {
+    std::cout << "Calling memoization routine for rule : " << func_name << " at pos: " << pos << "\n";
     auto key = MemoKey(func_name, pos);
 
     if (!memo.contains(key)) {
-      memo[key] = MemoValue(std::nullopt, pos);
+      std::cout << "Memoization cache is empty.\n";
+      LR lr(false);
+      memo[key] = MemoValue(lr, pos);
+      std::cout << "Calling parsing function for rule: " << func_name << " at pos: " << pos << "\n";
       auto res = func();
+      std::cout << "Result of calling parsing function for rule: " << func_name << " at pos: " << pos << "\n\t";
+      if (res) {
+        std::cout << res.value() << "\n";
+      } else {
+        std::cout << "std::nullopt" << "\n";
+      }
       memo[key].res = res;
       memo[key].endpos = mark();
-      return res;
+      std::cout << "\tendpos: " << memo[key].endpos << "\n";
+      if (lr.detected && res != std::nullopt) {
+        std::cout << "Left recursion detected in rule: " << func_name << " at pos: " << pos << "\n";
+        return grow_lr(func_name, func, pos, key, NULL);
+      } else {
+        std::cout << "No left recursion detected in rule: " << func_name << " at pos: " << pos << "\n";
+        return res;
+      }
     } else {
       reset(memo[key].endpos);
-      return memo[key].res;
+      if (std::holds_alternative<LR>(memo[key].res)) {
+        std::cout << "LR before: " << std::get<LR>(memo[key].res).detected
+                  << "\n";
+        std::get<LR>(memo[key].res).detected = true;
+        std::cout << "LR after: " << std::get<LR>(memo[key].res).detected
+                  << "\n";
+        return std::nullopt;
+      }
+      return std::get<std::optional<Node>>(memo[key].res);
     }
   }
 
