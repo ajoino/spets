@@ -44,8 +44,10 @@ protected:
     auto key = MemoKey(func_name, pos);
 
     if (!memo.contains(key)) {
+      memo[key] = MemoValue(std::nullopt, pos);
       auto res = func();
-      memo[key] = MemoValue(res, mark());
+      memo[key].res = res;
+      memo[key].endpos = mark();
       return res;
     } else {
       reset(memo[key].endpos);
