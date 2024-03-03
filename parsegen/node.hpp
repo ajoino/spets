@@ -1,63 +1,42 @@
-#ifndef __SPETS_NODE_H__
-#define __SPETS_NODE_H__
-#include <string>
-#include <vector>
-#include <ostream>
-#include <iostream>
+#pragma once
 
-#include "lexer.hpp"
+#include <iostream>
+#include <ostream>
+#include <string>
+#include <utility>
+#include <vector>
+
 struct Node;
-inline std::ostream &operator<<(std::ostream &os, const Node &n);
+inline std::ostream& operator<<(std::ostream& os, const Node& n);
 
 struct Node {
-  std::string node_type;
-  std::string text;
-  std::vector<Node> children;
-  
-  Node(std::string nt, std::string t, std::vector<Node> chdn) = delete;
-  Node(std::string nt, std::string t) : node_type(nt), text(t), children{} {};
-  Node(std::string nt, std::vector<Node> chdn) : node_type{nt}, text{}, children{} {
-    for (const auto child : chdn) {
-        add_child(child);
+    std::string node_type;
+    std::string text;
+    std::vector<Node> children;
+
+    Node(std::string nt, std::string t, std::vector<Node> chdn) = delete;
+    Node(std::string nt, std::string t) : node_type(std::move(nt)), text(std::move(t)) {};
+
+    Node(std::string nt, const std::vector<Node>& chdn) : node_type{std::move(nt)} {
+        for (const auto& child : chdn) {
+            add_child(child);
+        }
     }
-  }
 
-
-  Node &add_child(Node child) {
-    children.push_back(child);
-    text += child.text;
-    return *this;
-  }
+    Node& add_child(const Node& child) {
+        children.push_back(child);
+        text += child.text;
+        return *this;
+    }
 };
 
-inline std::ostream &operator<<(std::ostream &os, const Node &n) {
-  auto &ret = os << n.node_type << "_Node("
-                 << "\"" << n.text << "\"" ;
-  if (!n.children.empty()) {
-    for (const auto &child : n.children) {
-      ret << ", " << child;
+inline std::ostream& operator<<(std::ostream& os, const Node& n) {
+    auto& ret = os << n.node_type << "_Node("
+                   << "\"" << n.text << "\"";
+    if (!n.children.empty()) {
+        for (const auto& child : n.children) {
+            ret << ", " << child;
+        }
     }
-  }
-  return ret << ")";
+    return ret << ")";
 }
-
-// struct Node {
-//   std::string node_type;
-//   std::vector<Node> children;
-//
-//   Node &add_child(Node child) {
-//     children.push_back(child);
-//     return *this;
-//   }
-// };
-//
-// inline std::ostream &operator<<(std::ostream &os, const Node &n) {
-//   auto &ret = os << n.node_type << "_Node(";
-//   if (!n.children.empty()) {
-//     for (const auto &child : n.children) {
-//       ret << ", " << child;
-//     }
-//   }
-//   return ret << ")";
-// }
-#endif // __SPETS_NODE_H__
