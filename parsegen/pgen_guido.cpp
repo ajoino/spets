@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <optional>
+#include <span>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -71,7 +72,7 @@ public:
             return {};
         }
         // return items;
-        std::string action = "";
+        std::string action;
         int pos = mark();
         if (expect("{")) {
             skip_ws();
@@ -154,24 +155,14 @@ std::string str_tolower(std::string s) {
 }
 
 template <class T> bool in_vector(const std::vector<T>& vt, const T& value) {
-    for (const auto& t : vt) {
-        if (t == value) {
-            return true;
-        }
-    }
-    return false;
+    return std::ranges::any_of(vt, [&](T t) { return t == value; });
 }
 
 bool all_upper(const std::string& s) {
-    for (const auto& ch : s) {
-        if (ch < 0x41 || ch > 0x5A) {
-            return false;
-        }
-    }
-    return true;
+    return !std::ranges::all_of(s, [](char ch) { return ch < 0x41 || ch > 0x5A; });
 }
 
-std::stringstream generate_parser_class(std::vector<Rule> rules) {
+std::stringstream generate_parser_class(const std::vector<Rule>& rules) {
     std::stringstream stream;
     stream << R"preamble(#include <optional>
 #include <fstream>
@@ -232,14 +223,9 @@ std::stringstream generate_parser_class(std::vector<Rule> rules) {
                 }
             }
             stream << "            ){\n";
-            // stream << "                std::cout << \"";
-            // for (const auto& item : items) {
-            //   stream << item << " ";
-            // }
-            // stream << "\"\\n;\n";
 
-            for (int i = 0; i < items.size(); i++) {
-                stream << "                std::cout << \"" << items[i] << ": \" << " << items[i] << " << \"\\n\";\n";
+            for (const auto & item : items) {
+                stream << "                std::cout << \"" << item << ": \" << " << item << " << \"\\n\";\n";
             }
             // stream << "                std::cout << "
             stream << "                return Node{\"" << rule.name << "\", {";
@@ -292,8 +278,8 @@ int main(int argc, char**argv) {
 }
 
 int main(int argc, char** argv) {
-    // std::string input{"<-\n\n"};
-    std::fstream fin{argv[1], std::fstream::in};
+    auto args = std::span(argv, size_t(argc));
+    std::fstream fin{args[1], std::fstream::in};
     std::string content((std::istreambuf_iterator<char>(fin)), (std::istreambuf_iterator<char>()));
     fin.close();
 
@@ -303,14 +289,12 @@ int main(int argc, char** argv) {
     GrammarParser p{t};
 
     auto rules = p.grammar();
-    std::cout << rules.value();
-    // if (rules) {
-    //   std::cout << rules.value() << "\n\n\n";
-    //   std::cout << generate_parser_class(rules.value()).str();
-    // } else {
-    //   std::cout << "Could not parse content.\n";
-    // }
-
-    std::fstream fout{"parsegen/generated_parser.cpp", std::fstream::out};
-    fout << generate_parser_class(rules.value()).str();
+    if (rules) {
+        std::cout << rules.value();
+        std::fstream fout{"parsegen/generated_parser.cpp", std::fstream::out};
+        fout << generate_parser_class(rules.value()).str();
+        return 0;
+    }
+    std::cout << "Could not generated parser.\n";
+    return 1;
 }

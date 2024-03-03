@@ -1,3 +1,4 @@
+#pragma once
 #include <algorithm>
 #include <functional>
 #include <iostream>
@@ -14,7 +15,6 @@
 
 namespace rr = std::ranges;
 
-// namespace rv = rr::views;
 std::ostream& operator<<(std::ostream& os, std::optional<Node> maybe_node) {
     if (maybe_node) {
         return os << maybe_node.value();

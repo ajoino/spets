@@ -1,5 +1,4 @@
-#ifndef __LEXER_H__
-#define __LEXER_H__
+#pragma once
 
 #include <string>
 #include <utility>
@@ -110,5 +109,3 @@ public:
         return tokens[pos];
     }
 };
-
-#endif // !__LEXER_H__
