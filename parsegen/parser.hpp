@@ -3,6 +3,7 @@
 #include <map>
 #include <memory>
 #include <optional>
+#include <set>
 #include <variant>
 
 #include "lexer.hpp"
@@ -16,7 +17,14 @@ std::ostream& operator<<(std::ostream& os, std::optional<Node> maybe_node) {
 }
 
 class Parser {
+    struct Head {
+        std::string rule;
+        std::set<std::string> involved_set;
+        std::set<std::string> eval_set;
+    };
+
     Tokenizer tokenizer;
+    std::map<int, Head> heads = {};
 
 protected:
 
@@ -72,7 +80,6 @@ protected:
         return true;
     }
 
-
     std::optional<Node>
     grow_lr(const std::string& func_name, std::function<std::optional<Node>()> func, const int pos, MemoKey K, int* H) {
         std::cout << "Calling `grow_lr` for rule: " << func_name << " at pos: " << pos << "\n";
@@ -96,7 +103,7 @@ protected:
     memoize(const std::string& func_name, std::function<std::optional<Node>()> func, const int pos) {
         std::cout << "Calling memoization routine for rule : " << func_name << " at pos: " << pos << "\n";
         auto key = MemoKey(func_name, pos);
-        for (const auto &[k, m] : memo) {
+        for (const auto& [k, m] : memo) {
             std::cout << "\t" << k << " -> " << m;
             if (k.pos == pos && k.func_name == func_name) {
                 std::cout << " <- currently under consideration\n";
@@ -104,7 +111,6 @@ protected:
                 std::cout << "\n";
             }
         }
-        
 
         if (!memo.contains(key)) {
             std::cout << "Memoization cache is empty.\n";
@@ -112,8 +118,7 @@ protected:
             memo[key] = MemoValue(lr, pos);
             std::cout << "Calling parsing function for rule: " << func_name << " at pos: " << pos << "\n";
             auto res = func();
-            std::cout << "Result of calling parsing function for rule: "
-                      << func_name << " at pos: " << pos << "\n\t";
+            std::cout << "Result of calling parsing function for rule: " << func_name << " at pos: " << pos << "\n\t";
             if (res) {
                 std::cout << res.value() << "\n";
             } else {
@@ -124,26 +129,18 @@ protected:
             memo[key].endpos = mark();
             std::cout << "\tendpos: " << memo[key].endpos << "\n";
             if (lr->detected && res != std::nullopt) {
-                std::cout << "Left recursion detected in rule: " << func_name
-                          << " at pos: " << pos << "\n";
+                std::cout << "Left recursion detected in rule: " << func_name << " at pos: " << pos << "\n";
                 return grow_lr(func_name, func, pos, key, NULL);
             } else {
-                std::cout << "No left recursion detected in rule: " << func_name
-                          << " at pos: " << pos << "\n";
+                std::cout << "No left recursion detected in rule: " << func_name << " at pos: " << pos << "\n";
                 return res;
             }
         } else {
             reset(memo[key].endpos);
             if (std::holds_alternative<std::shared_ptr<LR>>(memo[key].res)) {
-                std::cout
-                    << "LR before: "
-                    << std::get<std::shared_ptr<LR>>(memo[key].res)->detected
-                    << "\n";
+                std::cout << "LR before: " << std::get<std::shared_ptr<LR>>(memo[key].res)->detected << "\n";
                 std::get<std::shared_ptr<LR>>(memo[key].res)->detected = true;
-                std::cout
-                    << "LR after: "
-                    << std::get<std::shared_ptr<LR>>(memo[key].res)->detected
-                    << "\n";
+                std::cout << "LR after: " << std::get<std::shared_ptr<LR>>(memo[key].res)->detected << "\n";
                 return std::nullopt;
             }
             return std::get<std::optional<Node>>(memo[key].res);
@@ -152,7 +149,7 @@ protected:
 
 public:
 
-    Parser(Tokenizer t) : tokenizer{t} {};
+    Parser(Tokenizer t) : tokenizer{t}, heads{} {};
 
     using ParseMethod = std::function<std::optional<Node>()>;
 

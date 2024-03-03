@@ -1,5 +1,4 @@
-#ifndef __SPETS_RULE_H__
-#define __SPETS_RULE_H__
+#pragma once
 
 #include <string>
 #include <vector>
@@ -13,4 +12,3 @@ struct Rule {
     }
 };
 
-#endif // !__SPETS_RULE_H__
