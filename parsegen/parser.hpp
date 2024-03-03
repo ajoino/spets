@@ -99,7 +99,6 @@ class Parser {
     Tokenizer tokenizer;
     std::map<int, Head> heads;
     std::vector<std::shared_ptr<LR>> lr_stack;
-
     std::map<MemoKey, MemoValue> memo;
 
 protected:
@@ -238,10 +237,6 @@ protected:
         reset(memo[key].endpos);
         std::cout << "pos is now: " << mark() << "\n";
         if (std::holds_alternative<std::shared_ptr<LR>>(memo[key].res)) {
-            // std::cout << "LR before: " << std::get<std::shared_ptr<LR>>(memo[key].res)->detected << "\n";
-            // std::get<std::shared_ptr<LR>>(memo[key].res)->detected = true;
-            // std::cout << "LR after: " << std::get<std::shared_ptr<LR>>(memo[key].res)->detected << "\n";
-            // return std::nullopt;
             setup_lr(func_name, std::get<std::shared_ptr<LR>>(memo[key].res));
             return std::get<std::shared_ptr<LR>>(memo[key].res)->seed;
         }
