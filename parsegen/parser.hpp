@@ -21,10 +21,21 @@ class Parser {
         std::string rule;
         std::set<std::string> involved_set;
         std::set<std::string> eval_set;
+
+        auto operator<=>(const Head&) const = default;
+    };
+
+    struct LR {
+        // bool detected;
+        Node seed;
+        std::string rule;
+        std::optional<Head> head;
+        std::unique_ptr<LR> next;
     };
 
     Tokenizer tokenizer;
-    std::map<int, Head> heads = {};
+    std::map<int, Head> heads;
+    std::unique_ptr<LR> lr_stack;
 
 protected:
 
@@ -51,10 +62,6 @@ protected:
         }
     };
 
-    struct LR {
-        bool detected;
-    };
-
     struct MemoValue {
         std::variant<std::shared_ptr<LR>, std::optional<Node>> res;
         int endpos;
@@ -78,6 +85,18 @@ protected:
     bool skip_ws() {
         if (expect(TokenType::WHITESPACE)) {}
         return true;
+    }
+
+    void setup_lr(std::string& rule_name, LR& L) {
+        if (!L.head) {
+            L.head = Head(rule_name, {}, {});
+        }
+        auto& s = lr_stack;
+        while (s->head != L.head) {
+            s->head = L.head;
+            L.head->involved_set.insert(s->rule);
+            s = std::move(s->next);
+        }
     }
 
     std::optional<Node>
