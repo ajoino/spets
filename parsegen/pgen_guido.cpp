@@ -1,12 +1,12 @@
+#include <cstdint>
 #include <format>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <span>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <cstdint>
-#include <iomanip>
 
 #include "grammar_parser.hpp"
 #include "lexer.hpp"
@@ -52,11 +52,9 @@ class Generator {
 
 public:
 
-    void inc_indentation() noexcept {
-        indentation++;
-    }
+    void inc_indentation() noexcept { indentation++; }
 
-    void dec_indentation() {
+    void dec_indentation() noexcept {
         if (indentation > 0) {
             indentation--;
         }
@@ -64,7 +62,7 @@ public:
 
     void put(const std::string& input) { stream << std::string(" ", indentation) << input; }
 
-    void generate_item(const std::string& item, std::vector<std::string>& items, uint16_t& token_counter) {
+    void generate_item(const std::string& item, std::vector<std::string>& items, uint16_t& token_counter, std::map<std::string, uint16_t>& name_counter) {
         if (item.starts_with("'") || item.starts_with("\"")) {
             std::string string_item_inner{item.begin() + 1, item.end() - 1};
             auto token_id = std::string{"token_"} + std::to_string(token_counter);
@@ -73,7 +71,7 @@ public:
             auto node_string = std::format("Node(\"token\", {})", token_id + ".value().value");
             items.push_back(node_string);
         } else {
-            auto var = str_tolower(item);
+            auto var = str_tolower(item) + "_" + std::to_string(name_counter[str_tolower(item)]);
             if (in_vector(items, var)) {
                 var += std::to_string(items.size());
             }
@@ -90,8 +88,9 @@ public:
     void generate_alt(const Alt& alt, const Rule& rule, std::vector<std::string>& vars) {
         std::vector<std::string> items;
         uint16_t token_counter = 0;
+        std::map<std::string, uint16_t> name_counter;
         for (const auto& item : alt.items) {
-            std::string var_name = str_tolower(item);
+            std::string var_name = str_tolower(item) + "_" + std::to_string(name_counter[str_tolower(item)]);
             auto token_name = std::string{"token_"} + std::to_string(token_counter);
             if (!in_vector(vars, var_name)) {
                 if ((item.starts_with("'") || item.starts_with("\""))) {
@@ -102,12 +101,14 @@ public:
                     token_counter++;
                     vars.push_back(token_name);
                     continue;
-                } else if (all_upper(item)) {
+                }
+                if (all_upper(item)) {
                     stream << "            std::optional<Token> " << var_name << ";\n";
                 } else {
                     stream << "            std::optional<Node> " << var_name << ";\n";
                 }
-                vars.push_back(item);
+                name_counter[var_name]++;
+                vars.push_back(var_name);
             }
         }
         stream << "            std::cout << \"\\n### " << rule.name << ": ";
@@ -116,9 +117,10 @@ public:
         }
         stream << "\\n\\n\";\n";
         token_counter = 0;
+        name_counter.clear();
         stream << "            if (true\n";
         for (const auto& item : alt.items) {
-            generate_item(item, items, token_counter);
+            generate_item(item, items, token_counter, name_counter);
         }
         stream << "            ){\n";
 
@@ -179,7 +181,7 @@ public:
 
         stream << R"c++(
 int main(int argc, char**argv) {
-  std::fstream fin{argv[1], std::fstream::in};
+  std::fstream fin{std::span(argv, size_t(argc))[1], std::fstream::in};
   std::string content((std::istreambuf_iterator<char>(fin)),
                       (std::istreambuf_iterator<char>()));
   fin.close();
