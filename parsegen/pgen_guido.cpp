@@ -62,7 +62,10 @@ public:
 
     void put(const std::string& input) { stream << std::string(" ", indentation) << input; }
 
-    void generate_item(const std::string& item, std::vector<std::string>& items, uint16_t& token_counter, std::map<std::string, uint16_t>& name_counter) {
+    void generate_item(
+        const std::string& item, std::vector<std::string>& items, uint16_t& token_counter,
+        std::map<std::string, uint16_t>& name_counter
+    ) {
         if (item.starts_with("'") || item.starts_with("\"")) {
             std::string string_item_inner{item.begin() + 1, item.end() - 1};
             auto token_id = std::string{"token_"} + std::to_string(token_counter);
@@ -127,15 +130,20 @@ public:
         for (const auto& item : items) {
             stream << "                std::cout << " << std::quoted(item + ": ") << " << " << item << " << \"\\n\";\n";
         }
+        std::cout << "alt.action = " << alt.action.value_or("null") << "\n";
         // stream << "                std::cout << "
-        stream << "                return Node{\"" << rule.name << "\", {";
-        for (int i = 0; i < items.size(); i++) {
-            stream << items[i];
-            if (i != items.size() - 1) {
-                stream << ", ";
+        if (alt.action && !alt.action.value().empty()) {
+            stream << "                return " << alt.action.value() << ";\n";
+        } else {
+            stream << "                return Node{\"" << rule.name << "\", {";
+            for (int i = 0; i < items.size(); i++) {
+                stream << items[i];
+                if (i != items.size() - 1) {
+                    stream << ", ";
+                }
             }
+            stream << "}};\n";
         }
-        stream << "}};\n";
         stream << "            }\n";
         stream << "            reset(pos);\n";
     }

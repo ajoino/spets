@@ -173,7 +173,7 @@ public:
                 std::cout << "Node(\"token\", token_0.value().value): " << Node("token", token_0.value().value) << "\n";
                 std::cout << "expr_0.value(): " << expr_0.value() << "\n";
                 std::cout << "Node(\"token\", token_1.value().value): " << Node("token", token_1.value().value) << "\n";
-                return Node{"atom", {Node("token", token_0.value().value), expr_0.value(), Node("token", token_1.value().value)}};
+                return Node("atom", {expr_0.value()}) ;
             }
             reset(pos);
             std::optional<Token> name_0;
