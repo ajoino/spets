@@ -1,4 +1,4 @@
-#include "grammar_parser.hpp"
+#include <parsegen/grammar_parser.hpp>
 #include <format>
 
 std::optional<std::vector<Rule>> GrammarParser::grammar() {

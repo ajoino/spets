@@ -10,8 +10,8 @@
 #include <utility>
 #include <variant>
 
-#include "lexer.hpp"
-#include "node.hpp"
+#include <tokenizer/lexer.hpp>
+#include <parser/node.hpp>
 
 namespace rr = std::ranges;
 

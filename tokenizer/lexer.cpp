@@ -3,8 +3,8 @@
 #include <string>
 #include <vector>
 
-#include "ctre.hpp"
-#include <parsegen/lexer.hpp>
+#include <tokenizer/ctre.hpp>
+#include <tokenizer/lexer.hpp>
 
 const char* token_type_to_string(TokenType tok) noexcept {
     switch (tok) {

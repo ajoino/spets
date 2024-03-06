@@ -1,8 +1,8 @@
 #pragma once
 
-#include "lexer.hpp"
-#include "parser.hpp"
-#include "rule.hpp"
+#include <tokenizer/lexer.hpp>
+#include <parser/parser.hpp>
+#include <parsegen/rule.hpp>
 
 class GrammarParser : public Parser {
 public:

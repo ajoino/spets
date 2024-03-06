@@ -1,8 +1,8 @@
 #include <optional>
 #include <ostream>
 
-#include "node.hpp"
-#include "parser.hpp"
+#include "parser/node.hpp"
+#include "parser/parser.hpp"
 
 std::ostream& operator<<(std::ostream& os, std::optional<Node> maybe_node) {
     if (maybe_node) {

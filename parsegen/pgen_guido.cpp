@@ -8,9 +8,9 @@
 #include <string>
 #include <vector>
 
-#include "grammar_parser.hpp"
-#include "lexer.hpp"
-#include "rule.hpp"
+#include <parsegen/grammar_parser.hpp>
+#include <parsegen/rule.hpp>
+#include <tokenizer/lexer.hpp>
 
 std::ostream& operator<<(std::ostream& os, const std::vector<Alt>& alts) {
     for (const auto& alt : alts) {
@@ -127,11 +127,6 @@ public:
         }
         stream << "            ){\n";
 
-        for (const auto& item : items) {
-            stream << "                std::cout << " << std::quoted(item + ": ") << " << " << item << " << \"\\n\";\n";
-        }
-        std::cout << "alt.action = " << alt.action.value_or("null") << "\n";
-        // stream << "                std::cout << "
         if (alt.action && !alt.action.value().empty()) {
             stream << "                return " << alt.action.value() << ";\n";
         } else {

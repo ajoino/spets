@@ -2,5 +2,5 @@ start <- statement
 statement <- expr statement_end
 expr <- expr '+' term / expr '-' term / term
 term <- term '*' atom / term '/' atom / atom
-atom <- '(' expr ')' { Node("atom", {expr_0.value()}) } / NAME / NUMBER 
+atom <- '(' expr ')' { Node("atom", {expr.value()}) } / NAME / NUMBER 
 statement_end <- NEWLINE / SEMICOLON

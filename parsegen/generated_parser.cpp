@@ -19,7 +19,6 @@ public:
             if (true
                 && (statement_0 = this->statement())
             ){
-                std::cout << "statement_0.value(): " << statement_0.value() << "\n";
                 return Node{"start", {statement_0.value()}};
             }
             reset(pos);
@@ -44,8 +43,6 @@ public:
                 && (expr_0 = this->expr())
                 && (statement_end_0 = this->statement_end())
             ){
-                std::cout << "expr_0.value(): " << expr_0.value() << "\n";
-                std::cout << "statement_end_0.value(): " << statement_end_0.value() << "\n";
                 return Node{"statement", {expr_0.value(), statement_end_0.value()}};
             }
             reset(pos);
@@ -72,9 +69,6 @@ public:
                 && (token_0 = expect("+"))
                 && (term_0 = this->term())
             ){
-                std::cout << "expr_0.value(): " << expr_0.value() << "\n";
-                std::cout << "Node(\"token\", token_0.value().value): " << Node("token", token_0.value().value) << "\n";
-                std::cout << "term_0.value(): " << term_0.value() << "\n";
                 return Node{"expr", {expr_0.value(), Node("token", token_0.value().value), term_0.value()}};
             }
             reset(pos);
@@ -84,9 +78,6 @@ public:
                 && (token_0 = expect("-"))
                 && (term_0 = this->term())
             ){
-                std::cout << "expr_0.value(): " << expr_0.value() << "\n";
-                std::cout << "Node(\"token\", token_0.value().value): " << Node("token", token_0.value().value) << "\n";
-                std::cout << "term_0.value(): " << term_0.value() << "\n";
                 return Node{"expr", {expr_0.value(), Node("token", token_0.value().value), term_0.value()}};
             }
             reset(pos);
@@ -94,7 +85,6 @@ public:
             if (true
                 && (term_0 = this->term())
             ){
-                std::cout << "term_0.value(): " << term_0.value() << "\n";
                 return Node{"expr", {term_0.value()}};
             }
             reset(pos);
@@ -121,9 +111,6 @@ public:
                 && (token_0 = expect("*"))
                 && (atom_0 = this->atom())
             ){
-                std::cout << "term_0.value(): " << term_0.value() << "\n";
-                std::cout << "Node(\"token\", token_0.value().value): " << Node("token", token_0.value().value) << "\n";
-                std::cout << "atom_0.value(): " << atom_0.value() << "\n";
                 return Node{"term", {term_0.value(), Node("token", token_0.value().value), atom_0.value()}};
             }
             reset(pos);
@@ -133,9 +120,6 @@ public:
                 && (token_0 = expect("/"))
                 && (atom_0 = this->atom())
             ){
-                std::cout << "term_0.value(): " << term_0.value() << "\n";
-                std::cout << "Node(\"token\", token_0.value().value): " << Node("token", token_0.value().value) << "\n";
-                std::cout << "atom_0.value(): " << atom_0.value() << "\n";
                 return Node{"term", {term_0.value(), Node("token", token_0.value().value), atom_0.value()}};
             }
             reset(pos);
@@ -143,7 +127,6 @@ public:
             if (true
                 && (atom_0 = this->atom())
             ){
-                std::cout << "atom_0.value(): " << atom_0.value() << "\n";
                 return Node{"term", {atom_0.value()}};
             }
             reset(pos);
@@ -170,10 +153,7 @@ public:
                 && (expr_0 = this->expr())
                 && (token_1 = expect(")"))
             ){
-                std::cout << "Node(\"token\", token_0.value().value): " << Node("token", token_0.value().value) << "\n";
-                std::cout << "expr_0.value(): " << expr_0.value() << "\n";
-                std::cout << "Node(\"token\", token_1.value().value): " << Node("token", token_1.value().value) << "\n";
-                return Node("atom", {expr_0.value()}) ;
+                return Node("atom", {expr.value()}) ;
             }
             reset(pos);
             std::optional<Token> name_0;
@@ -181,7 +161,6 @@ public:
             if (true
                 && (name_0 = expect(TokenType::NAME))
             ){
-                std::cout << "name_0.value().value: " << name_0.value().value << "\n";
                 return Node{"atom", {name_0.value().value}};
             }
             reset(pos);
@@ -190,7 +169,6 @@ public:
             if (true
                 && (number_0 = expect(TokenType::NUMBER))
             ){
-                std::cout << "number_0.value().value: " << number_0.value().value << "\n";
                 return Node{"atom", {number_0.value().value}};
             }
             reset(pos);
@@ -213,7 +191,6 @@ public:
             if (true
                 && (newline_0 = expect(TokenType::NEWLINE))
             ){
-                std::cout << "newline_0.value().value: " << newline_0.value().value << "\n";
                 return Node{"statement_end", {newline_0.value().value}};
             }
             reset(pos);
@@ -222,7 +199,6 @@ public:
             if (true
                 && (semicolon_0 = expect(TokenType::SEMICOLON))
             ){
-                std::cout << "semicolon_0.value().value: " << semicolon_0.value().value << "\n";
                 return Node{"statement_end", {semicolon_0.value().value}};
             }
             reset(pos);
