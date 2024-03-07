@@ -1,9 +1,6 @@
 # CMakeLists.txt
-cmake_minimum_required(VERSION 3.28)
-
 find_library(PARSER_COMMON parsercommon HINT ${CMAKE_SOURCE_DIR}/build/parser)
 find_library(LEXER lexer HINT ${CMAKE_SOURCE_DIR}/build/tokenizer)
-project(spets_parsegen CXX)
 
 add_executable(parsegen pgen_guido.cpp grammar_parser.cpp)
 
