@@ -1,11 +1,11 @@
 start <- rules ENDOFFILE { Node("start", {rules_0.value()}) }
 rules <- rule rules { rules_0.value().prepend_child(rule_0.value()) }
     / rule { Node("rules", {rule_0.value()}) }
-rule <- NAME ws "<-" ws alts NEWLINE { Node("rule", { alts_1.value() })}
+rule <- NAME ws "<-" ws alts NEWLINE { Node("rule", { alts_0.value() })}
 alts <- alt ws "/" ws alts { alts_0.value().prepend_child(alt_0.value()) }
     / alt { Node("alts", { alt_0.value() })}
 alt <- items { Node("alt", {items_0.value()}) }
-items <- item items { items_0.value().prepend_child(item_0.value()) }
+items[std::vector<std::string>] <- item items { items_0.value().prepend_child(item_0.value()) }
     / item { Node("items", {item_0.value()}) }
 item[std::string] <- NAME { Node("item", name_0.value().value) }
     / STRING { Node("item", name_0.value().value) }

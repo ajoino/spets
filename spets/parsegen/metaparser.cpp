@@ -79,7 +79,7 @@ public:
                 && (alts_0 = this->alts())
                 && (newline_0 = expect(TokenType::NEWLINE))
             ){
-                return Node("rule", { alts_1.value() });
+                return Node("rule", { alts_0.value() });
             }
             reset(pos);
             std::cout << "No parse found for rule\n";
@@ -145,7 +145,7 @@ public:
         return memoize("alt", inner_func, mark());
     }
 
-    std::optional<Node> items() {
+    std::vector<std::string> items() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization

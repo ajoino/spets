@@ -20,6 +20,10 @@ const char* token_type_to_string(TokenType tok) noexcept {
         return "LPAREN";
     case TokenType::RPAREN:
         return "RPAREN";
+    case TokenType::LBRACK:
+        return "LBRACK";
+    case TokenType::RBRACK:
+        return "RBRACK";
     case TokenType::LCURL:
         return "LCURL";
     case TokenType::RCURL:
@@ -185,6 +189,10 @@ ScanResult scan_token(Lexer& lexer) {
         return {Token::from_lexer(TokenType::LPAREN, lexer), lexer};
     case ')':
         return {Token::from_lexer(TokenType::RPAREN, lexer), lexer};
+    case '[':
+        return {Token::from_lexer(TokenType::LBRACK, lexer), lexer};
+    case ']':
+        return {Token::from_lexer(TokenType::RBRACK, lexer), lexer};
     case '{':
         return {Token::from_lexer(TokenType::LCURL, lexer), lexer};
     case '}':
@@ -207,7 +215,7 @@ ScanResult scan_token(Lexer& lexer) {
         break;
     }
 
-    if (auto res = ctre::starts_with<R"(([_a-zA-Z][_a-zA-Z0-9]*)|([<>*+=/\-|\]\[]+))">(lexer.start, lexer.end)) {
+    if (auto res = ctre::starts_with<R"(([_a-zA-Z][_a-zA-Z0-9]*)|([<>*+=/\-|]+))">(lexer.start, lexer.end)) {
         // Identifiers
         for (int i = 1; i < res.size(); i++) {
             lexer.advance();
