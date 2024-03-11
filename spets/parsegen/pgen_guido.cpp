@@ -114,11 +114,11 @@ public:
                 vars.push_back(var_name);
             }
         }
-        stream << "            std::cout << \"\\n### " << rule.name << ": ";
-        for (const auto& item : alt.items) {
-            stream << str_tolower(item) << " ";
-        }
-        stream << "\\n\\n\";\n";
+        // stream << "            std::cout << \"\\n### " << rule.name << ": ";
+        // for (const auto& item : alt.items) {
+        //     stream << str_tolower(item) << " ";
+        // }
+        // stream << "\\n\\n\";\n";
         token_counter = 0;
         name_counter.clear();
         stream << "            if (true\n";
@@ -144,7 +144,7 @@ public:
     }
 
     void generate_rule(const Rule& rule) {
-        stream << "    std::optional<Node> " << rule.name << "() {\n\n";
+        stream << "    " << rule.return_type << " " << rule.name << "() {\n\n";
         stream << "        // inner_func does the actual parsing but is called later by\n";
         stream << "        // to enable memoization\n";
         stream << "        auto inner_func = [&, this]() -> std::optional<Node> {\n";
@@ -171,9 +171,9 @@ public:
 #include <fstream>
 #include <optional>
 
-#include "node.hpp"
-#include "lexer.hpp"
-#include "parser.hpp"
+#include <parser/node.hpp>
+#include <tokenizer/lexer.hpp>
+#include <parser/parser.hpp>
     
 )preamble";
         stream << "class Toyparser : public Parser {\npublic:\n";
@@ -223,7 +223,7 @@ int main(int argc, char** argv) {
     auto rules = p.grammar();
     if (rules) {
         std::cout << rules.value();
-        std::fstream fout{"parsegen/generated_parser.cpp", std::fstream::out};
+        std::fstream fout{args[2], std::fstream::out};
         fout << Generator().generate_parser(rules).rdbuf();
         return 0;
     }

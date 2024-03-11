@@ -2,9 +2,9 @@
 #include <fstream>
 #include <optional>
 
-#include "node.hpp"
-#include "lexer.hpp"
-#include "parser.hpp"
+#include <parser/node.hpp>
+#include <tokenizer/lexer.hpp>
+#include <parser/parser.hpp>
     
 class Toyparser : public Parser {
 public:
@@ -15,7 +15,6 @@ public:
         auto inner_func = [&, this]() -> std::optional<Node> {
             int pos = mark();
             std::optional<Node> statement_0;
-            std::cout << "\n### start: statement \n\n";
             if (true
                 && (statement_0 = this->statement())
             ){
@@ -38,7 +37,6 @@ public:
             int pos = mark();
             std::optional<Node> expr_0;
             std::optional<Node> statement_end_0;
-            std::cout << "\n### statement: expr statement_end \n\n";
             if (true
                 && (expr_0 = this->expr())
                 && (statement_end_0 = this->statement_end())
@@ -63,7 +61,6 @@ public:
             std::optional<Node> expr_0;
             std::optional<Token> token_0;
             std::optional<Node> term_0;
-            std::cout << "\n### expr: expr '+' term \n\n";
             if (true
                 && (expr_0 = this->expr())
                 && (token_0 = expect("+"))
@@ -72,7 +69,6 @@ public:
                 return Node{"expr", {expr_0.value(), Node("token", token_0.value().value), term_0.value()}};
             }
             reset(pos);
-            std::cout << "\n### expr: expr '-' term \n\n";
             if (true
                 && (expr_0 = this->expr())
                 && (token_0 = expect("-"))
@@ -81,7 +77,6 @@ public:
                 return Node{"expr", {expr_0.value(), Node("token", token_0.value().value), term_0.value()}};
             }
             reset(pos);
-            std::cout << "\n### expr: term \n\n";
             if (true
                 && (term_0 = this->term())
             ){
@@ -105,7 +100,6 @@ public:
             std::optional<Node> term_0;
             std::optional<Token> token_0;
             std::optional<Node> atom_0;
-            std::cout << "\n### term: term '*' atom \n\n";
             if (true
                 && (term_0 = this->term())
                 && (token_0 = expect("*"))
@@ -114,7 +108,6 @@ public:
                 return Node{"term", {term_0.value(), Node("token", token_0.value().value), atom_0.value()}};
             }
             reset(pos);
-            std::cout << "\n### term: term '/' atom \n\n";
             if (true
                 && (term_0 = this->term())
                 && (token_0 = expect("/"))
@@ -123,7 +116,6 @@ public:
                 return Node{"term", {term_0.value(), Node("token", token_0.value().value), atom_0.value()}};
             }
             reset(pos);
-            std::cout << "\n### term: atom \n\n";
             if (true
                 && (atom_0 = this->atom())
             ){
@@ -147,17 +139,15 @@ public:
             std::optional<Token> token_0;
             std::optional<Node> expr_0;
             std::optional<Token> token_1;
-            std::cout << "\n### atom: '(' expr ')' \n\n";
             if (true
                 && (token_0 = expect("("))
                 && (expr_0 = this->expr())
                 && (token_1 = expect(")"))
             ){
-                return Node("atom", {expr.value()}) ;
+                return Node("atom", {expr_0.value()}) ;
             }
             reset(pos);
             std::optional<Token> name_0;
-            std::cout << "\n### atom: name \n\n";
             if (true
                 && (name_0 = expect(TokenType::NAME))
             ){
@@ -165,7 +155,6 @@ public:
             }
             reset(pos);
             std::optional<Token> number_0;
-            std::cout << "\n### atom: number \n\n";
             if (true
                 && (number_0 = expect(TokenType::NUMBER))
             ){
@@ -187,7 +176,6 @@ public:
         auto inner_func = [&, this]() -> std::optional<Node> {
             int pos = mark();
             std::optional<Token> newline_0;
-            std::cout << "\n### statement_end: newline \n\n";
             if (true
                 && (newline_0 = expect(TokenType::NEWLINE))
             ){
@@ -195,7 +183,6 @@ public:
             }
             reset(pos);
             std::optional<Token> semicolon_0;
-            std::cout << "\n### statement_end: semicolon \n\n";
             if (true
                 && (semicolon_0 = expect(TokenType::SEMICOLON))
             ){

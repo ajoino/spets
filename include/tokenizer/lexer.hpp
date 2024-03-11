@@ -22,6 +22,7 @@ enum class TokenType {
     STAR,
     SLASH,
     INDENT,
+    LEFTARROW,
     UNINDENT,
     NEWLINE,
     ENDOFFILE,

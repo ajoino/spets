@@ -22,10 +22,21 @@ struct Node {
             add_child(child);
         }
     }
+    Node(std::string nt, const std::vector<Node>& chdn, const Node& extra_chld) : node_type{std::move(nt)} {
+        for (const auto& child : chdn) {
+            add_child(child);
+        }
+        add_child(extra_chld);
+    }
 
     Node& add_child(const Node& child) {
         children.push_back(child);
         text += child.text;
+        return *this;
+    }
+
+    Node& prepend_child(const Node& child) {
+        children.insert(children.begin(), child);
         return *this;
     }
 };

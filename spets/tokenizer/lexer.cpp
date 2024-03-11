@@ -40,6 +40,8 @@ const char* token_type_to_string(TokenType tok) noexcept {
         return "STAR";
     case TokenType::SLASH:
         return "SLASH";
+    case TokenType::LEFTARROW:
+        return "LEFTARROW";
     case TokenType::INDENT:
         return "INDENT";
     case TokenType::UNINDENT:
@@ -213,7 +215,7 @@ ScanResult scan_token(Lexer& lexer) {
         return ScanResult{Token::from_lexer(TokenType::NAME, lexer), lexer};
     }
     if (auto res
-        = ctre::starts_with<R"(("""[\w+\-*/()=:]*""")|('''[\w+\-*/()=:]*''')|("[\w+\-*/()=:]*")|('[\w+\-*/()=:]*'))">(
+        = ctre::starts_with<R"(("""[\w+\-*/()=:<\[\]]*""")|('''[\w+\-*/()=:<\[\]]*''')|("[\w+\-*/()=:<\[\]]*")|('[\w+\-*/()=:<\[\]]*'))">(
             lexer.start, lexer.end
         )) {
         // String literals
