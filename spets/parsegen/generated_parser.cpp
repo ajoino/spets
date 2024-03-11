@@ -26,7 +26,12 @@ public:
         };
 
         std::cout << "Parsing start\n";
-        return memoize("start", inner_func, mark());
+        std::optional<std::any> return_value = memoize("start", inner_func, mark());
+        if (return_value) {
+            return std::any_cast<std::optional<Node>>(return_value.value());
+        } else {
+           return std::nullopt;
+        }
     }
 
     std::optional<Node> statement() {
@@ -49,7 +54,12 @@ public:
         };
 
         std::cout << "Parsing statement\n";
-        return memoize("statement", inner_func, mark());
+        std::optional<std::any> return_value = memoize("statement", inner_func, mark());
+        if (return_value) {
+            return std::any_cast<std::optional<Node>>(return_value.value());
+        } else {
+           return std::nullopt;
+        }
     }
 
     std::optional<Node> expr() {
@@ -88,7 +98,12 @@ public:
         };
 
         std::cout << "Parsing expr\n";
-        return memoize("expr", inner_func, mark());
+        std::optional<std::any> return_value = memoize("expr", inner_func, mark());
+        if (return_value) {
+            return std::any_cast<std::optional<Node>>(return_value.value());
+        } else {
+           return std::nullopt;
+        }
     }
 
     std::optional<Node> term() {
@@ -127,7 +142,12 @@ public:
         };
 
         std::cout << "Parsing term\n";
-        return memoize("term", inner_func, mark());
+        std::optional<std::any> return_value = memoize("term", inner_func, mark());
+        if (return_value) {
+            return std::any_cast<std::optional<Node>>(return_value.value());
+        } else {
+           return std::nullopt;
+        }
     }
 
     std::optional<Node> atom() {
@@ -166,7 +186,12 @@ public:
         };
 
         std::cout << "Parsing atom\n";
-        return memoize("atom", inner_func, mark());
+        std::optional<std::any> return_value = memoize("atom", inner_func, mark());
+        if (return_value) {
+            return std::any_cast<std::optional<Node>>(return_value.value());
+        } else {
+           return std::nullopt;
+        }
     }
 
     std::optional<Node> statement_end() {
@@ -194,7 +219,12 @@ public:
         };
 
         std::cout << "Parsing statement_end\n";
-        return memoize("statement_end", inner_func, mark());
+        std::optional<std::any> return_value = memoize("statement_end", inner_func, mark());
+        if (return_value) {
+            return std::any_cast<std::optional<Node>>(return_value.value());
+        } else {
+           return std::nullopt;
+        }
     }
 
 };

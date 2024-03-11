@@ -9,6 +9,7 @@
 #include <set>
 #include <utility>
 #include <variant>
+#include <any>
 
 #include <tokenizer/lexer.hpp>
 #include <parser/node.hpp>
@@ -26,7 +27,7 @@ struct Head {
 };
 
 struct LR {
-    std::optional<Node> seed;
+    std::optional<std::any> seed;
     std::string rule;
     std::optional<Head> head;
 };
@@ -41,7 +42,7 @@ struct MemoKey {
 };
 
 struct MemoValue {
-    std::variant<std::shared_ptr<LR>, std::optional<Node>> res;
+    std::variant<std::shared_ptr<LR>, std::optional<std::any>> res;
     int endpos;
 };
 
@@ -98,19 +99,19 @@ protected:
 
     void setup_lr(const std::string& rule_name, std::shared_ptr<LR>& L);
 
-    std::optional<Node> lr_answer(
-        const std::string& rule_name, const std::function<std::optional<Node>()>& func, const int pos, const MemoKey& k
+    std::optional<std::any> lr_answer(
+        const std::string& rule_name, const std::function<std::optional<std::any>()>& func, const int pos, const MemoKey& k
     );
 
-    void recall(const std::string& rule_name, const std::function<std::optional<Node>()>& func, const int pos);
+    void recall(const std::string& rule_name, const std::function<std::optional<std::any>()>& func, const int pos);
 
-    std::optional<Node> grow_lr(
-        const std::string& func_name, const std::function<std::optional<Node>()>& func, const int pos, const MemoKey& K,
+    std::optional<std::any> grow_lr(
+        const std::string& func_name, const std::function<std::optional<std::any>()>& func, const int pos, const MemoKey& K,
         const Head& H
     );
 
-    std::optional<Node>
-    memoize(const std::string& func_name, const std::function<std::optional<Node>()>& func, const int pos);
+    std::optional<std::any>
+    memoize(const std::string& func_name, const std::function<std::optional<std::any>()>& func, const int pos);
 
 public:
 

@@ -28,7 +28,12 @@ public:
         };
 
         std::cout << "Parsing start\n";
-        return memoize("start", inner_func, mark());
+        std::optional<std::any> return_value = memoize("start", inner_func, mark());
+        if (return_value) {
+            return std::any_cast<std::optional<Node>>(return_value.value());
+        } else {
+           return std::nullopt;
+        }
     }
 
     std::optional<Node> rules() {
@@ -57,7 +62,12 @@ public:
         };
 
         std::cout << "Parsing rules\n";
-        return memoize("rules", inner_func, mark());
+        std::optional<std::any> return_value = memoize("rules", inner_func, mark());
+        if (return_value) {
+            return std::any_cast<std::optional<Node>>(return_value.value());
+        } else {
+           return std::nullopt;
+        }
     }
 
     std::optional<Node> rule() {
@@ -87,7 +97,12 @@ public:
         };
 
         std::cout << "Parsing rule\n";
-        return memoize("rule", inner_func, mark());
+        std::optional<std::any> return_value = memoize("rule", inner_func, mark());
+        if (return_value) {
+            return std::any_cast<std::optional<Node>>(return_value.value());
+        } else {
+           return std::nullopt;
+        }
     }
 
     std::optional<Node> alts() {
@@ -121,7 +136,12 @@ public:
         };
 
         std::cout << "Parsing alts\n";
-        return memoize("alts", inner_func, mark());
+        std::optional<std::any> return_value = memoize("alts", inner_func, mark());
+        if (return_value) {
+            return std::any_cast<std::optional<Node>>(return_value.value());
+        } else {
+           return std::nullopt;
+        }
     }
 
     std::optional<Node> alt() {
@@ -142,14 +162,19 @@ public:
         };
 
         std::cout << "Parsing alt\n";
-        return memoize("alt", inner_func, mark());
+        std::optional<std::any> return_value = memoize("alt", inner_func, mark());
+        if (return_value) {
+            return std::any_cast<std::optional<Node>>(return_value.value());
+        } else {
+           return std::nullopt;
+        }
     }
 
     std::vector<std::string> items() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
-        auto inner_func = [&, this]() -> std::optional<Node> {
+        auto inner_func = [&, this]() -> std::vector<std::string> {
             int pos = mark();
             std::optional<Node> item_0;
             std::optional<Node> items_0;
@@ -171,14 +196,19 @@ public:
         };
 
         std::cout << "Parsing items\n";
-        return memoize("items", inner_func, mark());
+        std::optional<std::any> return_value = memoize("items", inner_func, mark());
+        if (return_value) {
+            return std::any_cast<std::vector<std::string>>(return_value.value());
+        } else {
+           return std::nullopt;
+        }
     }
 
     std::string item() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
-        auto inner_func = [&, this]() -> std::optional<Node> {
+        auto inner_func = [&, this]() -> std::string {
             int pos = mark();
             std::optional<Token> name_0;
             if (true
@@ -199,7 +229,12 @@ public:
         };
 
         std::cout << "Parsing item\n";
-        return memoize("item", inner_func, mark());
+        std::optional<std::any> return_value = memoize("item", inner_func, mark());
+        if (return_value) {
+            return std::any_cast<std::string>(return_value.value());
+        } else {
+           return std::nullopt;
+        }
     }
 
     std::optional<Node> ws() {
@@ -220,7 +255,12 @@ public:
         };
 
         std::cout << "Parsing ws\n";
-        return memoize("ws", inner_func, mark());
+        std::optional<std::any> return_value = memoize("ws", inner_func, mark());
+        if (return_value) {
+            return std::any_cast<std::optional<Node>>(return_value.value());
+        } else {
+           return std::nullopt;
+        }
     }
 
 };

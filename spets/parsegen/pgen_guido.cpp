@@ -147,7 +147,7 @@ public:
         stream << "    " << rule.return_type << " " << rule.name << "() {\n\n";
         stream << "        // inner_func does the actual parsing but is called later by\n";
         stream << "        // to enable memoization\n";
-        stream << "        auto inner_func = [&, this]() -> std::optional<Node> {\n";
+        stream << "        auto inner_func = [&, this]() -> " << rule.return_type << " {\n";
         stream << "            int pos = mark();\n";
         std::vector<std::string> vars;
         for (const auto& alt : rule.alts) {
@@ -157,7 +157,12 @@ public:
         stream << "            return {};\n";
         stream << "        };\n\n";
         stream << "        std::cout << \"Parsing " << rule.name << "\\n\";\n";
-        stream << "        return memoize(\"" << rule.name << "\", inner_func, mark());\n";
+        stream << "        std::optional<std::any> return_value = memoize(\"" << rule.name << "\", inner_func, mark());\n";
+        stream << "        if (return_value) {\n";
+        stream << "            return std::any_cast<" << rule.return_type << ">(return_value.value());\n";
+        stream << "        } else {\n";
+        stream << "           return std::nullopt;\n";
+        stream << "        }\n";
         stream << "    }\n\n";
     }
 
@@ -169,7 +174,6 @@ public:
         auto rules = maybe_rules.value();
         stream << R"preamble(#include <optional>
 #include <fstream>
-#include <optional>
 
 #include <parser/node.hpp>
 #include <tokenizer/lexer.hpp>
