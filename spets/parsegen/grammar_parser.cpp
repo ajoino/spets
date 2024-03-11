@@ -22,7 +22,30 @@ std::optional<Rule> GrammarParser::rule() {
     int pos = mark();
     std::optional<Token> name;
     if (skip_while(TokenType::UNINDENT) && (name = expect(TokenType::NAME))) {
-        if (skip_ws() && expect("<-") && skip_ws()) {
+        std::string return_type;
+        if (expect("[")) {
+            int level = 0;
+            std::vector<std::string> return_type_tokens{};
+            while(true) {
+                std::string token = get_token().value;
+                if (token == "[") {
+                    level++;
+                } else if (token == "]") {
+                    level--;
+                    if (level < 0) {
+                        break;
+                    }
+                }
+                return_type_tokens.push_back(token);
+            }
+            return_type = return_type_tokens[0];
+            for (auto at = return_type_tokens.begin() + 1; at != return_type_tokens.end(); at++) {
+                return_type.append(*at);
+            }
+        } else {
+            return_type = "std::optional<Node>";
+        }
+        if (skip_ws() && expect("<-") && skip_ws() && skip("/") && skip_nl()) {
             auto maybe_alt = alternative();
             if (!maybe_alt) {
                 throw "Empty alternative not allowed";
@@ -40,7 +63,7 @@ std::optional<Rule> GrammarParser::rule() {
                 reset(apos);
                 if (expect(TokenType::NEWLINE) || expect(TokenType::UNINDENT)) {
                     skip_nl();
-                    return Rule(name.value().value, alts);
+                    return Rule(name.value().value, alts, return_type);
                 }
             }
         }

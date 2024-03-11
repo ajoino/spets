@@ -207,15 +207,15 @@ ScanResult scan_token(Lexer& lexer) {
         break;
     }
 
-    if (auto res = ctre::starts_with<"([_a-zA-Z][_a-zA-Z0-9]*)|([<>*+=/\\-|]+)">(lexer.start, lexer.end)) {
+    if (auto res = ctre::starts_with<R"(([_a-zA-Z][_a-zA-Z0-9]*)|([<>*+=/\-|\]\[]+))">(lexer.start, lexer.end)) {
         // Identifiers
         for (int i = 1; i < res.size(); i++) {
             lexer.advance();
         }
         return ScanResult{Token::from_lexer(TokenType::NAME, lexer), lexer};
     }
-    if (auto res
-        = ctre::starts_with<R"(("""[\w+\-*/()=:<\[\]]*""")|('''[\w+\-*/()=:<\[\]]*''')|("[\w+\-*/()=:<\[\]]*")|('[\w+\-*/()=:<\[\]]*'))">(
+    if (auto res = ctre::starts_with<
+            R"(("""[\w+\-*/()=:<\[\]]*""")|('''[\w+\-*/()=:<\[\]]*''')|("[\w+\-*/()=:<\[\]]*")|('[\w+\-*/()=:<\[\]]*'))">(
             lexer.start, lexer.end
         )) {
         // String literals

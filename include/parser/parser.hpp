@@ -66,8 +66,33 @@ protected:
         return true;
     }
 
+    inline bool skip(TokenType tt) {
+        expect(tt);
+        return true;
+    }
+
     inline bool skip_while(TokenType tt) {
         while (expect(tt)) {}
+        return true;
+    }
+
+    inline bool skip_until(TokenType tt) {
+        while (!expect(tt)) {}
+        return true;
+    }
+
+    inline bool skip(const std::string& s) {
+        expect(s);
+        return true;
+    }
+
+    inline bool skip_while(const std::string& s) {
+        while (expect(s)) {}
+        return true;
+    }
+
+    inline bool skip_until(const std::string& s) {
+        while (!expect(s)) {}
         return true;
     }
 
