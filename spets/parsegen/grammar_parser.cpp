@@ -38,6 +38,7 @@ std::optional<Rule> GrammarParser::rule() {
                 }
                 reset(apos);
                 if (expect(TokenType::NEWLINE)) {
+                    skip_nl();
                     return Rule(name.value().value, alts);
                 }
             }

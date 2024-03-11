@@ -61,6 +61,11 @@ protected:
         return true;
     }
 
+    inline bool skip_nl() {
+        while (expect(TokenType::NEWLINE)) {}
+        return true;
+    }
+
     void setup_lr(const std::string& rule_name, std::shared_ptr<LR>& L);
 
     std::optional<Node> lr_answer(
