@@ -20,7 +20,8 @@ std::optional<std::vector<Rule>> GrammarParser::grammar() {
 std::optional<Rule> GrammarParser::rule() {
     std::cout << "\"rule\" at pos: " << mark() << "\n";
     int pos = mark();
-    if (auto name = expect(TokenType::NAME)) {
+    std::optional<Token> name;
+    if (skip_while(TokenType::UNINDENT) && (name = expect(TokenType::NAME))) {
         if (skip_ws() && expect("<-") && skip_ws()) {
             auto maybe_alt = alternative();
             if (!maybe_alt) {
@@ -31,13 +32,13 @@ std::optional<Rule> GrammarParser::rule() {
                 auto alts = std::vector<Alt>{alt};
                 skip_ws();
                 int apos = mark();
-                while (expect("/") && skip_ws() && (maybe_alt = alternative()) && !maybe_alt.value().items.empty()) {
+                while (skip_nl() && skip_ws() && expect("/") && skip_ws() && (maybe_alt = alternative()) && !maybe_alt.value().items.empty()) {
                     skip_ws();
                     alts.push_back(maybe_alt.value());
                     apos = mark();
                 }
                 reset(apos);
-                if (expect(TokenType::NEWLINE)) {
+                if (expect(TokenType::NEWLINE) || expect(TokenType::UNINDENT)) {
                     skip_nl();
                     return Rule(name.value().value, alts);
                 }

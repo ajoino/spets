@@ -6,5 +6,6 @@ alt <- items { Node("alt", {items_0.value()}) }
 items <- item items { items_0.value().prepend_child(item_0.value()) } / item { Node("items", {item_0.value()}) }
 
 
-item <- NAME { Node("item", name_0.value().value) } / STRING { Node("item", name_0.value().value) }
+item <- NAME { Node("item", name_0.value().value) }
+ / STRING { Node("item", name_0.value().value) }
 ws <- WHITESPACE

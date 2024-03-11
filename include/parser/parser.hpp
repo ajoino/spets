@@ -62,7 +62,12 @@ protected:
     }
 
     inline bool skip_nl() {
-        while (expect(TokenType::NEWLINE)) {}
+        while (expect(TokenType::NEWLINE) || expect(TokenType::INDENT)) {}
+        return true;
+    }
+
+    inline bool skip_while(TokenType tt) {
+        while (expect(tt)) {}
         return true;
     }
 
