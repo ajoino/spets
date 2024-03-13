@@ -216,15 +216,13 @@ int main(int argc, char**argv) {
   Toyparser p{t};
 
   auto nodes = p.start();
-  // if (nodes) {
-  //   std::cout << nodes.value() << "\n";
-  //   std::cout << "number of children " << nodes.value().children.size() << "\n";
-  //   for (const auto& child : nodes.value().children) {
-  //       std::cout << child << "\n";
-  //   }
-  // } else {
-  //   std::cout << "Could not parse content.\n";
-  // }
+  if (nodes) {
+    for (const auto& child : nodes.value()) {
+        std::cout << child << "\n";
+    }
+  } else {
+    std::cout << "Could not parse content.\n";
+  }
 }
     )c++";
         return stream;

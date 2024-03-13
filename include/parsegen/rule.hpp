@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <optional>
+#include <iostream>
 
 struct Alt { 
     std::vector<std::string> items;
@@ -20,4 +21,5 @@ struct Rule {
     }
 };
 
-
+std::ostream& operator<<(std::ostream& os, const Rule& r);
+std::ostream& operator<<(std::ostream& os, const Alt& r);

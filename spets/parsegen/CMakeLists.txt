@@ -5,6 +5,9 @@ target_include_directories(parsegen PRIVATE ${CMAKE_SOURCE_DIR}/include)
 target_link_libraries(parsegen PRIVATE parsercommon lexer)
 set_target_properties(parsegen PROPERTIES EXCLUDE_FROM_ALL TRUE)
 
+add_library(rule rule.cpp)
+target_include_directories(rule PRIVATE ${CMAKE_SOURCE_DIR}/include)
+
 add_custom_command(
     TARGET parsegen
     POST_BUILD
@@ -29,9 +32,9 @@ target_include_directories(parser PRIVATE ${CMAKE_SOURCE_DIR}/include -fsanitize
 target_link_libraries(parser PRIVATE parsercommon lexer)
 
 add_executable(metaparser ${CMAKE_SOURCE_DIR}/spets/parsegen/metaparser.cpp)
-add_dependencies(metaparser parsercommon lexer parsegen)
+add_dependencies(metaparser parsercommon lexer parsegen rule)
 target_include_directories(metaparser PRIVATE ${CMAKE_SOURCE_DIR}/include)
-target_link_libraries(metaparser PRIVATE parsercommon lexer)
+target_link_libraries(metaparser PRIVATE parsercommon lexer rule)
 set_target_properties(metaparser PROPERTIES EXCLUDE_FROM_ALL TRUE)
 
 
