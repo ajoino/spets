@@ -56,6 +56,7 @@ class Parser {
 protected:
 
     inline Token get_token() { return tokenizer.get_token(); }
+    inline bool is_at_end() { return tokenizer.is_at_end(); }
 
     inline bool skip_ws() {
         if (expect(TokenType::WHITESPACE)) {}

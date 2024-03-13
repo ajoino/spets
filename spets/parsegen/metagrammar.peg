@@ -1,7 +1,7 @@
 start[std::vector<Rule>] <- rules ENDOFFILE { rules_0 }
 rules[std::vector<Rule>] <- rules rule { append_vector(rules_0, rule_0) }
     / rule { {{rule_0}} }
-rule[Rule] <- NAME ws "<-" ws alts NEWLINE { Rule{name_0.value, alts_0, {}} }
+rule[Rule] <- NAME "[" type "]" ws "<-" ws alts NEWLINE { Rule{name_0.value, alts_0, {}} }
 
 alts[std::vector<Alt>] <- alts ws "/" ws alt { {append_vector(alts_0, alt_0)} }
     / alt { {{alt_0}} }
@@ -12,4 +12,11 @@ items[std::vector<std::string>] <- items item { {append_vector(items_0, item_0)}
 item[std::string] <- NAME { {name_0.value} }
     / STRING { {string_0.value } }
 
+type[std::string] <- parts { parts_0 }
+parts[std::string] <- parts part { parts_0.append(part_0) }
+    / part { part_0 }
+part[std::string] <- NAME { name_0.value }
+    / SEMICOLON { semicolon_0.value }
+    / "<" { token_0.value }
+    / ">" { token_0.value }
 ws <- WHITESPACE

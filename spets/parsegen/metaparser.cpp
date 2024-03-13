@@ -90,25 +90,37 @@ public:
             int pos = mark();
             std::optional<Token> maybe_name_0;
             Token name_0;
-            std::optional<Node> maybe_ws_0;
-            Node ws_0;
             std::optional<Token> maybe_token_0;
             Token token_0;
+            std::optional<std::string> maybe_type_0;
+            std::string type_0;
+            std::optional<Token> maybe_token_1;
+            Token token_1;
+            std::optional<Node> maybe_ws_0;
+            Node ws_0;
+            std::optional<Token> maybe_token_2;
+            Token token_2;
             std::optional<std::vector<Alt>> maybe_alts_0;
             std::vector<Alt> alts_0;
             std::optional<Token> maybe_newline_0;
             Token newline_0;
             if (true
                 && (maybe_name_0 = expect(TokenType::NAME))
+                && (maybe_token_0 = expect("["))
+                && (maybe_type_0 = this->type())
+                && (maybe_token_1 = expect("]"))
                 && (maybe_ws_0 = this->ws())
-                && (maybe_token_0 = expect("<-"))
+                && (maybe_token_2 = expect("<-"))
                 && (maybe_ws_0 = this->ws())
                 && (maybe_alts_0 = this->alts())
                 && (maybe_newline_0 = expect(TokenType::NEWLINE))
             ){
                 name_0 = maybe_name_0.value();
-                ws_0 = maybe_ws_0.value();
                 token_0 = maybe_token_0.value();
+                type_0 = maybe_type_0.value();
+                token_1 = maybe_token_1.value();
+                ws_0 = maybe_ws_0.value();
+                token_2 = maybe_token_2.value();
                 alts_0 = maybe_alts_0.value();
                 newline_0 = maybe_newline_0.value();
                 return Rule{name_0.value, alts_0, {}} ;
@@ -277,6 +289,132 @@ public:
 
         std::cout << "Parsing item\n";
         std::optional<std::any> return_value = memoize("item", inner_func, mark());
+        if (return_value) {
+            return std::any_cast<std::string>(return_value.value());
+        } else {
+           return std::nullopt;
+        }
+    }
+
+    std::optional<std::string> type() {
+
+        // inner_func does the actual parsing but is called later by
+        // to enable memoization
+        auto inner_func = [&, this]() -> std::optional<std::string> {
+            int pos = mark();
+            std::optional<std::string> maybe_parts_0;
+            std::string parts_0;
+            if (true
+                && (maybe_parts_0 = this->parts())
+            ){
+                parts_0 = maybe_parts_0.value();
+                return parts_0 ;
+            }
+            reset(pos);
+            std::cout << "No parse found for type\n";
+            return {};
+        };
+
+        std::cout << "Parsing type\n";
+        std::optional<std::any> return_value = memoize("type", inner_func, mark());
+        if (return_value) {
+            return std::any_cast<std::string>(return_value.value());
+        } else {
+           return std::nullopt;
+        }
+    }
+
+    std::optional<std::string> parts() {
+
+        // inner_func does the actual parsing but is called later by
+        // to enable memoization
+        auto inner_func = [&, this]() -> std::optional<std::string> {
+            int pos = mark();
+            std::optional<std::string> maybe_parts_0;
+            std::string parts_0;
+            std::optional<std::string> maybe_part_0;
+            std::string part_0;
+            if (true
+                && (maybe_parts_0 = this->parts())
+                && (maybe_part_0 = this->part())
+            ){
+                parts_0 = maybe_parts_0.value();
+                part_0 = maybe_part_0.value();
+                return parts_0.append(part_0) ;
+            }
+            reset(pos);
+            if (true
+                && (maybe_part_0 = this->part())
+            ){
+                parts_0 = maybe_parts_0.value();
+                part_0 = maybe_part_0.value();
+                return part_0 ;
+            }
+            reset(pos);
+            std::cout << "No parse found for parts\n";
+            return {};
+        };
+
+        std::cout << "Parsing parts\n";
+        std::optional<std::any> return_value = memoize("parts", inner_func, mark());
+        if (return_value) {
+            return std::any_cast<std::string>(return_value.value());
+        } else {
+           return std::nullopt;
+        }
+    }
+
+    std::optional<std::string> part() {
+
+        // inner_func does the actual parsing but is called later by
+        // to enable memoization
+        auto inner_func = [&, this]() -> std::optional<std::string> {
+            int pos = mark();
+            std::optional<Token> maybe_name_0;
+            Token name_0;
+            if (true
+                && (maybe_name_0 = expect(TokenType::NAME))
+            ){
+                name_0 = maybe_name_0.value();
+                return name_0.value ;
+            }
+            reset(pos);
+            std::optional<Token> maybe_semicolon_0;
+            Token semicolon_0;
+            if (true
+                && (maybe_semicolon_0 = expect(TokenType::SEMICOLON))
+            ){
+                name_0 = maybe_name_0.value();
+                semicolon_0 = maybe_semicolon_0.value();
+                return semicolon_0.value ;
+            }
+            reset(pos);
+            std::optional<Token> maybe_token_0;
+            Token token_0;
+            if (true
+                && (maybe_token_0 = expect("<"))
+            ){
+                name_0 = maybe_name_0.value();
+                semicolon_0 = maybe_semicolon_0.value();
+                token_0 = maybe_token_0.value();
+                return token_0.value ;
+            }
+            reset(pos);
+            if (true
+                && (maybe_token_0 = expect(">"))
+            ){
+                name_0 = maybe_name_0.value();
+                semicolon_0 = maybe_semicolon_0.value();
+                token_0 = maybe_token_0.value();
+                return token_0.value ;
+            }
+            reset(pos);
+            std::cout << "No parse found for part\n";
+            return {};
+        };
+
+        std::cout << "Parsing part\n";
+        std::optional<std::any> return_value = memoize("part", inner_func, mark());
         if (return_value) {
             return std::any_cast<std::string>(return_value.value());
         } else {

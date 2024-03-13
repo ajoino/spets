@@ -95,6 +95,7 @@ public:
     Tokenizer(const Lexer& lexer) : lexer{lexer} {};
 
     [[nodiscard]] int mark() const { return pos; }
+    [[nodiscard]] inline bool is_at_end() const { return lexer.is_at_end(); }
 
     void reset(int new_pos) { pos = new_pos; }
 
