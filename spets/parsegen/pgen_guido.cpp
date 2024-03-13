@@ -13,11 +13,10 @@
 #include <parser/parsing_helpers.hpp>
 
 std::string str_tolower(std::string s) {
-    std::string r{};
     std::transform(
-        s.begin(), s.end(), r.begin(), [](unsigned char c) { return std::tolower(c); } // correct
+        s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::tolower(c); } // correct
     );
-    return r;
+    return s;
 }
 
 template <class T> bool in_vector(const std::vector<T>& vt, const T& value) {
@@ -71,17 +70,21 @@ public:
         }
     }
 
-    void generate_alt(const Alt& alt, const Rule& rule, std::vector<std::string>& vars) {
+    void generate_alt(const Alt& alt, const Rule& rule, std::vector<std::string>& vars, std::vector<Item>& items_) {
         std::vector<std::string> items;
         uint16_t token_counter = 0;
         std::map<std::string, uint16_t> name_counter;
-        std::vector<Item> items_;
+        std::vector<Item> local_items;
         for (const auto& item : alt.items) {
             auto name = item;
+            std::cout << "alt item: " << item << "\n";
             std::string return_type = "Node";
+            std::string expect_value = item;
             if ((item.starts_with("'") || item.starts_with("\""))) {
                 return_type = "Token";
                 name = "token";
+            } else if (all_upper(name)){
+                name = str_tolower(name);
             }
             int count{};
             for (const auto& r : rules) {
@@ -97,42 +100,55 @@ public:
                 count = name_counter[name];
                 name_counter[name]++;
             }
-            items_.emplace_back(name, return_type, count);
+            local_items.emplace_back(name, return_type, expect_value, count);
         }
         std::cout << "items_: " << items_ << "\n";
+        token_counter = 0;
+        name_counter.clear();
+        for (const auto& i : items_) {
+            stream << "            " << i.var_name() << ";\n";
+        }
 
-        for (const auto& item : alt.items) {
-            std::string var_name = str_tolower(item) + "_" + std::to_string(name_counter[str_tolower(item)]);
-            auto token_name = std::string{"token_"} + std::to_string(token_counter);
-            if (!in_vector(vars, var_name)) {
-                if ((item.starts_with("'") || item.starts_with("\""))) {
-                    if (in_vector(vars, token_name)) {
-                        continue;
-                    }
-                    stream << "            std::optional<Token> maybe_" << token_name << ";\n";
-                    stream << "            Token " << token_name << ";\n";
-                    token_counter++;
-                    vars.push_back(token_name);
-                    continue;
-                }
-                std::string return_type = "Node";
-                for (const auto& rule_ : rules) {
-                    std::cout << "rule_.name = " << rule_.name << ", item = " << item << "\n";
-                    if (rule_.name == item) {
-                        return_type = rule_.return_type;
-                        break;
-                    }
-                }
-                if (all_upper(item)) {
-                    stream << "            std::optional<Token> maybe_" << var_name << ";\n";
-                    stream << "            Token " << var_name << ";\n";
-                } else {
-                    stream << "            std::optional<" << return_type << "> maybe_" << var_name << ";\n";
-                    stream << "            " << return_type << " " << var_name << ";\n";
-                }
-                name_counter[var_name]++;
-                vars.push_back(var_name);
+        // for (const auto& item : alt.items) {
+        //     std::string var_name = str_tolower(item) + "_" + std::to_string(name_counter[str_tolower(item)]);
+        //     auto token_name = std::string{"token_"} + std::to_string(token_counter);
+        //     if (!in_vector(vars, var_name)) {
+        //         if ((item.starts_with("'") || item.starts_with("\""))) {
+        //             if (in_vector(vars, token_name)) {
+        //                 continue;
+        //             }
+        //             stream << "            std::optional<Token> maybe_" << token_name << ";\n";
+        //             stream << "            Token " << token_name << ";\n";
+        //             token_counter++;
+        //             vars.push_back(token_name);
+        //             continue;
+        //         }
+        //         std::string return_type = "Node";
+        //         for (const auto& rule_ : rules) {
+        //             std::cout << "rule_.name = " << rule_.name << ", item = " << item << "\n";
+        //             if (rule_.name == item) {
+        //                 return_type = rule_.return_type;
+        //                 break;
+        //             }
+        //         }
+        //         if (all_upper(item)) {
+        //             stream << "            std::optional<Token> maybe_" << var_name << ";\n";
+        //             stream << "            Token " << var_name << ";\n";
+        //         } else {
+        //             stream << "            std::optional<" << return_type << "> maybe_" << var_name << ";\n";
+        //             stream << "            " << return_type << " " << var_name << ";\n";
+        //         }
+        //         name_counter[var_name]++;
+        //         vars.push_back(var_name);
+        //     }
+        // }
+
+        for (const auto& item : local_items) {
+            if (in_vector(items_, item)) {
+                continue;
             }
+            stream << "            std::optional<" << item.type << "> maybe_" << item.var_name() << ";\n";
+            stream << "            std::optional<" << item.type << "> " << item.var_name() << ";\n";
         }
 
         token_counter = 0;
@@ -171,6 +187,7 @@ public:
         }
         stream << "            }\n";
         stream << "            reset(pos);\n";
+        items_.insert(std::end(items_), std::begin(local_items), std::end(local_items));
     }
 
     void generate_rule(const Rule& rule) {
@@ -180,8 +197,9 @@ public:
         stream << "        auto inner_func = [&, this]() -> std::optional<" << rule.return_type << "> {\n";
         stream << "            int pos = mark();\n";
         std::vector<std::string> vars;
+        std::vector<Item> items_;
         for (const auto& alt : rule.alts) {
-            generate_alt(alt, rule, vars);
+            generate_alt(alt, rule, vars, items_);
         }
         stream << "            std::cout << \"No parse found for " << rule.name << "\\n\";\n";
         stream << "            return {};\n";

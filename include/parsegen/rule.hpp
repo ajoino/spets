@@ -8,9 +8,11 @@
 struct Item {
     std::string name;
     std::string type;
+    std::string expect_value;
     int count{};
 
     [[nodiscard]] std::string var_name() const;
+    friend auto operator<=>(const Item&, const Item&) = default;
 };
 
 struct Alt {

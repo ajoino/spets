@@ -16,7 +16,7 @@ std::ostream& operator<<(std::ostream& os, const Alt& a) {
 }
 
 std::ostream& operator<<(std::ostream& os, const Item& r) {
-    return os << std::format("Item({}, {}, {}, {})", r.name, r.type, r.count, r.var_name());
+    return os << std::format("Item({}, {}, {}, {}, {})", r.name, r.type, r.count, r.expect_value, r.var_name());
 }
 
 std::ostream& operator<<(std::ostream& os, const std::vector<Rule>& rs) { return os << "Rules"; }
