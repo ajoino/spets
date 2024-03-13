@@ -16,14 +16,14 @@ public:
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<Node> {
             int pos = mark();
-            std::optional<Node> maybe_statement.value();
-            std::optional<Node> statement.value();
+            std::optional<Node> maybe_statement;
+            Node statement;
             if (true
-                && (maybe_statement_0 = this->statement())
+                && (maybe_statement = this->statement())
             ){
+                statement = maybe_statement.value();
                 std::cout << "generating alt in rule: start\n";
-                statement_0 = maybe_statement_0.value();
-                return {Node{"start", {maybe_statement_0.value()}}};
+                return {Node{"start", {}}};
             }
             reset(pos);
             std::cout << "No parse found for start\n";
@@ -49,18 +49,18 @@ public:
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<Node> {
             int pos = mark();
-            std::optional<Node> maybe_expr.value();
-            std::optional<Node> expr.value();
-            std::optional<Node> maybe_statement_end.value();
-            std::optional<Node> statement_end.value();
+            std::optional<Node> maybe_expr;
+            Node expr;
+            std::optional<Node> maybe_statement_end;
+            Node statement_end;
             if (true
-                && (maybe_expr_0 = this->expr())
-                && (maybe_statement_end_0 = this->statement_end())
+                && (maybe_expr = this->expr())
+                && (maybe_statement_end = this->statement_end())
             ){
+                expr = maybe_expr.value();
+                statement_end = maybe_statement_end.value();
                 std::cout << "generating alt in rule: statement\n";
-                expr_0 = maybe_expr_0.value();
-                statement_end_0 = maybe_statement_end_0.value();
-                return {Node{"statement", {maybe_expr_0.value(), maybe_statement_end_0.value()}}};
+                return {Node{"statement", {}}};
             }
             reset(pos);
             std::cout << "No parse found for statement\n";
@@ -86,53 +86,42 @@ public:
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<Node> {
             int pos = mark();
-            std::optional<Node> maybe_expr.value();
-            std::optional<Node> expr.value();
-            std::optional<Token> maybe_token.value().value;
-            std::optional<Token> token.value().value;
-            std::optional<Node> maybe_term.value();
-            std::optional<Node> term.value();
+            std::optional<Node> maybe_expr;
+            Node expr;
+            std::optional<Token> maybe_token;
+            Token token;
+            std::optional<Node> maybe_term;
+            Node term;
             if (true
-                && (maybe_expr_0 = this->expr())
-                && (maybe_token_0 = expect("+"))
-                && (maybe_term_0 = this->term())
+                && (maybe_expr = this->expr())
+                && (maybe_token = expect('+'))
+                && (maybe_term = this->term())
             ){
+                expr = maybe_expr.value();
+                token = maybe_token.value();
+                term = maybe_term.value();
                 std::cout << "generating alt in rule: expr\n";
-                expr_0 = maybe_expr_0.value();
-                '+'_0 = maybe_'+'_0.value();
-                term_0 = maybe_term_0.value();
-                return {Node{"expr", {maybe_expr_0.value(), Node("token", maybe_token_0.value().value), maybe_term_0.value()}}};
+                return {Node{"expr", {}}};
             }
             reset(pos);
-            expr.value();
-            token.value().value;
-            term.value();
-            std::optional<Token> maybe_token.value().value;
-            std::optional<Token> token.value().value;
             if (true
-                && (maybe_expr_0 = this->expr())
-                && (maybe_token_0 = expect("-"))
-                && (maybe_term_0 = this->term())
+                && (maybe_expr = this->expr())
+                && (maybe_token = expect('-'))
+                && (maybe_term = this->term())
             ){
+                expr = maybe_expr.value();
+                token = maybe_token.value();
+                term = maybe_term.value();
                 std::cout << "generating alt in rule: expr\n";
-                expr_0 = maybe_expr_0.value();
-                '-'_0 = maybe_'-'_0.value();
-                term_0 = maybe_term_0.value();
-                return {Node{"expr", {maybe_expr_0.value(), Node("token", maybe_token_0.value().value), maybe_term_0.value()}}};
+                return {Node{"expr", {}}};
             }
             reset(pos);
-            expr.value();
-            token.value().value;
-            term.value();
-            expr.value();
-            token.value().value;
-            term.value();
             if (true
-                && (maybe_term_0 = this->term())
+                && (maybe_term = this->term())
             ){
+                term = maybe_term.value();
                 std::cout << "generating alt in rule: expr\n";
-                term_0 = maybe_term_0.value();
-                return {Node{"expr", {maybe_term_0.value()}}};
+                return {Node{"expr", {}}};
             }
             reset(pos);
             std::cout << "No parse found for expr\n";
@@ -158,53 +147,42 @@ public:
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<Node> {
             int pos = mark();
-            std::optional<Node> maybe_term.value();
-            std::optional<Node> term.value();
-            std::optional<Token> maybe_token.value().value;
-            std::optional<Token> token.value().value;
-            std::optional<Node> maybe_atom.value();
-            std::optional<Node> atom.value();
+            std::optional<Node> maybe_term;
+            Node term;
+            std::optional<Token> maybe_token;
+            Token token;
+            std::optional<Node> maybe_atom;
+            Node atom;
             if (true
-                && (maybe_term_0 = this->term())
-                && (maybe_token_0 = expect("*"))
-                && (maybe_atom_0 = this->atom())
+                && (maybe_term = this->term())
+                && (maybe_token = expect('*'))
+                && (maybe_atom = this->atom())
             ){
+                term = maybe_term.value();
+                token = maybe_token.value();
+                atom = maybe_atom.value();
                 std::cout << "generating alt in rule: term\n";
-                term_0 = maybe_term_0.value();
-                '*'_0 = maybe_'*'_0.value();
-                atom_0 = maybe_atom_0.value();
-                return {Node{"term", {maybe_term_0.value(), Node("token", maybe_token_0.value().value), maybe_atom_0.value()}}};
+                return {Node{"term", {}}};
             }
             reset(pos);
-            term.value();
-            token.value().value;
-            atom.value();
-            std::optional<Token> maybe_token.value().value;
-            std::optional<Token> token.value().value;
             if (true
-                && (maybe_term_0 = this->term())
-                && (maybe_token_0 = expect("/"))
-                && (maybe_atom_0 = this->atom())
+                && (maybe_term = this->term())
+                && (maybe_token = expect('/'))
+                && (maybe_atom = this->atom())
             ){
+                term = maybe_term.value();
+                token = maybe_token.value();
+                atom = maybe_atom.value();
                 std::cout << "generating alt in rule: term\n";
-                term_0 = maybe_term_0.value();
-                '/'_0 = maybe_'/'_0.value();
-                atom_0 = maybe_atom_0.value();
-                return {Node{"term", {maybe_term_0.value(), Node("token", maybe_token_0.value().value), maybe_atom_0.value()}}};
+                return {Node{"term", {}}};
             }
             reset(pos);
-            term.value();
-            token.value().value;
-            atom.value();
-            term.value();
-            token.value().value;
-            atom.value();
             if (true
-                && (maybe_atom_0 = this->atom())
+                && (maybe_atom = this->atom())
             ){
+                atom = maybe_atom.value();
                 std::cout << "generating alt in rule: term\n";
-                atom_0 = maybe_atom_0.value();
-                return {Node{"term", {maybe_atom_0.value()}}};
+                return {Node{"term", {}}};
             }
             reset(pos);
             std::cout << "No parse found for term\n";
@@ -230,49 +208,42 @@ public:
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<Node> {
             int pos = mark();
-            std::optional<Token> maybe_token.value().value;
-            std::optional<Token> token.value().value;
-            std::optional<Node> maybe_expr.value();
-            std::optional<Node> expr.value();
-            std::optional<Token> maybe_token_1.value().value;
-            std::optional<Token> token_1.value().value;
+            std::optional<Token> maybe_token;
+            Token token;
+            std::optional<Node> maybe_expr;
+            Node expr;
+            std::optional<Token> maybe_token_1;
+            Token token_1;
             if (true
-                && (maybe_token_0 = expect("("))
-                && (maybe_expr_0 = this->expr())
-                && (maybe_token_1 = expect(")"))
+                && (maybe_token = expect('('))
+                && (maybe_expr = this->expr())
+                && (maybe_token_1 = expect(')'))
             ){
+                token = maybe_token.value();
+                expr = maybe_expr.value();
+                token_1 = maybe_token_1.value();
                 std::cout << "generating alt in rule: atom\n";
-                '('_0 = maybe_'('_0.value();
-                expr_0 = maybe_expr_0.value();
-                ')'_0 = maybe_')'_0.value();
                 return Node("atom", {expr_0.value()}) ;
             }
             reset(pos);
-            token.value().value;
-            expr.value();
-            token_1.value().value;
-            std::optional<Node> maybe_name.value();
-            std::optional<Node> name.value();
+            std::optional<Token> maybe_name;
+            Token name;
             if (true
-                && (maybe_name_0 = expect(TokenType::NAME))
+                && (maybe_name = expect(TokenType::NAME))
             ){
+                name = maybe_name.value();
                 std::cout << "generating alt in rule: atom\n";
-                NAME_0 = maybe_NAME_0.value();
-                return {Node{"atom", {maybe_name_0.value().value}}};
+                return {Node{"atom", {}}};
             }
             reset(pos);
-            token.value().value;
-            expr.value();
-            token_1.value().value;
-            name.value();
-            std::optional<Node> maybe_number.value();
-            std::optional<Node> number.value();
+            std::optional<Token> maybe_number;
+            Token number;
             if (true
-                && (maybe_number_0 = expect(TokenType::NUMBER))
+                && (maybe_number = expect(TokenType::NUMBER))
             ){
+                number = maybe_number.value();
                 std::cout << "generating alt in rule: atom\n";
-                NUMBER_0 = maybe_NUMBER_0.value();
-                return {Node{"atom", {maybe_number_0.value().value}}};
+                return {Node{"atom", {}}};
             }
             reset(pos);
             std::cout << "No parse found for atom\n";
@@ -298,25 +269,24 @@ public:
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<Node> {
             int pos = mark();
-            std::optional<Node> maybe_newline.value();
-            std::optional<Node> newline.value();
+            std::optional<Token> maybe_newline;
+            Token newline;
             if (true
-                && (maybe_newline_0 = expect(TokenType::NEWLINE))
+                && (maybe_newline = expect(TokenType::NEWLINE))
             ){
+                newline = maybe_newline.value();
                 std::cout << "generating alt in rule: statement_end\n";
-                NEWLINE_0 = maybe_NEWLINE_0.value();
-                return {Node{"statement_end", {maybe_newline_0.value().value}}};
+                return {Node{"statement_end", {}}};
             }
             reset(pos);
-            newline.value();
-            std::optional<Node> maybe_semicolon.value();
-            std::optional<Node> semicolon.value();
+            std::optional<Token> maybe_semicolon;
+            Token semicolon;
             if (true
-                && (maybe_semicolon_0 = expect(TokenType::SEMICOLON))
+                && (maybe_semicolon = expect(TokenType::SEMICOLON))
             ){
+                semicolon = maybe_semicolon.value();
                 std::cout << "generating alt in rule: statement_end\n";
-                SEMICOLON_0 = maybe_SEMICOLON_0.value();
-                return {Node{"statement_end", {maybe_semicolon_0.value().value}}};
+                return {Node{"statement_end", {}}};
             }
             reset(pos);
             std::cout << "No parse found for statement_end\n";

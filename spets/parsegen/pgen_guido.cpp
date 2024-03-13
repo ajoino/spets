@@ -45,32 +45,13 @@ public:
     void put(const std::string& input) { stream << std::string(" ", indentation) << input; }
 
     void generate_item(
-        const std::string& item, std::vector<std::string>& items, uint16_t& token_counter,
+        const Item& item, std::vector<Item>& items, uint16_t& token_counter,
         std::map<std::string, uint16_t>& name_counter
     ) {
-        if (item.starts_with("'") || item.starts_with("\"")) {
-            std::string string_item_inner{item.begin() + 1, item.end() - 1};
-            auto token_id = std::string{"maybe_token_"} + std::to_string(token_counter);
-            stream << "                && (" << token_id << " = expect(\"" << string_item_inner << "\"))\n";
-            token_counter++;
-            auto node_string = std::format("Node(\"token\", {})", token_id + ".value().value");
-            items.push_back(node_string);
-        } else {
-            auto var = "maybe_" + str_tolower(item) + "_" + std::to_string(name_counter[str_tolower(item)]);
-            if (in_vector(items, var)) {
-                var += std::to_string(items.size());
-            }
-            if (all_upper(item)) {
-                items.push_back(var + ".value().value");
-                stream << "                && (" << var << " = expect(TokenType::" << item << "))\n";
-            } else {
-                items.push_back(var + ".value()");
-                stream << "                && (" << var << " = this->" << item << "())\n";
-            }
-        }
+        stream << "                && (maybe_" << item.var_name() << " = " << item.expect_value << ")\n";
     }
 
-    void generate_alt(const Alt& alt, const Rule& rule, std::vector<std::string>& vars, std::vector<Item>& items_) {
+    void generate_alt(const Alt& alt, const Rule& rule, std::vector<std::string>& vars, std::vector<Item>& global_items) {
         std::vector<std::string> items;
         uint16_t token_counter = 0;
         std::map<std::string, uint16_t> name_counter;
@@ -79,12 +60,15 @@ public:
             auto name = item;
             std::cout << "alt item: " << item << "\n";
             std::string return_type = "Node";
-            std::string expect_value = item;
+            std::string expect_value = std::format("this->{}()", item);
             if ((item.starts_with("'") || item.starts_with("\""))) {
                 return_type = "Token";
                 name = "token";
+                expect_value = std::format("expect({})", item);
             } else if (all_upper(name)){
                 name = str_tolower(name);
+                expect_value = std::format("expect(TokenType::{})", item);
+                return_type = "Token";
             }
             int count{};
             for (const auto& r : rules) {
@@ -93,7 +77,7 @@ public:
                     break;
                 }
             }
-            if (return_type == "Token") {
+            if (return_type == "Token" && name == "token") {
                 count = token_counter;
                 token_counter++;
             } else {
@@ -102,12 +86,9 @@ public:
             }
             local_items.emplace_back(name, return_type, expect_value, count);
         }
-        std::cout << "items_: " << items_ << "\n";
+        std::cout << "items_: " << global_items << "\n";
         token_counter = 0;
         name_counter.clear();
-        for (const auto& i : items_) {
-            stream << "            " << i.var_name() << ";\n";
-        }
 
         // for (const auto& item : alt.items) {
         //     std::string var_name = str_tolower(item) + "_" + std::to_string(name_counter[str_tolower(item)]);
@@ -144,35 +125,24 @@ public:
         // }
 
         for (const auto& item : local_items) {
-            if (in_vector(items_, item)) {
+            if (in_vector(global_items, item)) {
                 continue;
             }
             stream << "            std::optional<" << item.type << "> maybe_" << item.var_name() << ";\n";
-            stream << "            std::optional<" << item.type << "> " << item.var_name() << ";\n";
+            stream << "            " << item.type << " " << item.var_name() << ";\n";
         }
 
         token_counter = 0;
         name_counter.clear();
         stream << "            if (true\n";
-        for (const auto& item : alt.items) {
-            generate_item(item, items, token_counter, name_counter);
+        for (const auto& item : local_items) {
+            generate_item(item, local_items, token_counter, name_counter);
         }
         stream << "            ){\n";
-
-        stream << "                std::cout << \"generating alt in rule: " << rule.name << "\\n\";\n";
-        name_counter.clear();
-        for (const auto& var_name : alt.items) {
-            std::cout << "generating maybe_ stuffs; alt.items: " << alt.items << "\n";
-            std::cout << var_name << std::endl;
-            std::cout << "keys:\n";
-            for (const auto& [key, value] : name_counter) {
-                std::cout << "    " << key << "\n";
-            }
-            std::cout << std::flush;
-            int count = name_counter[var_name];
-            stream << "                " << var_name << "_" << count << " = maybe_" << var_name << "_" << count << ".value();\n";
-            token_counter++;
+        for (const auto& item : local_items) {
+            stream << "                " << item.var_name() << " = maybe_" << item.eval_string() << ";\n";
         }
+        stream << "                std::cout << \"generating alt in rule: " << rule.name << "\\n\";\n";
         if (alt.action && !alt.action.value().empty()) {
             stream << "                return " << alt.action.value() << ";\n";
         } else {
@@ -187,7 +157,7 @@ public:
         }
         stream << "            }\n";
         stream << "            reset(pos);\n";
-        items_.insert(std::end(items_), std::begin(local_items), std::end(local_items));
+        global_items.insert(std::end(global_items), std::begin(local_items), std::end(local_items));
     }
 
     void generate_rule(const Rule& rule) {

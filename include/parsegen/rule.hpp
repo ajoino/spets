@@ -12,7 +12,9 @@ struct Item {
     int count{};
 
     [[nodiscard]] std::string var_name() const;
-    friend auto operator<=>(const Item&, const Item&) = default;
+    [[nodiscard]] std::string eval_string() const;
+    // friend auto operator<=>(const Item&, const Item&) = default;
+    const bool operator==(const Item& rhs) const;
 };
 
 struct Alt {
