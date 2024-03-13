@@ -2,7 +2,7 @@
 add_executable(parsegen pgen_guido.cpp grammar_parser.cpp)
 add_dependencies(parsegen parsercommon lexer)
 target_include_directories(parsegen PRIVATE ${CMAKE_SOURCE_DIR}/include)
-target_link_libraries(parsegen PRIVATE parsercommon lexer)
+target_link_libraries(parsegen PRIVATE parsercommon lexer -fsanitize=address)
 set_target_properties(parsegen PROPERTIES EXCLUDE_FROM_ALL TRUE)
 
 add_library(rule rule.cpp)
@@ -33,7 +33,7 @@ target_link_libraries(parser PRIVATE parsercommon lexer)
 
 add_executable(metaparser ${CMAKE_SOURCE_DIR}/spets/parsegen/metaparser.cpp)
 add_dependencies(metaparser parsercommon lexer parsegen rule)
-target_include_directories(metaparser PRIVATE ${CMAKE_SOURCE_DIR}/include)
+target_include_directories(metaparser PRIVATE ${CMAKE_SOURCE_DIR}/include -fsanitize=address)
 target_link_libraries(metaparser PRIVATE parsercommon lexer rule)
 set_target_properties(metaparser PROPERTIES EXCLUDE_FROM_ALL TRUE)
 
