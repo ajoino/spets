@@ -1,7 +1,6 @@
 #include <cstdint>
 #include <format>
 #include <fstream>
-#include <iomanip>
 #include <iostream>
 #include <span>
 #include <sstream>
@@ -12,24 +11,24 @@
 #include <parsegen/rule.hpp>
 #include <tokenizer/lexer.hpp>
 
-std::ostream& operator<<(std::ostream& os, const std::vector<Alt>& alts) {
-    for (const auto& alt : alts) {
-        os << "Alt(" << std::format("{}", alt.items) << ")";
-    }
-    return os;
-}
-
-std::ostream& operator<<(std::ostream& stream, const Rule& rule) {
-    return stream << "    Rule(\"" << rule.name << "\", " << rule.alts << ")";
-}
-
-std::ostream& operator<<(std::ostream& stream, const std::vector<Rule>& rule_list) {
-    stream << "[\n";
-    for (const auto& rule : rule_list) {
-        stream << rule << ",\n";
-    }
-    return stream << "]\n";
-}
+// std::ostream& operator<<(std::ostream& os, const std::vector<Alt>& alts) {
+//     for (const auto& alt : alts) {
+//         os << "Alt(" << std::format("{}", alt.items) << ")";
+//     }
+//     return os;
+// }
+//
+// std::ostream& operator<<(std::ostream& stream, const Rule& rule) {
+//     return stream << "    Rule(\"" << rule.name << "\", " << rule.alts << ")";
+// }
+//
+// std::ostream& operator<<(std::ostream& stream, const std::vector<Rule>& rule_list) {
+//     stream << "[\n";
+//     for (const auto& rule : rule_list) {
+//         stream << rule << ",\n";
+//     }
+//     return stream << "]\n";
+// }
 
 std::string str_tolower(std::string s) {
     std::transform(
@@ -139,20 +138,21 @@ public:
         }
         stream << "            ){\n";
 
+        stream << "                std::cout << \"generating alt in rule: " << rule.name << "\\n\";\n";
         for (const auto& var_name : vars) {
             stream << "                " << var_name << " = maybe_" << var_name << ".value();\n";
         }
         if (alt.action && !alt.action.value().empty()) {
             stream << "                return " << alt.action.value() << ";\n";
         } else {
-            stream << "                return Node{\"" << rule.name << "\", {";
+            stream << "                return {Node{\"" << rule.name << "\", {";
             for (int i = 0; i < items.size(); i++) {
                 stream << items[i];
                 if (i != items.size() - 1) {
                     stream << ", ";
                 }
             }
-            stream << "}};\n";
+            stream << "}}};\n";
         }
         stream << "            }\n";
         stream << "            reset(pos);\n";
@@ -174,9 +174,13 @@ public:
         stream << "        std::cout << \"Parsing " << rule.name << "\\n\";\n";
         stream << "        std::optional<std::any> return_value = memoize(\"" << rule.name << "\", inner_func, mark());\n";
         stream << "        if (return_value) {\n";
-        stream << "            return std::any_cast<" << rule.return_type << ">(return_value.value());\n";
+        stream << "            std::cout << \" value not null\\n\";\n";
+        stream << R"(            std::cout << "any holds type: " << return_value.value().type().name() << "should hold )" << rule.return_type << "\\n\";\n";
+        stream << "            std::cout << std::any_cast<std::optional<" << rule.return_type << ">>(return_value.value()) << std::endl;\n";
+        stream << "            return std::any_cast<std::optional<" << rule.return_type << ">>(return_value.value());\n";
         stream << "        } else {\n";
-        stream << "           return std::nullopt;\n";
+        stream << "            std::cout << \" value is null\\n\";\n";
+        stream << "            return std::nullopt;\n";
         stream << "        }\n";
         stream << "    }\n\n";
     }

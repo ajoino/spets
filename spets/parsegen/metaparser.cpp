@@ -24,6 +24,7 @@ public:
                 && (maybe_rules_0 = this->rules())
                 && (maybe_endoffile_0 = expect(TokenType::ENDOFFILE))
             ){
+                std::cout << "generating alt in rule: start\n;";
                 rules_0 = maybe_rules_0.value();
                 endoffile_0 = maybe_endoffile_0.value();
                 return rules_0 ;
@@ -36,9 +37,13 @@ public:
         std::cout << "Parsing start\n";
         std::optional<std::any> return_value = memoize("start", inner_func, mark());
         if (return_value) {
-            return std::any_cast<std::vector<Rule>>(return_value.value());
+            std::cout << " value not null\n";
+            std::cout << "any holds type: " << return_value.value().type().name() << "should hold std::vector<Rule>\n";
+            std::cout << std::any_cast<std::optional<std::vector<Rule>>>(return_value.value()) << std::endl;
+            return std::any_cast<std::optional<std::vector<Rule>>>(return_value.value());
         } else {
-           return std::nullopt;
+            std::cout << " value is null\n";
+            return std::nullopt;
         }
     }
 
@@ -56,6 +61,7 @@ public:
                 && (maybe_rules_0 = this->rules())
                 && (maybe_rule_0 = this->rule())
             ){
+                std::cout << "generating alt in rule: rules\n;";
                 rules_0 = maybe_rules_0.value();
                 rule_0 = maybe_rule_0.value();
                 return append_vector(rules_0, rule_0) ;
@@ -64,6 +70,7 @@ public:
             if (true
                 && (maybe_rule_0 = this->rule())
             ){
+                std::cout << "generating alt in rule: rules\n;";
                 rules_0 = maybe_rules_0.value();
                 rule_0 = maybe_rule_0.value();
                 return {{rule_0}} ;
@@ -76,9 +83,13 @@ public:
         std::cout << "Parsing rules\n";
         std::optional<std::any> return_value = memoize("rules", inner_func, mark());
         if (return_value) {
-            return std::any_cast<std::vector<Rule>>(return_value.value());
+            std::cout << " value not null\n";
+            std::cout << "any holds type: " << return_value.value().type().name() << "should hold std::vector<Rule>\n";
+            std::cout << std::any_cast<std::optional<std::vector<Rule>>>(return_value.value()) << std::endl;
+            return std::any_cast<std::optional<std::vector<Rule>>>(return_value.value());
         } else {
-           return std::nullopt;
+            std::cout << " value is null\n";
+            return std::nullopt;
         }
     }
 
@@ -115,6 +126,7 @@ public:
                 && (maybe_alts_0 = this->alts())
                 && (maybe_newline_0 = expect(TokenType::NEWLINE))
             ){
+                std::cout << "generating alt in rule: rule\n;";
                 name_0 = maybe_name_0.value();
                 token_0 = maybe_token_0.value();
                 type_0 = maybe_type_0.value();
@@ -133,9 +145,13 @@ public:
         std::cout << "Parsing rule\n";
         std::optional<std::any> return_value = memoize("rule", inner_func, mark());
         if (return_value) {
-            return std::any_cast<Rule>(return_value.value());
+            std::cout << " value not null\n";
+            std::cout << "any holds type: " << return_value.value().type().name() << "should hold Rule\n";
+            std::cout << std::any_cast<std::optional<Rule>>(return_value.value()) << std::endl;
+            return std::any_cast<std::optional<Rule>>(return_value.value());
         } else {
-           return std::nullopt;
+            std::cout << " value is null\n";
+            return std::nullopt;
         }
     }
 
@@ -160,6 +176,7 @@ public:
                 && (maybe_ws_0 = this->ws())
                 && (maybe_alt_0 = this->alt())
             ){
+                std::cout << "generating alt in rule: alts\n;";
                 alts_0 = maybe_alts_0.value();
                 ws_0 = maybe_ws_0.value();
                 token_0 = maybe_token_0.value();
@@ -170,6 +187,7 @@ public:
             if (true
                 && (maybe_alt_0 = this->alt())
             ){
+                std::cout << "generating alt in rule: alts\n;";
                 alts_0 = maybe_alts_0.value();
                 ws_0 = maybe_ws_0.value();
                 token_0 = maybe_token_0.value();
@@ -184,9 +202,13 @@ public:
         std::cout << "Parsing alts\n";
         std::optional<std::any> return_value = memoize("alts", inner_func, mark());
         if (return_value) {
-            return std::any_cast<std::vector<Alt>>(return_value.value());
+            std::cout << " value not null\n";
+            std::cout << "any holds type: " << return_value.value().type().name() << "should hold std::vector<Alt>\n";
+            std::cout << std::any_cast<std::optional<std::vector<Alt>>>(return_value.value()) << std::endl;
+            return std::any_cast<std::optional<std::vector<Alt>>>(return_value.value());
         } else {
-           return std::nullopt;
+            std::cout << " value is null\n";
+            return std::nullopt;
         }
     }
 
@@ -201,6 +223,7 @@ public:
             if (true
                 && (maybe_items_0 = this->items())
             ){
+                std::cout << "generating alt in rule: alt\n;";
                 items_0 = maybe_items_0.value();
                 return Alt{items_0, {}} ;
             }
@@ -212,9 +235,13 @@ public:
         std::cout << "Parsing alt\n";
         std::optional<std::any> return_value = memoize("alt", inner_func, mark());
         if (return_value) {
-            return std::any_cast<Alt>(return_value.value());
+            std::cout << " value not null\n";
+            std::cout << "any holds type: " << return_value.value().type().name() << "should hold Alt\n";
+            std::cout << std::any_cast<std::optional<Alt>>(return_value.value()) << std::endl;
+            return std::any_cast<std::optional<Alt>>(return_value.value());
         } else {
-           return std::nullopt;
+            std::cout << " value is null\n";
+            return std::nullopt;
         }
     }
 
@@ -232,6 +259,7 @@ public:
                 && (maybe_items_0 = this->items())
                 && (maybe_item_0 = this->item())
             ){
+                std::cout << "generating alt in rule: items\n;";
                 items_0 = maybe_items_0.value();
                 item_0 = maybe_item_0.value();
                 return {append_vector(items_0, item_0)} ;
@@ -240,6 +268,7 @@ public:
             if (true
                 && (maybe_item_0 = this->item())
             ){
+                std::cout << "generating alt in rule: items\n;";
                 items_0 = maybe_items_0.value();
                 item_0 = maybe_item_0.value();
                 return {{item_0}} ;
@@ -252,9 +281,13 @@ public:
         std::cout << "Parsing items\n";
         std::optional<std::any> return_value = memoize("items", inner_func, mark());
         if (return_value) {
-            return std::any_cast<std::vector<std::string>>(return_value.value());
+            std::cout << " value not null\n";
+            std::cout << "any holds type: " << return_value.value().type().name() << "should hold std::vector<std::string>\n";
+            std::cout << std::any_cast<std::optional<std::vector<std::string>>>(return_value.value()) << std::endl;
+            return std::any_cast<std::optional<std::vector<std::string>>>(return_value.value());
         } else {
-           return std::nullopt;
+            std::cout << " value is null\n";
+            return std::nullopt;
         }
     }
 
@@ -269,6 +302,7 @@ public:
             if (true
                 && (maybe_name_0 = expect(TokenType::NAME))
             ){
+                std::cout << "generating alt in rule: item\n;";
                 name_0 = maybe_name_0.value();
                 return {name_0.value} ;
             }
@@ -278,6 +312,7 @@ public:
             if (true
                 && (maybe_string_0 = expect(TokenType::STRING))
             ){
+                std::cout << "generating alt in rule: item\n;";
                 name_0 = maybe_name_0.value();
                 string_0 = maybe_string_0.value();
                 return {string_0.value } ;
@@ -290,9 +325,13 @@ public:
         std::cout << "Parsing item\n";
         std::optional<std::any> return_value = memoize("item", inner_func, mark());
         if (return_value) {
-            return std::any_cast<std::string>(return_value.value());
+            std::cout << " value not null\n";
+            std::cout << "any holds type: " << return_value.value().type().name() << "should hold std::string\n";
+            std::cout << std::any_cast<std::optional<std::string>>(return_value.value()) << std::endl;
+            return std::any_cast<std::optional<std::string>>(return_value.value());
         } else {
-           return std::nullopt;
+            std::cout << " value is null\n";
+            return std::nullopt;
         }
     }
 
@@ -307,6 +346,7 @@ public:
             if (true
                 && (maybe_parts_0 = this->parts())
             ){
+                std::cout << "generating alt in rule: type\n;";
                 parts_0 = maybe_parts_0.value();
                 return parts_0 ;
             }
@@ -318,9 +358,13 @@ public:
         std::cout << "Parsing type\n";
         std::optional<std::any> return_value = memoize("type", inner_func, mark());
         if (return_value) {
-            return std::any_cast<std::string>(return_value.value());
+            std::cout << " value not null\n";
+            std::cout << "any holds type: " << return_value.value().type().name() << "should hold std::string\n";
+            std::cout << std::any_cast<std::optional<std::string>>(return_value.value()) << std::endl;
+            return std::any_cast<std::optional<std::string>>(return_value.value());
         } else {
-           return std::nullopt;
+            std::cout << " value is null\n";
+            return std::nullopt;
         }
     }
 
@@ -338,6 +382,7 @@ public:
                 && (maybe_parts_0 = this->parts())
                 && (maybe_part_0 = this->part())
             ){
+                std::cout << "generating alt in rule: parts\n;";
                 parts_0 = maybe_parts_0.value();
                 part_0 = maybe_part_0.value();
                 return parts_0.append(part_0) ;
@@ -346,6 +391,7 @@ public:
             if (true
                 && (maybe_part_0 = this->part())
             ){
+                std::cout << "generating alt in rule: parts\n;";
                 parts_0 = maybe_parts_0.value();
                 part_0 = maybe_part_0.value();
                 return part_0 ;
@@ -358,9 +404,13 @@ public:
         std::cout << "Parsing parts\n";
         std::optional<std::any> return_value = memoize("parts", inner_func, mark());
         if (return_value) {
-            return std::any_cast<std::string>(return_value.value());
+            std::cout << " value not null\n";
+            std::cout << "any holds type: " << return_value.value().type().name() << "should hold std::string\n";
+            std::cout << std::any_cast<std::optional<std::string>>(return_value.value()) << std::endl;
+            return std::any_cast<std::optional<std::string>>(return_value.value());
         } else {
-           return std::nullopt;
+            std::cout << " value is null\n";
+            return std::nullopt;
         }
     }
 
@@ -375,6 +425,7 @@ public:
             if (true
                 && (maybe_name_0 = expect(TokenType::NAME))
             ){
+                std::cout << "generating alt in rule: part\n;";
                 name_0 = maybe_name_0.value();
                 return name_0.value ;
             }
@@ -384,6 +435,7 @@ public:
             if (true
                 && (maybe_semicolon_0 = expect(TokenType::SEMICOLON))
             ){
+                std::cout << "generating alt in rule: part\n;";
                 name_0 = maybe_name_0.value();
                 semicolon_0 = maybe_semicolon_0.value();
                 return semicolon_0.value ;
@@ -394,6 +446,7 @@ public:
             if (true
                 && (maybe_token_0 = expect("<"))
             ){
+                std::cout << "generating alt in rule: part\n;";
                 name_0 = maybe_name_0.value();
                 semicolon_0 = maybe_semicolon_0.value();
                 token_0 = maybe_token_0.value();
@@ -403,6 +456,7 @@ public:
             if (true
                 && (maybe_token_0 = expect(">"))
             ){
+                std::cout << "generating alt in rule: part\n;";
                 name_0 = maybe_name_0.value();
                 semicolon_0 = maybe_semicolon_0.value();
                 token_0 = maybe_token_0.value();
@@ -416,9 +470,13 @@ public:
         std::cout << "Parsing part\n";
         std::optional<std::any> return_value = memoize("part", inner_func, mark());
         if (return_value) {
-            return std::any_cast<std::string>(return_value.value());
+            std::cout << " value not null\n";
+            std::cout << "any holds type: " << return_value.value().type().name() << "should hold std::string\n";
+            std::cout << std::any_cast<std::optional<std::string>>(return_value.value()) << std::endl;
+            return std::any_cast<std::optional<std::string>>(return_value.value());
         } else {
-           return std::nullopt;
+            std::cout << " value is null\n";
+            return std::nullopt;
         }
     }
 
@@ -433,8 +491,9 @@ public:
             if (true
                 && (maybe_whitespace_0 = expect(TokenType::WHITESPACE))
             ){
+                std::cout << "generating alt in rule: ws\n;";
                 whitespace_0 = maybe_whitespace_0.value();
-                return Node{"ws", {maybe_whitespace_0.value().value}};
+                return {Node{"ws", {maybe_whitespace_0.value().value}}};
             }
             reset(pos);
             std::cout << "No parse found for ws\n";
@@ -444,9 +503,13 @@ public:
         std::cout << "Parsing ws\n";
         std::optional<std::any> return_value = memoize("ws", inner_func, mark());
         if (return_value) {
-            return std::any_cast<Node>(return_value.value());
+            std::cout << " value not null\n";
+            std::cout << "any holds type: " << return_value.value().type().name() << "should hold Node\n";
+            std::cout << std::any_cast<std::optional<Node>>(return_value.value()) << std::endl;
+            return std::any_cast<std::optional<Node>>(return_value.value());
         } else {
-           return std::nullopt;
+            std::cout << " value is null\n";
+            return std::nullopt;
         }
     }
 

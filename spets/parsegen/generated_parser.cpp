@@ -21,8 +21,9 @@ public:
             if (true
                 && (maybe_statement_0 = this->statement())
             ){
+                std::cout << "generating alt in rule: start\n;";
                 statement_0 = maybe_statement_0.value();
-                return Node{"start", {maybe_statement_0.value()}};
+                return {Node{"start", {maybe_statement_0.value()}}};
             }
             reset(pos);
             std::cout << "No parse found for start\n";
@@ -32,9 +33,13 @@ public:
         std::cout << "Parsing start\n";
         std::optional<std::any> return_value = memoize("start", inner_func, mark());
         if (return_value) {
-            return std::any_cast<Node>(return_value.value());
+            std::cout << " value not null\n";
+            std::cout << "any holds type: " << return_value.value().type().name() << "should hold Node\n";
+            std::cout << std::any_cast<std::optional<Node>>(return_value.value()) << std::endl;
+            return std::any_cast<std::optional<Node>>(return_value.value());
         } else {
-           return std::nullopt;
+            std::cout << " value is null\n";
+            return std::nullopt;
         }
     }
 
@@ -52,9 +57,10 @@ public:
                 && (maybe_expr_0 = this->expr())
                 && (maybe_statement_end_0 = this->statement_end())
             ){
+                std::cout << "generating alt in rule: statement\n;";
                 expr_0 = maybe_expr_0.value();
                 statement_end_0 = maybe_statement_end_0.value();
-                return Node{"statement", {maybe_expr_0.value(), maybe_statement_end_0.value()}};
+                return {Node{"statement", {maybe_expr_0.value(), maybe_statement_end_0.value()}}};
             }
             reset(pos);
             std::cout << "No parse found for statement\n";
@@ -64,9 +70,13 @@ public:
         std::cout << "Parsing statement\n";
         std::optional<std::any> return_value = memoize("statement", inner_func, mark());
         if (return_value) {
-            return std::any_cast<Node>(return_value.value());
+            std::cout << " value not null\n";
+            std::cout << "any holds type: " << return_value.value().type().name() << "should hold Node\n";
+            std::cout << std::any_cast<std::optional<Node>>(return_value.value()) << std::endl;
+            return std::any_cast<std::optional<Node>>(return_value.value());
         } else {
-           return std::nullopt;
+            std::cout << " value is null\n";
+            return std::nullopt;
         }
     }
 
@@ -87,10 +97,11 @@ public:
                 && (maybe_token_0 = expect("+"))
                 && (maybe_term_0 = this->term())
             ){
+                std::cout << "generating alt in rule: expr\n;";
                 expr_0 = maybe_expr_0.value();
                 token_0 = maybe_token_0.value();
                 term_0 = maybe_term_0.value();
-                return Node{"expr", {maybe_expr_0.value(), Node("token", maybe_token_0.value().value), maybe_term_0.value()}};
+                return {Node{"expr", {maybe_expr_0.value(), Node("token", maybe_token_0.value().value), maybe_term_0.value()}}};
             }
             reset(pos);
             if (true
@@ -98,19 +109,21 @@ public:
                 && (maybe_token_0 = expect("-"))
                 && (maybe_term_0 = this->term())
             ){
+                std::cout << "generating alt in rule: expr\n;";
                 expr_0 = maybe_expr_0.value();
                 token_0 = maybe_token_0.value();
                 term_0 = maybe_term_0.value();
-                return Node{"expr", {maybe_expr_0.value(), Node("token", maybe_token_0.value().value), maybe_term_0.value()}};
+                return {Node{"expr", {maybe_expr_0.value(), Node("token", maybe_token_0.value().value), maybe_term_0.value()}}};
             }
             reset(pos);
             if (true
                 && (maybe_term_0 = this->term())
             ){
+                std::cout << "generating alt in rule: expr\n;";
                 expr_0 = maybe_expr_0.value();
                 token_0 = maybe_token_0.value();
                 term_0 = maybe_term_0.value();
-                return Node{"expr", {maybe_term_0.value()}};
+                return {Node{"expr", {maybe_term_0.value()}}};
             }
             reset(pos);
             std::cout << "No parse found for expr\n";
@@ -120,9 +133,13 @@ public:
         std::cout << "Parsing expr\n";
         std::optional<std::any> return_value = memoize("expr", inner_func, mark());
         if (return_value) {
-            return std::any_cast<Node>(return_value.value());
+            std::cout << " value not null\n";
+            std::cout << "any holds type: " << return_value.value().type().name() << "should hold Node\n";
+            std::cout << std::any_cast<std::optional<Node>>(return_value.value()) << std::endl;
+            return std::any_cast<std::optional<Node>>(return_value.value());
         } else {
-           return std::nullopt;
+            std::cout << " value is null\n";
+            return std::nullopt;
         }
     }
 
@@ -143,10 +160,11 @@ public:
                 && (maybe_token_0 = expect("*"))
                 && (maybe_atom_0 = this->atom())
             ){
+                std::cout << "generating alt in rule: term\n;";
                 term_0 = maybe_term_0.value();
                 token_0 = maybe_token_0.value();
                 atom_0 = maybe_atom_0.value();
-                return Node{"term", {maybe_term_0.value(), Node("token", maybe_token_0.value().value), maybe_atom_0.value()}};
+                return {Node{"term", {maybe_term_0.value(), Node("token", maybe_token_0.value().value), maybe_atom_0.value()}}};
             }
             reset(pos);
             if (true
@@ -154,19 +172,21 @@ public:
                 && (maybe_token_0 = expect("/"))
                 && (maybe_atom_0 = this->atom())
             ){
+                std::cout << "generating alt in rule: term\n;";
                 term_0 = maybe_term_0.value();
                 token_0 = maybe_token_0.value();
                 atom_0 = maybe_atom_0.value();
-                return Node{"term", {maybe_term_0.value(), Node("token", maybe_token_0.value().value), maybe_atom_0.value()}};
+                return {Node{"term", {maybe_term_0.value(), Node("token", maybe_token_0.value().value), maybe_atom_0.value()}}};
             }
             reset(pos);
             if (true
                 && (maybe_atom_0 = this->atom())
             ){
+                std::cout << "generating alt in rule: term\n;";
                 term_0 = maybe_term_0.value();
                 token_0 = maybe_token_0.value();
                 atom_0 = maybe_atom_0.value();
-                return Node{"term", {maybe_atom_0.value()}};
+                return {Node{"term", {maybe_atom_0.value()}}};
             }
             reset(pos);
             std::cout << "No parse found for term\n";
@@ -176,9 +196,13 @@ public:
         std::cout << "Parsing term\n";
         std::optional<std::any> return_value = memoize("term", inner_func, mark());
         if (return_value) {
-            return std::any_cast<Node>(return_value.value());
+            std::cout << " value not null\n";
+            std::cout << "any holds type: " << return_value.value().type().name() << "should hold Node\n";
+            std::cout << std::any_cast<std::optional<Node>>(return_value.value()) << std::endl;
+            return std::any_cast<std::optional<Node>>(return_value.value());
         } else {
-           return std::nullopt;
+            std::cout << " value is null\n";
+            return std::nullopt;
         }
     }
 
@@ -199,6 +223,7 @@ public:
                 && (maybe_expr_0 = this->expr())
                 && (maybe_token_1 = expect(")"))
             ){
+                std::cout << "generating alt in rule: atom\n;";
                 token_0 = maybe_token_0.value();
                 expr_0 = maybe_expr_0.value();
                 token_1 = maybe_token_1.value();
@@ -210,11 +235,12 @@ public:
             if (true
                 && (maybe_name_0 = expect(TokenType::NAME))
             ){
+                std::cout << "generating alt in rule: atom\n;";
                 token_0 = maybe_token_0.value();
                 expr_0 = maybe_expr_0.value();
                 token_1 = maybe_token_1.value();
                 name_0 = maybe_name_0.value();
-                return Node{"atom", {maybe_name_0.value().value}};
+                return {Node{"atom", {maybe_name_0.value().value}}};
             }
             reset(pos);
             std::optional<Token> maybe_number_0;
@@ -222,12 +248,13 @@ public:
             if (true
                 && (maybe_number_0 = expect(TokenType::NUMBER))
             ){
+                std::cout << "generating alt in rule: atom\n;";
                 token_0 = maybe_token_0.value();
                 expr_0 = maybe_expr_0.value();
                 token_1 = maybe_token_1.value();
                 name_0 = maybe_name_0.value();
                 number_0 = maybe_number_0.value();
-                return Node{"atom", {maybe_number_0.value().value}};
+                return {Node{"atom", {maybe_number_0.value().value}}};
             }
             reset(pos);
             std::cout << "No parse found for atom\n";
@@ -237,9 +264,13 @@ public:
         std::cout << "Parsing atom\n";
         std::optional<std::any> return_value = memoize("atom", inner_func, mark());
         if (return_value) {
-            return std::any_cast<Node>(return_value.value());
+            std::cout << " value not null\n";
+            std::cout << "any holds type: " << return_value.value().type().name() << "should hold Node\n";
+            std::cout << std::any_cast<std::optional<Node>>(return_value.value()) << std::endl;
+            return std::any_cast<std::optional<Node>>(return_value.value());
         } else {
-           return std::nullopt;
+            std::cout << " value is null\n";
+            return std::nullopt;
         }
     }
 
@@ -254,8 +285,9 @@ public:
             if (true
                 && (maybe_newline_0 = expect(TokenType::NEWLINE))
             ){
+                std::cout << "generating alt in rule: statement_end\n;";
                 newline_0 = maybe_newline_0.value();
-                return Node{"statement_end", {maybe_newline_0.value().value}};
+                return {Node{"statement_end", {maybe_newline_0.value().value}}};
             }
             reset(pos);
             std::optional<Token> maybe_semicolon_0;
@@ -263,9 +295,10 @@ public:
             if (true
                 && (maybe_semicolon_0 = expect(TokenType::SEMICOLON))
             ){
+                std::cout << "generating alt in rule: statement_end\n;";
                 newline_0 = maybe_newline_0.value();
                 semicolon_0 = maybe_semicolon_0.value();
-                return Node{"statement_end", {maybe_semicolon_0.value().value}};
+                return {Node{"statement_end", {maybe_semicolon_0.value().value}}};
             }
             reset(pos);
             std::cout << "No parse found for statement_end\n";
@@ -275,9 +308,13 @@ public:
         std::cout << "Parsing statement_end\n";
         std::optional<std::any> return_value = memoize("statement_end", inner_func, mark());
         if (return_value) {
-            return std::any_cast<Node>(return_value.value());
+            std::cout << " value not null\n";
+            std::cout << "any holds type: " << return_value.value().type().name() << "should hold Node\n";
+            std::cout << std::any_cast<std::optional<Node>>(return_value.value()) << std::endl;
+            return std::any_cast<std::optional<Node>>(return_value.value());
         } else {
-           return std::nullopt;
+            std::cout << " value is null\n";
+            return std::nullopt;
         }
     }
 
