@@ -1,26 +1,32 @@
 #include <optional>
 #include <fstream>
-#include <optional>
 
 #include <parser/node.hpp>
 #include <tokenizer/lexer.hpp>
 #include <parser/parser.hpp>
+#include <parser/parsing_helpers.hpp>
+
+#include <parsegen/rule.hpp>
     
 class Toyparser : public Parser {
 public:
-    std::optional<Node> start() {
+    std::optional<std::vector<Rule>> start() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
-        auto inner_func = [&, this]() -> std::optional<Node> {
+        auto inner_func = [&, this]() -> std::optional<std::vector<Rule>> {
             int pos = mark();
-            std::optional<Node> rules_0;
-            std::optional<Token> endoffile_0;
+            std::optional<std::vector<Rule>> maybe_rules_0;
+            std::vector<Rule> rules_0;
+            std::optional<Token> maybe_endoffile_0;
+            Token endoffile_0;
             if (true
-                && (rules_0 = this->rules())
-                && (endoffile_0 = expect(TokenType::ENDOFFILE))
+                && (maybe_rules_0 = this->rules())
+                && (maybe_endoffile_0 = expect(TokenType::ENDOFFILE))
             ){
-                return Node("start", {rules_0.value()}) ;
+                rules_0 = maybe_rules_0.value();
+                endoffile_0 = maybe_endoffile_0.value();
+                return rules_0 ;
             }
             reset(pos);
             std::cout << "No parse found for start\n";
@@ -30,31 +36,37 @@ public:
         std::cout << "Parsing start\n";
         std::optional<std::any> return_value = memoize("start", inner_func, mark());
         if (return_value) {
-            return std::any_cast<std::optional<Node>>(return_value.value());
+            return std::any_cast<std::vector<Rule>>(return_value.value());
         } else {
            return std::nullopt;
         }
     }
 
-    std::optional<Node> rules() {
+    std::optional<std::vector<Rule>> rules() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
-        auto inner_func = [&, this]() -> std::optional<Node> {
+        auto inner_func = [&, this]() -> std::optional<std::vector<Rule>> {
             int pos = mark();
-            std::optional<Node> rule_0;
-            std::optional<Node> rules_0;
+            std::optional<std::vector<Rule>> maybe_rules_0;
+            std::vector<Rule> rules_0;
+            std::optional<Rule> maybe_rule_0;
+            Rule rule_0;
             if (true
-                && (rule_0 = this->rule())
-                && (rules_0 = this->rules())
+                && (maybe_rules_0 = this->rules())
+                && (maybe_rule_0 = this->rule())
             ){
-                return rules_0.value().prepend_child(rule_0.value()) ;
+                rules_0 = maybe_rules_0.value();
+                rule_0 = maybe_rule_0.value();
+                return append_vector(rules_0, rule_0) ;
             }
             reset(pos);
             if (true
-                && (rule_0 = this->rule())
+                && (maybe_rule_0 = this->rule())
             ){
-                return Node("rules", {rule_0.value()}) ;
+                rules_0 = maybe_rules_0.value();
+                rule_0 = maybe_rule_0.value();
+                return {{rule_0}} ;
             }
             reset(pos);
             std::cout << "No parse found for rules\n";
@@ -64,32 +76,42 @@ public:
         std::cout << "Parsing rules\n";
         std::optional<std::any> return_value = memoize("rules", inner_func, mark());
         if (return_value) {
-            return std::any_cast<std::optional<Node>>(return_value.value());
+            return std::any_cast<std::vector<Rule>>(return_value.value());
         } else {
            return std::nullopt;
         }
     }
 
-    std::optional<Node> rule() {
+    std::optional<Rule> rule() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
-        auto inner_func = [&, this]() -> std::optional<Node> {
+        auto inner_func = [&, this]() -> std::optional<Rule> {
             int pos = mark();
-            std::optional<Token> name_0;
-            std::optional<Node> ws_0;
-            std::optional<Token> token_0;
-            std::optional<Node> alts_0;
-            std::optional<Token> newline_0;
+            std::optional<Token> maybe_name_0;
+            Token name_0;
+            std::optional<Node> maybe_ws_0;
+            Node ws_0;
+            std::optional<Token> maybe_token_0;
+            Token token_0;
+            std::optional<std::vector<Alt>> maybe_alts_0;
+            std::vector<Alt> alts_0;
+            std::optional<Token> maybe_newline_0;
+            Token newline_0;
             if (true
-                && (name_0 = expect(TokenType::NAME))
-                && (ws_0 = this->ws())
-                && (token_0 = expect("<-"))
-                && (ws_0 = this->ws())
-                && (alts_0 = this->alts())
-                && (newline_0 = expect(TokenType::NEWLINE))
+                && (maybe_name_0 = expect(TokenType::NAME))
+                && (maybe_ws_0 = this->ws())
+                && (maybe_token_0 = expect("<-"))
+                && (maybe_ws_0 = this->ws())
+                && (maybe_alts_0 = this->alts())
+                && (maybe_newline_0 = expect(TokenType::NEWLINE))
             ){
-                return Node("rule", { alts_0.value() });
+                name_0 = maybe_name_0.value();
+                ws_0 = maybe_ws_0.value();
+                token_0 = maybe_token_0.value();
+                alts_0 = maybe_alts_0.value();
+                newline_0 = maybe_newline_0.value();
+                return Rule{name_0.value, alts_0, {}} ;
             }
             reset(pos);
             std::cout << "No parse found for rule\n";
@@ -99,36 +121,48 @@ public:
         std::cout << "Parsing rule\n";
         std::optional<std::any> return_value = memoize("rule", inner_func, mark());
         if (return_value) {
-            return std::any_cast<std::optional<Node>>(return_value.value());
+            return std::any_cast<Rule>(return_value.value());
         } else {
            return std::nullopt;
         }
     }
 
-    std::optional<Node> alts() {
+    std::optional<std::vector<Alt>> alts() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
-        auto inner_func = [&, this]() -> std::optional<Node> {
+        auto inner_func = [&, this]() -> std::optional<std::vector<Alt>> {
             int pos = mark();
-            std::optional<Node> alt_0;
-            std::optional<Node> ws_0;
-            std::optional<Token> token_0;
-            std::optional<Node> alts_0;
+            std::optional<std::vector<Alt>> maybe_alts_0;
+            std::vector<Alt> alts_0;
+            std::optional<Node> maybe_ws_0;
+            Node ws_0;
+            std::optional<Token> maybe_token_0;
+            Token token_0;
+            std::optional<Alt> maybe_alt_0;
+            Alt alt_0;
             if (true
-                && (alt_0 = this->alt())
-                && (ws_0 = this->ws())
-                && (token_0 = expect("/"))
-                && (ws_0 = this->ws())
-                && (alts_0 = this->alts())
+                && (maybe_alts_0 = this->alts())
+                && (maybe_ws_0 = this->ws())
+                && (maybe_token_0 = expect("/"))
+                && (maybe_ws_0 = this->ws())
+                && (maybe_alt_0 = this->alt())
             ){
-                return alts_0.value().prepend_child(alt_0.value()) ;
+                alts_0 = maybe_alts_0.value();
+                ws_0 = maybe_ws_0.value();
+                token_0 = maybe_token_0.value();
+                alt_0 = maybe_alt_0.value();
+                return {append_vector(alts_0, alt_0)} ;
             }
             reset(pos);
             if (true
-                && (alt_0 = this->alt())
+                && (maybe_alt_0 = this->alt())
             ){
-                return Node("alts", { alt_0.value() });
+                alts_0 = maybe_alts_0.value();
+                ws_0 = maybe_ws_0.value();
+                token_0 = maybe_token_0.value();
+                alt_0 = maybe_alt_0.value();
+                return {{alt_0}} ;
             }
             reset(pos);
             std::cout << "No parse found for alts\n";
@@ -138,23 +172,25 @@ public:
         std::cout << "Parsing alts\n";
         std::optional<std::any> return_value = memoize("alts", inner_func, mark());
         if (return_value) {
-            return std::any_cast<std::optional<Node>>(return_value.value());
+            return std::any_cast<std::vector<Alt>>(return_value.value());
         } else {
            return std::nullopt;
         }
     }
 
-    std::optional<Node> alt() {
+    std::optional<Alt> alt() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
-        auto inner_func = [&, this]() -> std::optional<Node> {
+        auto inner_func = [&, this]() -> std::optional<Alt> {
             int pos = mark();
-            std::optional<Node> items_0;
+            std::optional<std::vector<std::string>> maybe_items_0;
+            std::vector<std::string> items_0;
             if (true
-                && (items_0 = this->items())
+                && (maybe_items_0 = this->items())
             ){
-                return Node("alt", {items_0.value()}) ;
+                items_0 = maybe_items_0.value();
+                return Alt{items_0, {}} ;
             }
             reset(pos);
             std::cout << "No parse found for alt\n";
@@ -164,31 +200,37 @@ public:
         std::cout << "Parsing alt\n";
         std::optional<std::any> return_value = memoize("alt", inner_func, mark());
         if (return_value) {
-            return std::any_cast<std::optional<Node>>(return_value.value());
+            return std::any_cast<Alt>(return_value.value());
         } else {
            return std::nullopt;
         }
     }
 
-    std::vector<std::string> items() {
+    std::optional<std::vector<std::string>> items() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
-        auto inner_func = [&, this]() -> std::vector<std::string> {
+        auto inner_func = [&, this]() -> std::optional<std::vector<std::string>> {
             int pos = mark();
-            std::optional<Node> item_0;
-            std::optional<Node> items_0;
+            std::optional<std::vector<std::string>> maybe_items_0;
+            std::vector<std::string> items_0;
+            std::optional<std::string> maybe_item_0;
+            std::string item_0;
             if (true
-                && (item_0 = this->item())
-                && (items_0 = this->items())
+                && (maybe_items_0 = this->items())
+                && (maybe_item_0 = this->item())
             ){
-                return items_0.value().prepend_child(item_0.value()) ;
+                items_0 = maybe_items_0.value();
+                item_0 = maybe_item_0.value();
+                return {append_vector(items_0, item_0)} ;
             }
             reset(pos);
             if (true
-                && (item_0 = this->item())
+                && (maybe_item_0 = this->item())
             ){
-                return Node("items", {item_0.value()}) ;
+                items_0 = maybe_items_0.value();
+                item_0 = maybe_item_0.value();
+                return {{item_0}} ;
             }
             reset(pos);
             std::cout << "No parse found for items\n";
@@ -204,24 +246,29 @@ public:
         }
     }
 
-    std::string item() {
+    std::optional<std::string> item() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
-        auto inner_func = [&, this]() -> std::string {
+        auto inner_func = [&, this]() -> std::optional<std::string> {
             int pos = mark();
-            std::optional<Token> name_0;
+            std::optional<Token> maybe_name_0;
+            Token name_0;
             if (true
-                && (name_0 = expect(TokenType::NAME))
+                && (maybe_name_0 = expect(TokenType::NAME))
             ){
-                return Node("item", name_0.value().value) ;
+                name_0 = maybe_name_0.value();
+                return {name_0.value} ;
             }
             reset(pos);
-            std::optional<Token> string_0;
+            std::optional<Token> maybe_string_0;
+            Token string_0;
             if (true
-                && (string_0 = expect(TokenType::STRING))
+                && (maybe_string_0 = expect(TokenType::STRING))
             ){
-                return Node("item", name_0.value().value) ;
+                name_0 = maybe_name_0.value();
+                string_0 = maybe_string_0.value();
+                return {string_0.value } ;
             }
             reset(pos);
             std::cout << "No parse found for item\n";
@@ -243,11 +290,13 @@ public:
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<Node> {
             int pos = mark();
-            std::optional<Token> whitespace_0;
+            std::optional<Token> maybe_whitespace_0;
+            Token whitespace_0;
             if (true
-                && (whitespace_0 = expect(TokenType::WHITESPACE))
+                && (maybe_whitespace_0 = expect(TokenType::WHITESPACE))
             ){
-                return Node{"ws", {whitespace_0.value().value}};
+                whitespace_0 = maybe_whitespace_0.value();
+                return Node{"ws", {maybe_whitespace_0.value().value}};
             }
             reset(pos);
             std::cout << "No parse found for ws\n";
@@ -257,7 +306,7 @@ public:
         std::cout << "Parsing ws\n";
         std::optional<std::any> return_value = memoize("ws", inner_func, mark());
         if (return_value) {
-            return std::any_cast<std::optional<Node>>(return_value.value());
+            return std::any_cast<Node>(return_value.value());
         } else {
            return std::nullopt;
         }
@@ -278,14 +327,14 @@ int main(int argc, char**argv) {
   Toyparser p{t};
 
   auto nodes = p.start();
-  if (nodes) {
-    std::cout << nodes.value() << "\n";
-    std::cout << "number of children " << nodes.value().children.size() << "\n";
-    for (const auto& child : nodes.value().children) {
-        std::cout << child << "\n";
-    }
-  } else {
-    std::cout << "Could not parse content.\n";
-  }
+  // if (nodes) {
+  //   std::cout << nodes.value() << "\n";
+  //   std::cout << "number of children " << nodes.value().children.size() << "\n";
+  //   for (const auto& child : nodes.value().children) {
+  //       std::cout << child << "\n";
+  //   }
+  // } else {
+  //   std::cout << "Could not parse content.\n";
+  // }
 }
     

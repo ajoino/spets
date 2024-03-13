@@ -1,12 +1,15 @@
-start <- rules ENDOFFILE { Node("start", {rules_0.value()}) }
-rules <- rule rules { rules_0.value().prepend_child(rule_0.value()) }
-    / rule { Node("rules", {rule_0.value()}) }
-rule <- NAME ws "<-" ws alts NEWLINE { Node("rule", { alts_0.value() })}
-alts <- alt ws "/" ws alts { alts_0.value().prepend_child(alt_0.value()) }
-    / alt { Node("alts", { alt_0.value() })}
-alt <- items { Node("alt", {items_0.value()}) }
-items[std::vector<std::string>] <- item items { items_0.value().prepend_child(item_0.value()) }
-    / item { Node("items", {item_0.value()}) }
-item[std::string] <- NAME { Node("item", name_0.value().value) }
-    / STRING { Node("item", name_0.value().value) }
+start[std::vector<Rule>] <- rules ENDOFFILE { rules_0 }
+rules[std::vector<Rule>] <- rules rule { append_vector(rules_0, rule_0) }
+    / rule { {{rule_0}} }
+rule[Rule] <- NAME ws "<-" ws alts NEWLINE { Rule{name_0.value, alts_0, {}} }
+
+alts[std::vector<Alt>] <- alts ws "/" ws alt { {append_vector(alts_0, alt_0)} }
+    / alt { {{alt_0}} }
+alt[Alt] <- items { Alt{items_0, {}} }
+
+items[std::vector<std::string>] <- items item { {append_vector(items_0, item_0)} }
+    / item { {{item_0}} }
+item[std::string] <- NAME { {name_0.value} }
+    / STRING { {string_0.value } }
+
 ws <- WHITESPACE

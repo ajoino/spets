@@ -13,7 +13,7 @@ struct Alt {
 struct Rule {
     std::string name;
     std::vector<Alt> alts;
-    std::string return_type = "std::optional<Node>";
+    std::string return_type = "Node";
 
     inline constexpr bool operator<(const Rule& rhs) const {
         return this->name < rhs.name;

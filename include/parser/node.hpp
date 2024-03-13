@@ -14,6 +14,7 @@ struct Node {
     std::string text;
     std::vector<Node> children;
 
+    Node() = default;
     Node(std::string nt, std::string t, std::vector<Node> chdn) = delete;
     Node(std::string nt, std::string t) : node_type(std::move(nt)), text(std::move(t)) {};
 

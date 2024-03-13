@@ -43,7 +43,7 @@ std::optional<Rule> GrammarParser::rule() {
                 return_type.append(*at);
             }
         } else {
-            return_type = "std::optional<Node>";
+            return_type = "Node";
         }
         if (skip_ws() && expect("<-") && skip_ws() && skip("/") && skip_nl()) {
             auto maybe_alt = alternative();

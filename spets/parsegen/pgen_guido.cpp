@@ -49,6 +49,7 @@ bool all_upper(const std::string& s) {
 class Generator {
     std::stringstream stream;
     uint indentation = 0;
+    std::vector<Rule> rules;
 
 public:
 
@@ -68,13 +69,13 @@ public:
     ) {
         if (item.starts_with("'") || item.starts_with("\"")) {
             std::string string_item_inner{item.begin() + 1, item.end() - 1};
-            auto token_id = std::string{"token_"} + std::to_string(token_counter);
+            auto token_id = std::string{"maybe_token_"} + std::to_string(token_counter);
             stream << "                && (" << token_id << " = expect(\"" << string_item_inner << "\"))\n";
             token_counter++;
             auto node_string = std::format("Node(\"token\", {})", token_id + ".value().value");
             items.push_back(node_string);
         } else {
-            auto var = str_tolower(item) + "_" + std::to_string(name_counter[str_tolower(item)]);
+            auto var = "maybe_" + str_tolower(item) + "_" + std::to_string(name_counter[str_tolower(item)]);
             if (in_vector(items, var)) {
                 var += std::to_string(items.size());
             }
@@ -100,15 +101,26 @@ public:
                     if (in_vector(vars, token_name)) {
                         continue;
                     }
-                    stream << "            std::optional<Token> " << token_name << ";\n";
+                    stream << "            std::optional<Token> maybe_" << token_name << ";\n";
+                    stream << "            Token " << token_name << ";\n";
                     token_counter++;
                     vars.push_back(token_name);
                     continue;
                 }
+                std::string return_type = "Node";
+                for (const auto& rule_ : rules) {
+                    std::cout << "rule_.name = " << rule_.name << ", item = " << item << "\n";
+                    if (rule_.name == item) {
+                        return_type = rule_.return_type;
+                        break;
+                    }
+                }
                 if (all_upper(item)) {
-                    stream << "            std::optional<Token> " << var_name << ";\n";
+                    stream << "            std::optional<Token> maybe_" << var_name << ";\n";
+                    stream << "            Token " << var_name << ";\n";
                 } else {
-                    stream << "            std::optional<Node> " << var_name << ";\n";
+                    stream << "            std::optional<" << return_type << "> maybe_" << var_name << ";\n";
+                    stream << "            " << return_type << " " << var_name << ";\n";
                 }
                 name_counter[var_name]++;
                 vars.push_back(var_name);
@@ -127,6 +139,9 @@ public:
         }
         stream << "            ){\n";
 
+        for (const auto& var_name : vars) {
+            stream << "                " << var_name << " = maybe_" << var_name << ".value();\n";
+        }
         if (alt.action && !alt.action.value().empty()) {
             stream << "                return " << alt.action.value() << ";\n";
         } else {
@@ -144,10 +159,10 @@ public:
     }
 
     void generate_rule(const Rule& rule) {
-        stream << "    " << rule.return_type << " " << rule.name << "() {\n\n";
+        stream << "    std::optional<" << rule.return_type << "> " << rule.name << "() {\n\n";
         stream << "        // inner_func does the actual parsing but is called later by\n";
         stream << "        // to enable memoization\n";
-        stream << "        auto inner_func = [&, this]() -> " << rule.return_type << " {\n";
+        stream << "        auto inner_func = [&, this]() -> std::optional<" << rule.return_type << "> {\n";
         stream << "            int pos = mark();\n";
         std::vector<std::string> vars;
         for (const auto& alt : rule.alts) {
@@ -171,13 +186,16 @@ public:
             std::cout << "Cannot generate parser from no rules.\n";
             return stream;
         }
-        auto rules = maybe_rules.value();
+        rules = maybe_rules.value();
         stream << R"preamble(#include <optional>
 #include <fstream>
 
 #include <parser/node.hpp>
 #include <tokenizer/lexer.hpp>
 #include <parser/parser.hpp>
+#include <parser/parsing_helpers.hpp>
+
+#include <parsegen/rule.hpp>
     
 )preamble";
         stream << "class Toyparser : public Parser {\npublic:\n";
@@ -198,15 +216,15 @@ int main(int argc, char**argv) {
   Toyparser p{t};
 
   auto nodes = p.start();
-  if (nodes) {
-    std::cout << nodes.value() << "\n";
-    std::cout << "number of children " << nodes.value().children.size() << "\n";
-    for (const auto& child : nodes.value().children) {
-        std::cout << child << "\n";
-    }
-  } else {
-    std::cout << "Could not parse content.\n";
-  }
+  // if (nodes) {
+  //   std::cout << nodes.value() << "\n";
+  //   std::cout << "number of children " << nodes.value().children.size() << "\n";
+  //   for (const auto& child : nodes.value().children) {
+  //       std::cout << child << "\n";
+  //   }
+  // } else {
+  //   std::cout << "Could not parse content.\n";
+  // }
 }
     )c++";
         return stream;

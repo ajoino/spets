@@ -62,8 +62,8 @@ struct Lexer {
 struct Token {
     TokenType type;
     std::string value;
-    int line;
-    int column;
+    int line{};
+    int column{};
 
     Token(const TokenType& token_type, std::string value, const int line, const int column) :
         type(token_type), value(std::move(value)), line(line), column(column){};
@@ -71,6 +71,7 @@ struct Token {
     Token& operator=(const Token& other) = default;
     Token(Token&&) = default;
     Token& operator=(Token&&) = default;
+    Token() : type{TokenType::ERROR} {};
     ~Token() = default;
 
     static Token from_lexer(TokenType type, Lexer& lexer) noexcept;
