@@ -16,17 +16,15 @@ public:
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<std::vector<Rule>> {
             int pos = mark();
-            std::optional<std::vector<Rule>> maybe_rules_0;
-            std::vector<Rule> rules_0;
-            std::optional<Token> maybe_endoffile_0;
-            Token endoffile_0;
+            std::optional<std::vector<Rule>> maybe__0;
+            std::vector<Rule> _0;
             if (true
-                && (maybe_rules_0 = this->rules())
-                && (maybe_endoffile_0 = expect(TokenType::ENDOFFILE))
+                && (maybe__0 = this->rules())
+                && (maybe__0 = expect(TokenType::ENDOFFILE))
             ){
-                std::cout << "generating alt in rule: start\n;";
+                std::cout << "generating alt in rule: start\n";
                 rules_0 = maybe_rules_0.value();
-                endoffile_0 = maybe_endoffile_0.value();
+                ENDOFFILE_0 = maybe_ENDOFFILE_0.value();
                 return rules_0 ;
             }
             reset(pos);
@@ -53,25 +51,22 @@ public:
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<std::vector<Rule>> {
             int pos = mark();
-            std::optional<std::vector<Rule>> maybe_rules_0;
-            std::vector<Rule> rules_0;
-            std::optional<Rule> maybe_rule_0;
-            Rule rule_0;
+            std::optional<std::vector<Rule>> maybe__0;
+            std::vector<Rule> _0;
             if (true
-                && (maybe_rules_0 = this->rules())
-                && (maybe_rule_0 = this->rule())
+                && (maybe__0 = this->rules())
+                && (maybe__0 = this->rule())
             ){
-                std::cout << "generating alt in rule: rules\n;";
+                std::cout << "generating alt in rule: rules\n";
                 rules_0 = maybe_rules_0.value();
                 rule_0 = maybe_rule_0.value();
                 return append_vector(rules_0, rule_0) ;
             }
             reset(pos);
             if (true
-                && (maybe_rule_0 = this->rule())
+                && (maybe__0 = this->rule())
             ){
-                std::cout << "generating alt in rule: rules\n;";
-                rules_0 = maybe_rules_0.value();
+                std::cout << "generating alt in rule: rules\n";
                 rule_0 = maybe_rule_0.value();
                 return {{rule_0}} ;
             }
@@ -99,42 +94,29 @@ public:
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<Rule> {
             int pos = mark();
-            std::optional<Token> maybe_name_0;
-            Token name_0;
-            std::optional<Token> maybe_token_0;
-            Token token_0;
-            std::optional<std::string> maybe_type_0;
-            std::string type_0;
-            std::optional<Token> maybe_token_1;
-            Token token_1;
-            std::optional<Node> maybe_ws_0;
-            Node ws_0;
-            std::optional<Token> maybe_token_2;
-            Token token_2;
-            std::optional<std::vector<Alt>> maybe_alts_0;
-            std::vector<Alt> alts_0;
-            std::optional<Token> maybe_newline_0;
-            Token newline_0;
+            std::optional<Token> maybe__0;
+            Token _0;
             if (true
-                && (maybe_name_0 = expect(TokenType::NAME))
+                && (maybe__0 = expect(TokenType::NAME))
                 && (maybe_token_0 = expect("["))
-                && (maybe_type_0 = this->type())
+                && (maybe__0 = this->type())
                 && (maybe_token_1 = expect("]"))
-                && (maybe_ws_0 = this->ws())
+                && (maybe__0 = this->ws())
                 && (maybe_token_2 = expect("<-"))
-                && (maybe_ws_0 = this->ws())
-                && (maybe_alts_0 = this->alts())
-                && (maybe_newline_0 = expect(TokenType::NEWLINE))
+                && (maybe__0 = this->ws())
+                && (maybe__0 = this->alts())
+                && (maybe__0 = expect(TokenType::NEWLINE))
             ){
-                std::cout << "generating alt in rule: rule\n;";
-                name_0 = maybe_name_0.value();
-                token_0 = maybe_token_0.value();
+                std::cout << "generating alt in rule: rule\n";
+                NAME_0 = maybe_NAME_0.value();
+                "["_0 = maybe_"["_0.value();
                 type_0 = maybe_type_0.value();
-                token_1 = maybe_token_1.value();
+                "]"_0 = maybe_"]"_0.value();
                 ws_0 = maybe_ws_0.value();
-                token_2 = maybe_token_2.value();
+                "<-"_0 = maybe_"<-"_0.value();
+                ws_0 = maybe_ws_0.value();
                 alts_0 = maybe_alts_0.value();
-                newline_0 = maybe_newline_0.value();
+                NEWLINE_0 = maybe_NEWLINE_0.value();
                 return Rule{name_0.value, alts_0, {}} ;
             }
             reset(pos);
@@ -161,36 +143,28 @@ public:
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<std::vector<Alt>> {
             int pos = mark();
-            std::optional<std::vector<Alt>> maybe_alts_0;
-            std::vector<Alt> alts_0;
-            std::optional<Node> maybe_ws_0;
-            Node ws_0;
-            std::optional<Token> maybe_token_0;
-            Token token_0;
-            std::optional<Alt> maybe_alt_0;
-            Alt alt_0;
+            std::optional<std::vector<Alt>> maybe__0;
+            std::vector<Alt> _0;
             if (true
-                && (maybe_alts_0 = this->alts())
-                && (maybe_ws_0 = this->ws())
+                && (maybe__0 = this->alts())
+                && (maybe__0 = this->ws())
                 && (maybe_token_0 = expect("/"))
-                && (maybe_ws_0 = this->ws())
-                && (maybe_alt_0 = this->alt())
+                && (maybe__0 = this->ws())
+                && (maybe__0 = this->alt())
             ){
-                std::cout << "generating alt in rule: alts\n;";
+                std::cout << "generating alt in rule: alts\n";
                 alts_0 = maybe_alts_0.value();
                 ws_0 = maybe_ws_0.value();
-                token_0 = maybe_token_0.value();
+                "/"_0 = maybe_"/"_0.value();
+                ws_0 = maybe_ws_0.value();
                 alt_0 = maybe_alt_0.value();
                 return {append_vector(alts_0, alt_0)} ;
             }
             reset(pos);
             if (true
-                && (maybe_alt_0 = this->alt())
+                && (maybe__0 = this->alt())
             ){
-                std::cout << "generating alt in rule: alts\n;";
-                alts_0 = maybe_alts_0.value();
-                ws_0 = maybe_ws_0.value();
-                token_0 = maybe_token_0.value();
+                std::cout << "generating alt in rule: alts\n";
                 alt_0 = maybe_alt_0.value();
                 return {{alt_0}} ;
             }
@@ -218,12 +192,12 @@ public:
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<Alt> {
             int pos = mark();
-            std::optional<std::vector<std::string>> maybe_items_0;
-            std::vector<std::string> items_0;
+            std::optional<std::vector<std::string>> maybe__0;
+            std::vector<std::string> _0;
             if (true
-                && (maybe_items_0 = this->items())
+                && (maybe__0 = this->items())
             ){
-                std::cout << "generating alt in rule: alt\n;";
+                std::cout << "generating alt in rule: alt\n";
                 items_0 = maybe_items_0.value();
                 return Alt{items_0, {}} ;
             }
@@ -251,25 +225,22 @@ public:
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<std::vector<std::string>> {
             int pos = mark();
-            std::optional<std::vector<std::string>> maybe_items_0;
-            std::vector<std::string> items_0;
-            std::optional<std::string> maybe_item_0;
-            std::string item_0;
+            std::optional<std::vector<std::string>> maybe__0;
+            std::vector<std::string> _0;
             if (true
-                && (maybe_items_0 = this->items())
-                && (maybe_item_0 = this->item())
+                && (maybe__0 = this->items())
+                && (maybe__0 = this->item())
             ){
-                std::cout << "generating alt in rule: items\n;";
+                std::cout << "generating alt in rule: items\n";
                 items_0 = maybe_items_0.value();
                 item_0 = maybe_item_0.value();
                 return {append_vector(items_0, item_0)} ;
             }
             reset(pos);
             if (true
-                && (maybe_item_0 = this->item())
+                && (maybe__0 = this->item())
             ){
-                std::cout << "generating alt in rule: items\n;";
-                items_0 = maybe_items_0.value();
+                std::cout << "generating alt in rule: items\n";
                 item_0 = maybe_item_0.value();
                 return {{item_0}} ;
             }
@@ -297,24 +268,21 @@ public:
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<std::string> {
             int pos = mark();
-            std::optional<Token> maybe_name_0;
-            Token name_0;
+            std::optional<Token> maybe__0;
+            Token _0;
             if (true
-                && (maybe_name_0 = expect(TokenType::NAME))
+                && (maybe__0 = expect(TokenType::NAME))
             ){
-                std::cout << "generating alt in rule: item\n;";
-                name_0 = maybe_name_0.value();
+                std::cout << "generating alt in rule: item\n";
+                NAME_0 = maybe_NAME_0.value();
                 return {name_0.value} ;
             }
             reset(pos);
-            std::optional<Token> maybe_string_0;
-            Token string_0;
             if (true
-                && (maybe_string_0 = expect(TokenType::STRING))
+                && (maybe__0 = expect(TokenType::STRING))
             ){
-                std::cout << "generating alt in rule: item\n;";
-                name_0 = maybe_name_0.value();
-                string_0 = maybe_string_0.value();
+                std::cout << "generating alt in rule: item\n";
+                STRING_0 = maybe_STRING_0.value();
                 return {string_0.value } ;
             }
             reset(pos);
@@ -341,12 +309,12 @@ public:
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<std::string> {
             int pos = mark();
-            std::optional<std::string> maybe_parts_0;
-            std::string parts_0;
+            std::optional<std::string> maybe__0;
+            std::string _0;
             if (true
-                && (maybe_parts_0 = this->parts())
+                && (maybe__0 = this->parts())
             ){
-                std::cout << "generating alt in rule: type\n;";
+                std::cout << "generating alt in rule: type\n";
                 parts_0 = maybe_parts_0.value();
                 return parts_0 ;
             }
@@ -374,25 +342,22 @@ public:
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<std::string> {
             int pos = mark();
-            std::optional<std::string> maybe_parts_0;
-            std::string parts_0;
-            std::optional<std::string> maybe_part_0;
-            std::string part_0;
+            std::optional<std::string> maybe__0;
+            std::string _0;
             if (true
-                && (maybe_parts_0 = this->parts())
-                && (maybe_part_0 = this->part())
+                && (maybe__0 = this->parts())
+                && (maybe__0 = this->part())
             ){
-                std::cout << "generating alt in rule: parts\n;";
+                std::cout << "generating alt in rule: parts\n";
                 parts_0 = maybe_parts_0.value();
                 part_0 = maybe_part_0.value();
                 return parts_0.append(part_0) ;
             }
             reset(pos);
             if (true
-                && (maybe_part_0 = this->part())
+                && (maybe__0 = this->part())
             ){
-                std::cout << "generating alt in rule: parts\n;";
-                parts_0 = maybe_parts_0.value();
+                std::cout << "generating alt in rule: parts\n";
                 part_0 = maybe_part_0.value();
                 return part_0 ;
             }
@@ -420,46 +385,37 @@ public:
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<std::string> {
             int pos = mark();
-            std::optional<Token> maybe_name_0;
-            Token name_0;
+            std::optional<Token> maybe__0;
+            Token _0;
             if (true
-                && (maybe_name_0 = expect(TokenType::NAME))
+                && (maybe__0 = expect(TokenType::NAME))
             ){
-                std::cout << "generating alt in rule: part\n;";
-                name_0 = maybe_name_0.value();
+                std::cout << "generating alt in rule: part\n";
+                NAME_0 = maybe_NAME_0.value();
                 return name_0.value ;
             }
             reset(pos);
-            std::optional<Token> maybe_semicolon_0;
-            Token semicolon_0;
             if (true
-                && (maybe_semicolon_0 = expect(TokenType::SEMICOLON))
+                && (maybe__0 = expect(TokenType::SEMICOLON))
             ){
-                std::cout << "generating alt in rule: part\n;";
-                name_0 = maybe_name_0.value();
-                semicolon_0 = maybe_semicolon_0.value();
+                std::cout << "generating alt in rule: part\n";
+                SEMICOLON_0 = maybe_SEMICOLON_0.value();
                 return semicolon_0.value ;
             }
             reset(pos);
-            std::optional<Token> maybe_token_0;
-            Token token_0;
             if (true
                 && (maybe_token_0 = expect("<"))
             ){
-                std::cout << "generating alt in rule: part\n;";
-                name_0 = maybe_name_0.value();
-                semicolon_0 = maybe_semicolon_0.value();
-                token_0 = maybe_token_0.value();
+                std::cout << "generating alt in rule: part\n";
+                "<"_0 = maybe_"<"_0.value();
                 return token_0.value ;
             }
             reset(pos);
             if (true
                 && (maybe_token_0 = expect(">"))
             ){
-                std::cout << "generating alt in rule: part\n;";
-                name_0 = maybe_name_0.value();
-                semicolon_0 = maybe_semicolon_0.value();
-                token_0 = maybe_token_0.value();
+                std::cout << "generating alt in rule: part\n";
+                ">"_0 = maybe_">"_0.value();
                 return token_0.value ;
             }
             reset(pos);
@@ -486,14 +442,14 @@ public:
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<Node> {
             int pos = mark();
-            std::optional<Token> maybe_whitespace_0;
-            Token whitespace_0;
+            std::optional<Token> maybe__0;
+            Token _0;
             if (true
-                && (maybe_whitespace_0 = expect(TokenType::WHITESPACE))
+                && (maybe__0 = expect(TokenType::WHITESPACE))
             ){
-                std::cout << "generating alt in rule: ws\n;";
-                whitespace_0 = maybe_whitespace_0.value();
-                return {Node{"ws", {maybe_whitespace_0.value().value}}};
+                std::cout << "generating alt in rule: ws\n";
+                WHITESPACE_0 = maybe_WHITESPACE_0.value();
+                return {Node{"ws", {maybe__0.value().value}}};
             }
             reset(pos);
             std::cout << "No parse found for ws\n";

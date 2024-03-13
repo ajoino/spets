@@ -10,31 +10,14 @@
 #include <parsegen/grammar_parser.hpp>
 #include <parsegen/rule.hpp>
 #include <tokenizer/lexer.hpp>
-
-// std::ostream& operator<<(std::ostream& os, const std::vector<Alt>& alts) {
-//     for (const auto& alt : alts) {
-//         os << "Alt(" << std::format("{}", alt.items) << ")";
-//     }
-//     return os;
-// }
-//
-// std::ostream& operator<<(std::ostream& stream, const Rule& rule) {
-//     return stream << "    Rule(\"" << rule.name << "\", " << rule.alts << ")";
-// }
-//
-// std::ostream& operator<<(std::ostream& stream, const std::vector<Rule>& rule_list) {
-//     stream << "[\n";
-//     for (const auto& rule : rule_list) {
-//         stream << rule << ",\n";
-//     }
-//     return stream << "]\n";
-// }
+#include <parser/parsing_helpers.hpp>
 
 std::string str_tolower(std::string s) {
+    std::string r{};
     std::transform(
-        s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::tolower(c); } // correct
+        s.begin(), s.end(), r.begin(), [](unsigned char c) { return std::tolower(c); } // correct
     );
-    return s;
+    return r;
 }
 
 template <class T> bool in_vector(const std::vector<T>& vt, const T& value) {
@@ -92,6 +75,32 @@ public:
         std::vector<std::string> items;
         uint16_t token_counter = 0;
         std::map<std::string, uint16_t> name_counter;
+        std::vector<Item> items_;
+        for (const auto& item : alt.items) {
+            auto name = item;
+            std::string return_type = "Node";
+            if ((item.starts_with("'") || item.starts_with("\""))) {
+                return_type = "Token";
+                name = "token";
+            }
+            int count{};
+            for (const auto& r : rules) {
+                if (r.name == item) {
+                    return_type = r.return_type;
+                    break;
+                }
+            }
+            if (return_type == "Token") {
+                count = token_counter;
+                token_counter++;
+            } else {
+                count = name_counter[name];
+                name_counter[name]++;
+            }
+            items_.emplace_back(name, return_type, count);
+        }
+        std::cout << "items_: " << items_ << "\n";
+
         for (const auto& item : alt.items) {
             std::string var_name = str_tolower(item) + "_" + std::to_string(name_counter[str_tolower(item)]);
             auto token_name = std::string{"token_"} + std::to_string(token_counter);
@@ -125,11 +134,7 @@ public:
                 vars.push_back(var_name);
             }
         }
-        // stream << "            std::cout << \"\\n### " << rule.name << ": ";
-        // for (const auto& item : alt.items) {
-        //     stream << str_tolower(item) << " ";
-        // }
-        // stream << "\\n\\n\";\n";
+
         token_counter = 0;
         name_counter.clear();
         stream << "            if (true\n";
@@ -139,8 +144,18 @@ public:
         stream << "            ){\n";
 
         stream << "                std::cout << \"generating alt in rule: " << rule.name << "\\n\";\n";
-        for (const auto& var_name : vars) {
-            stream << "                " << var_name << " = maybe_" << var_name << ".value();\n";
+        name_counter.clear();
+        for (const auto& var_name : alt.items) {
+            std::cout << "generating maybe_ stuffs; alt.items: " << alt.items << "\n";
+            std::cout << var_name << std::endl;
+            std::cout << "keys:\n";
+            for (const auto& [key, value] : name_counter) {
+                std::cout << "    " << key << "\n";
+            }
+            std::cout << std::flush;
+            int count = name_counter[var_name];
+            stream << "                " << var_name << "_" << count << " = maybe_" << var_name << "_" << count << ".value();\n";
+            token_counter++;
         }
         if (alt.action && !alt.action.value().empty()) {
             stream << "                return " << alt.action.value() << ";\n";
