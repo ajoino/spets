@@ -8,14 +8,14 @@ target_include_directories(parsegen PRIVATE ${CMAKE_SOURCE_DIR}/include)
 target_link_libraries(parsegen PRIVATE parsercommon lexer rule parsing_helpers -fsanitize=address)
 set_target_properties(parsegen PROPERTIES EXCLUDE_FROM_ALL TRUE)
 
-add_custom_command(
-    TARGET parsegen
-    POST_BUILD
-    COMMAND ${CMAKE_SOURCE_DIR}/build/spets/parsegen/parsegen ${CMAKE_SOURCE_DIR}/spets/parsegen/test_grammar.peg ${CMAKE_SOURCE_DIR}/spets/parsegen/generated_parser.cpp
-    BYPRODUCTS ${CMAKE_SOURCE_DIR}/parsegen/generated_parser.cpp
-    COMMENT "Run parser generator."
-    DEPENDS parsegen
-)
+# add_custom_command(
+#     TARGET parsegen
+#     POST_BUILD
+#     COMMAND ${CMAKE_SOURCE_DIR}/build/spets/parsegen/parsegen ${CMAKE_SOURCE_DIR}/spets/parsegen/test_grammar.peg ${CMAKE_SOURCE_DIR}/spets/parsegen/generated_parser.cpp
+#     BYPRODUCTS ${CMAKE_SOURCE_DIR}/parsegen/generated_parser.cpp
+#     COMMENT "Run parser generator."
+#     DEPENDS parsegen
+# )
 
 add_custom_command(
     TARGET parsegen
@@ -37,5 +37,7 @@ target_include_directories(metaparser PRIVATE ${CMAKE_SOURCE_DIR}/include -fsani
 target_link_libraries(metaparser PRIVATE parsercommon lexer rule parsing_helpers)
 set_target_properties(metaparser PROPERTIES EXCLUDE_FROM_ALL TRUE)
 
-
+add_executable(token_inspector token_inspector.cpp)
+target_include_directories(token_inspector PRIVATE ${CMAKE_SOURCE_DIR}/include -fsanitize=address)
+target_link_libraries(token_inspector PRIVATE lexer)
 

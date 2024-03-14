@@ -2,6 +2,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <format>
 
 #include <tokenizer/ctre.hpp>
 #include <tokenizer/lexer.hpp>
@@ -52,6 +53,10 @@ const char* token_type_to_string(TokenType tok) noexcept {
         return "UNINDENT";
     case TokenType::NEWLINE:
         return "NEWLINE";
+    case TokenType::NL:
+        return "NL";
+    case TokenType::COMMENT:
+        return "COMMENT";
     case TokenType::ENDOFFILE:
         return "ENDOFFILE";
     case TokenType::ERROR:
@@ -144,35 +149,37 @@ int skip_leading_spaces(Lexer& lexer) {
     return skipped_spaces;
 }
 
-ScanResult scan_newline(Lexer& lexer) {
-    int current_indent = skip_leading_spaces(lexer);
-    int last_indent = lexer.get_indent();
-    if (current_indent < last_indent) {
-        lexer.pop_indent();
-        Token ret_token = Token::from_lexer(TokenType::UNINDENT, lexer);
-        lexer.line++;
-        lexer.column = current_indent + 1;
-        return ScanResult{ret_token, lexer};
-    }
-    if (current_indent > last_indent) {
-        lexer.push_indent(current_indent);
-        lexer.line++;
-        lexer.column = 1;
-        Token ret_token = Token::from_lexer(TokenType::INDENT, lexer);
-        lexer.column = current_indent;
-        return ScanResult{ret_token, lexer};
-    }
-    Token ret_token = Token::from_lexer(TokenType::NEWLINE, lexer);
-    lexer.column = current_indent + 1;
-    lexer.line++;
-    return ScanResult{ret_token, lexer};
-}
-
 ScanResult scan_token(Lexer& lexer) {
     lexer.start = lexer.current;
     if (lexer.is_at_end()) {
         auto token = Token::from_lexer(TokenType::ENDOFFILE, lexer);
         return ScanResult(token, lexer);
+    }
+    if (lexer.column == 0) {
+        int current_indent = skip_leading_spaces(lexer);
+        int last_indent = lexer.get_indent();
+        if (lexer.peek() == '\n') {
+            lexer.advance();
+            auto token = Token::from_lexer(TokenType::NL, lexer);
+            lexer.line++;
+            lexer.column = 0;
+            return ScanResult{token, lexer};
+        }
+        if (current_indent < last_indent) {
+            lexer.pop_indent();
+            auto token = Token::from_lexer(TokenType::UNINDENT, lexer);
+            lexer.column = current_indent;
+            return ScanResult{token, lexer};
+        }
+        if (current_indent > last_indent) {
+            lexer.push_indent(current_indent);
+            auto token = Token::from_lexer(TokenType::INDENT, lexer);
+            lexer.column = current_indent;
+            return ScanResult{token, lexer};
+        }
+        if (current_indent == last_indent && current_indent > 0) {
+            lexer.start = lexer.current;
+        }
     }
 
     char c = lexer.advance();
@@ -181,10 +188,15 @@ ScanResult scan_token(Lexer& lexer) {
     switch (c) {
     case '\n': {
         // Whitespace significance means newlines needs complex handling.
-        return scan_newline(lexer);
+        auto token = Token::from_lexer(TokenType::NEWLINE, lexer);
+        lexer.column = 0;
+        lexer.line++;
+        return ScanResult(token, lexer);
+        // return scan_newline(lexer);
     }
-    case ' ':
+    case ' ': {
         return scan_whitespace(lexer);
+    }
     case '(':
         return {Token::from_lexer(TokenType::LPAREN, lexer), lexer};
     case ')':
@@ -215,6 +227,12 @@ ScanResult scan_token(Lexer& lexer) {
         break;
     }
 
+    if (auto res = ctre::starts_with<R"(#[^\n])">(lexer.start, lexer.end)) {
+        for (int i = 1; i < res.size(); i++) {
+            lexer.advance();
+        }
+        return ScanResult{Token::from_lexer(TokenType::COMMENT, lexer), lexer};
+    }
     if (auto res = ctre::starts_with<R"(([_a-zA-Z][_a-zA-Z0-9]*)|([<>*+=/\-|]+))">(lexer.start, lexer.end)) {
         // Identifiers
         for (int i = 1; i < res.size(); i++) {

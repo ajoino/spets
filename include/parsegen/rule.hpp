@@ -3,6 +3,7 @@
 #include <iostream>
 #include <optional>
 #include <string>
+#include <utility>
 #include <vector>
 
 struct Item {
@@ -20,6 +21,10 @@ struct Item {
 struct Alt {
     std::vector<std::string> items;
     std::optional<std::string> action;
+
+    Alt() = default;
+    Alt(std::vector<std::string> items) : items{std::move(items)} {};
+    Alt(std::vector<std::string> items, std::optional<std::string> action) : items{std::move(items)}, action{std::move(action)} {};
 };
 
 struct Rule {
@@ -28,6 +33,10 @@ struct Rule {
     std::string return_type = "Node";
 
     inline constexpr bool operator<(const Rule& rhs) const { return this->name < rhs.name; }
+
+    Rule() = default;
+    Rule(std::string name, const std::vector<Alt>& alts, std::string return_type) : name{std::move(name)}, alts{alts}, return_type{std::move(return_type)} {};
+    Rule(std::string name, const std::vector<Alt>& alts) : name{std::move(name)}, alts{alts} {};
 };
 
 using Rules = std::vector<Rule>;
