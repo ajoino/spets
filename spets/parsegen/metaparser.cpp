@@ -8,7 +8,7 @@
 
 #include <parsegen/rule.hpp>
     
-class Toyparser : public Parser {
+class MetaParser : public Parser {
 public:
     std::optional<Rules> start() {
 
@@ -748,10 +748,8 @@ int main(int argc, char**argv) {
   fin.close();
     
   Tokenizer t{content};
-
-  Toyparser p{t};
-
-  auto nodes = p.start();
+MetaParser p{t};
+auto nodes = p.start();
   if (nodes) {
     for (const auto& child : nodes.value()) {
         std::cout << child << "\n";

@@ -20,7 +20,10 @@ set_target_properties(parsegen PROPERTIES EXCLUDE_FROM_ALL TRUE)
 add_custom_command(
     TARGET parsegen
     POST_BUILD
-    COMMAND ${CMAKE_SOURCE_DIR}/build/spets/parsegen/parsegen ${CMAKE_SOURCE_DIR}/spets/parsegen/metagrammar.peg ${CMAKE_SOURCE_DIR}/spets/parsegen/metaparser.cpp
+    COMMAND parsegen Meta
+        ${CMAKE_SOURCE_DIR}/spets/parsegen/metagrammar.peg
+        ${CMAKE_SOURCE_DIR}/spets/parsegen/metaparser.cpp
+        ${CMAKE_SOURCE_DIR}/include/parsegen/metaparser.hpp
     BYPRODUCTS ${CMAKE_SOURCE_DIR}/parsegen/metaparser.cpp
     COMMENT "Generate metaparser source files"
     DEPENDS parsegen
