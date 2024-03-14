@@ -95,6 +95,9 @@ std::optional<Alt> GrammarParser::alternative() {
                 return {};
             }
             std::string token = get_token().value;
+            if (is_at_end()) {
+                return {};
+            }
             if (token == "{") {
                 level++;
             } else if (token == "}") {

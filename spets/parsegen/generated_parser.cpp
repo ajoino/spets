@@ -34,8 +34,6 @@ public:
         std::optional<std::any> return_value = memoize("start", inner_func, mark());
         if (return_value) {
             std::cout << " value not null\n";
-            std::cout << "any holds type: " << return_value.value().type().name() << "should hold Node\n";
-            std::cout << std::any_cast<std::optional<Node>>(return_value.value()) << std::endl;
             return std::any_cast<std::optional<Node>>(return_value.value());
         } else {
             std::cout << " value is null\n";
@@ -71,8 +69,6 @@ public:
         std::optional<std::any> return_value = memoize("statement", inner_func, mark());
         if (return_value) {
             std::cout << " value not null\n";
-            std::cout << "any holds type: " << return_value.value().type().name() << "should hold Node\n";
-            std::cout << std::any_cast<std::optional<Node>>(return_value.value()) << std::endl;
             return std::any_cast<std::optional<Node>>(return_value.value());
         } else {
             std::cout << " value is null\n";
@@ -132,8 +128,6 @@ public:
         std::optional<std::any> return_value = memoize("expr", inner_func, mark());
         if (return_value) {
             std::cout << " value not null\n";
-            std::cout << "any holds type: " << return_value.value().type().name() << "should hold Node\n";
-            std::cout << std::any_cast<std::optional<Node>>(return_value.value()) << std::endl;
             return std::any_cast<std::optional<Node>>(return_value.value());
         } else {
             std::cout << " value is null\n";
@@ -193,8 +187,6 @@ public:
         std::optional<std::any> return_value = memoize("term", inner_func, mark());
         if (return_value) {
             std::cout << " value not null\n";
-            std::cout << "any holds type: " << return_value.value().type().name() << "should hold Node\n";
-            std::cout << std::any_cast<std::optional<Node>>(return_value.value()) << std::endl;
             return std::any_cast<std::optional<Node>>(return_value.value());
         } else {
             std::cout << " value is null\n";
@@ -254,8 +246,6 @@ public:
         std::optional<std::any> return_value = memoize("atom", inner_func, mark());
         if (return_value) {
             std::cout << " value not null\n";
-            std::cout << "any holds type: " << return_value.value().type().name() << "should hold Node\n";
-            std::cout << std::any_cast<std::optional<Node>>(return_value.value()) << std::endl;
             return std::any_cast<std::optional<Node>>(return_value.value());
         } else {
             std::cout << " value is null\n";
@@ -297,8 +287,6 @@ public:
         std::optional<std::any> return_value = memoize("statement_end", inner_func, mark());
         if (return_value) {
             std::cout << " value not null\n";
-            std::cout << "any holds type: " << return_value.value().type().name() << "should hold Node\n";
-            std::cout << std::any_cast<std::optional<Node>>(return_value.value()) << std::endl;
             return std::any_cast<std::optional<Node>>(return_value.value());
         } else {
             std::cout << " value is null\n";

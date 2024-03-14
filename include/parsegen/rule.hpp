@@ -30,6 +30,12 @@ struct Rule {
     inline constexpr bool operator<(const Rule& rhs) const { return this->name < rhs.name; }
 };
 
+using Rules = std::vector<Rule>;
+using Alts = std::vector<Alt>;
+using Items = std::vector<Item>;
+using String = std::string;
+using Strings = std::vector<std::string>;
+
 std::ostream& operator<<(std::ostream& os, const Rule& r);
 std::ostream& operator<<(std::ostream& os, const Alt& r);
 std::ostream& operator<<(std::ostream& os, const Item& r);

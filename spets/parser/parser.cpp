@@ -176,19 +176,9 @@ Parser::memoize(const std::string& func_name, const std::function<std::optional<
         if (std::get<std::shared_ptr<LR>>(memo[key].res)->head) {
             std::get<std::shared_ptr<LR>>(memo[key].res)->seed = res.value();
             auto ans = lr_answer(func_name, func, pos, key);
-            if (ans) {
-                std::cout << "in memoize: type contained in result optional is " << ans.value().type().name() << "\n";
-            } else {
-                std::cout << "memoize returning nullopt\n";
-            }
             return ans;
         }
         memo[key].res = res;
-        if (auto r = std::get<std::optional<std::any>>(memo[key].res)) {
-            std::cout << "in memoize: type contained in result optional is " << r.value().type().name() << "\n";
-        } else {
-            std::cout << "memoize returning nullopt\n";
-        }
         return res;
     }
     std::cout << "Resetting pos to " << memo[key].endpos << "\n";
@@ -197,13 +187,7 @@ Parser::memoize(const std::string& func_name, const std::function<std::optional<
     if (std::holds_alternative<std::shared_ptr<LR>>(memo[key].res)) {
         setup_lr(func_name, std::get<std::shared_ptr<LR>>(memo[key].res));
         std::cout << "Exiting memoize function\n";
-        std::cout << "WTF IT GOES HERE???\n";
         return std::get<std::shared_ptr<LR>>(memo[key].res)->seed;
-    }
-    if (auto r = std::get<std::optional<std::any>>(memo[key].res)) {
-        std::cout << "in memoize: type contained in result optional is " << r.value().type().name() << "\n";
-    } else {
-        std::cout << "memoize returning nullopt\n";
     }
     return std::get<std::optional<std::any>>(memo[key].res);
 }

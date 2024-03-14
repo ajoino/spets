@@ -178,8 +178,6 @@ public:
         stream << "        std::optional<std::any> return_value = memoize(\"" << rule.name << "\", inner_func, mark());\n";
         stream << "        if (return_value) {\n";
         stream << "            std::cout << \" value not null\\n\";\n";
-        stream << R"(            std::cout << "any holds type: " << return_value.value().type().name() << "should hold )" << rule.return_type << "\\n\";\n";
-        stream << "            std::cout << std::any_cast<std::optional<" << rule.return_type << ">>(return_value.value()) << std::endl;\n";
         stream << "            return std::any_cast<std::optional<" << rule.return_type << ">>(return_value.value());\n";
         stream << "        } else {\n";
         stream << "            std::cout << \" value is null\\n\";\n";
