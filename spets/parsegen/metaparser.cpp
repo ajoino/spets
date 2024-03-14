@@ -70,7 +70,7 @@ public:
             ){
                 rule = maybe_rule.value();
                 std::cout << "generating alt in rule: rules\n";
-                return Rules{rule} ;
+                return Rules(rule) ;
             }
             reset(pos);
             std::cout << "No parse found for rules\n";
@@ -183,17 +183,17 @@ public:
                 return {append_vector(alts, alt)} ;
             }
             reset(pos);
-            std::optional<Token> maybe_indent;
-            Token indent;
+            std::optional<String> maybe_linebreak;
+            String linebreak;
             if (true
                 && (maybe_alts = this->alts())
-                && (maybe_indent = expect(TokenType::INDENT))
+                && (maybe_linebreak = this->linebreak())
                 && (maybe_token = expect("/"))
                 && (maybe_ws = this->ws())
                 && (maybe_alt = this->alt())
             ){
                 alts = maybe_alts.value();
-                indent = maybe_indent.value();
+                linebreak = maybe_linebreak.value();
                 token = maybe_token.value();
                 ws = maybe_ws.value();
                 alt = maybe_alt.value();
