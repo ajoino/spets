@@ -70,7 +70,7 @@ public:
             ){
                 rule = maybe_rule.value();
                 std::cout << "generating alt in rule: rules\n";
-                return Rules{rule} ;
+                return create_vector(rule) ;
             }
             reset(pos);
             std::cout << "No parse found for rules\n";
@@ -110,8 +110,8 @@ public:
             String ws_1;
             std::optional<Alts> maybe_alts;
             Alts alts;
-            std::optional<String> maybe_newlines;
-            String newlines;
+            std::optional<Token> maybe_newline;
+            Token newline;
             if (true
                 && (maybe_name = expect(TokenType::NAME))
                 && (maybe_token = expect("["))
@@ -121,7 +121,7 @@ public:
                 && (maybe_token_2 = expect("<-"))
                 && (maybe_ws_1 = this->ws())
                 && (maybe_alts = this->alts())
-                && (maybe_newlines = this->newlines())
+                && (maybe_newline = expect(TokenType::NEWLINE))
             ){
                 name = maybe_name.value();
                 token = maybe_token.value();
@@ -131,9 +131,9 @@ public:
                 token_2 = maybe_token_2.value();
                 ws_1 = maybe_ws_1.value();
                 alts = maybe_alts.value();
-                newlines = maybe_newlines.value();
+                newline = maybe_newline.value();
                 std::cout << "generating alt in rule: rule\n";
-                return Rule{name.value, alts, {}} ;
+                return Rule(name.value, alts) ;
             }
             reset(pos);
             std::cout << "No parse found for rule\n";
@@ -183,17 +183,17 @@ public:
                 return {append_vector(alts, alt)} ;
             }
             reset(pos);
-            std::optional<Token> maybe_indent;
-            Token indent;
+            std::optional<String> maybe_alt_breaks;
+            String alt_breaks;
             if (true
                 && (maybe_alts = this->alts())
-                && (maybe_indent = expect(TokenType::INDENT))
+                && (maybe_alt_breaks = this->alt_breaks())
                 && (maybe_token = expect("/"))
                 && (maybe_ws = this->ws())
                 && (maybe_alt = this->alt())
             ){
                 alts = maybe_alts.value();
-                indent = maybe_indent.value();
+                alt_breaks = maybe_alt_breaks.value();
                 token = maybe_token.value();
                 ws = maybe_ws.value();
                 alt = maybe_alt.value();
@@ -580,6 +580,174 @@ public:
 
         std::cout << "Parsing ws\n";
         std::optional<std::any> return_value = memoize("ws", inner_func, mark());
+        if (return_value) {
+            std::cout << " value not null\n";
+            return std::any_cast<std::optional<String>>(return_value.value());
+        } else {
+            std::cout << " value is null\n";
+            return std::nullopt;
+        }
+    }
+
+    std::optional<String> alt_breaks() {
+
+        // inner_func does the actual parsing but is called later by
+        // to enable memoization
+        auto inner_func = [&, this]() -> std::optional<String> {
+            int pos = mark();
+            std::optional<String> maybe_alt_breaks;
+            String alt_breaks;
+            std::optional<String> maybe_alt_break;
+            String alt_break;
+            if (true
+                && (maybe_alt_breaks = this->alt_breaks())
+                && (maybe_alt_break = this->alt_break())
+            ){
+                alt_breaks = maybe_alt_breaks.value();
+                alt_break = maybe_alt_break.value();
+                std::cout << "generating alt in rule: alt_breaks\n";
+                return alt_breaks.append(alt_break) ;
+            }
+            reset(pos);
+            if (true
+                && (maybe_alt_break = this->alt_break())
+            ){
+                alt_break = maybe_alt_break.value();
+                std::cout << "generating alt in rule: alt_breaks\n";
+                return alt_break ;
+            }
+            reset(pos);
+            std::cout << "No parse found for alt_breaks\n";
+            return {};
+        };
+
+        std::cout << "Parsing alt_breaks\n";
+        std::optional<std::any> return_value = memoize("alt_breaks", inner_func, mark());
+        if (return_value) {
+            std::cout << " value not null\n";
+            return std::any_cast<std::optional<String>>(return_value.value());
+        } else {
+            std::cout << " value is null\n";
+            return std::nullopt;
+        }
+    }
+
+    std::optional<String> alt_break() {
+
+        // inner_func does the actual parsing but is called later by
+        // to enable memoization
+        auto inner_func = [&, this]() -> std::optional<String> {
+            int pos = mark();
+            std::optional<Token> maybe_newline;
+            Token newline;
+            if (true
+                && (maybe_newline = expect(TokenType::NEWLINE))
+            ){
+                newline = maybe_newline.value();
+                std::cout << "generating alt in rule: alt_break\n";
+                return newline.value ;
+            }
+            reset(pos);
+            std::optional<Token> maybe_indent;
+            Token indent;
+            if (true
+                && (maybe_indent = expect(TokenType::INDENT))
+            ){
+                indent = maybe_indent.value();
+                std::cout << "generating alt in rule: alt_break\n";
+                return indent.value ;
+            }
+            reset(pos);
+            std::cout << "No parse found for alt_break\n";
+            return {};
+        };
+
+        std::cout << "Parsing alt_break\n";
+        std::optional<std::any> return_value = memoize("alt_break", inner_func, mark());
+        if (return_value) {
+            std::cout << " value not null\n";
+            return std::any_cast<std::optional<String>>(return_value.value());
+        } else {
+            std::cout << " value is null\n";
+            return std::nullopt;
+        }
+    }
+
+    std::optional<String> rule_breaks() {
+
+        // inner_func does the actual parsing but is called later by
+        // to enable memoization
+        auto inner_func = [&, this]() -> std::optional<String> {
+            int pos = mark();
+            std::optional<String> maybe_rule_breaks;
+            String rule_breaks;
+            std::optional<String> maybe_rule_break;
+            String rule_break;
+            if (true
+                && (maybe_rule_breaks = this->rule_breaks())
+                && (maybe_rule_break = this->rule_break())
+            ){
+                rule_breaks = maybe_rule_breaks.value();
+                rule_break = maybe_rule_break.value();
+                std::cout << "generating alt in rule: rule_breaks\n";
+                return rule_breaks.append(rule_break) ;
+            }
+            reset(pos);
+            if (true
+                && (maybe_rule_break = this->rule_break())
+            ){
+                rule_break = maybe_rule_break.value();
+                std::cout << "generating alt in rule: rule_breaks\n";
+                return rule_break ;
+            }
+            reset(pos);
+            std::cout << "No parse found for rule_breaks\n";
+            return {};
+        };
+
+        std::cout << "Parsing rule_breaks\n";
+        std::optional<std::any> return_value = memoize("rule_breaks", inner_func, mark());
+        if (return_value) {
+            std::cout << " value not null\n";
+            return std::any_cast<std::optional<String>>(return_value.value());
+        } else {
+            std::cout << " value is null\n";
+            return std::nullopt;
+        }
+    }
+
+    std::optional<String> rule_break() {
+
+        // inner_func does the actual parsing but is called later by
+        // to enable memoization
+        auto inner_func = [&, this]() -> std::optional<String> {
+            int pos = mark();
+            std::optional<Token> maybe_newline;
+            Token newline;
+            if (true
+                && (maybe_newline = expect(TokenType::NEWLINE))
+            ){
+                newline = maybe_newline.value();
+                std::cout << "generating alt in rule: rule_break\n";
+                return newline.value ;
+            }
+            reset(pos);
+            std::optional<Token> maybe_unindent;
+            Token unindent;
+            if (true
+                && (maybe_unindent = expect(TokenType::UNINDENT))
+            ){
+                unindent = maybe_unindent.value();
+                std::cout << "generating alt in rule: rule_break\n";
+                return unindent.value ;
+            }
+            reset(pos);
+            std::cout << "No parse found for rule_break\n";
+            return {};
+        };
+
+        std::cout << "Parsing rule_break\n";
+        std::optional<std::any> return_value = memoize("rule_break", inner_func, mark());
         if (return_value) {
             std::cout << " value not null\n";
             return std::any_cast<std::optional<String>>(return_value.value());

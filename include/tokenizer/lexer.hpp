@@ -27,6 +27,8 @@ enum class TokenType {
     LEFTARROW,
     UNINDENT,
     NEWLINE,
+    COMMENT,
+    NL,
     ENDOFFILE,
     ERROR,
 };
@@ -42,6 +44,7 @@ struct Lexer {
 
     Lexer(std::string& buffer) : start(buffer.begin()), end(buffer.end()), current(buffer.begin()){};
 
+    Lexer() = default;
     ~Lexer() = default;
 
     Lexer(const Lexer& other) = default;
@@ -107,8 +110,15 @@ public:
 
     Token peek_token() {
         if (pos == tokens.size()) {
-            auto scan_result = scan_token(lexer);
-            lexer = scan_result.lexer;
+            ScanResult scan_result;
+            while (true) {
+                scan_result = scan_token(lexer);
+                if (scan_result.token.type == TokenType::NL || scan_result.token.type == TokenType::COMMENT) {
+                    continue;
+                }
+                lexer = scan_result.lexer;
+                break;
+            }
             tokens.push_back(scan_result.token);
         }
         return tokens[pos];
