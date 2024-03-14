@@ -1,7 +1,7 @@
 start[Rules] <- rules ENDOFFILE { rules }
 rules[Rules] <- rules rule { append_vector(rules, rule) }
     / rule { Rules{rule} }
-rule[Rule] <- NAME "[" type "]" ws "<-" ws alts linebreak { Rule{name.value, alts, {}} }
+rule[Rule] <- NAME "[" type "]" ws "<-" ws alts newlines { Rule{name.value, alts, {}} }
 
 alts[Alts] <- alts ws "/" ws alt { {append_vector(alts, alt)} }
     / alts INDENT "/" ws alt { {append_vector(alts, alt)} }
@@ -28,4 +28,5 @@ part[String] <- NAME { name.value }
     / COMMA { comma.value }
 
 ws[String] <- WHITESPACE { whitespace.value }
+newlines[String] <- newlines linebreak { newlines.append(linebreak) } / linebreak { linebreak }
 linebreak[String] <- NEWLINE { newline.value } / INDENT { indent.value } / UNINDENT { unindent.value }
