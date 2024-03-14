@@ -3,14 +3,15 @@
 
 #include <parser/node.hpp>
 #include <tokenizer/lexer.hpp>
+#include <parsegen/metaparser.hpp>
 #include <parser/parser.hpp>
 #include <parser/parsing_helpers.hpp>
 
 #include <parsegen/rule.hpp>
     
-class MetaParser : public Parser {
-public:
-    std::optional<Rules> start() {
+
+
+    std::optional<Rules> MetaParser::start() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
@@ -45,7 +46,7 @@ public:
         }
     }
 
-    std::optional<Rules> rules() {
+    std::optional<Rules> MetaParser::rules() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
@@ -88,7 +89,7 @@ public:
         }
     }
 
-    std::optional<Rule> rule() {
+    std::optional<Rule> MetaParser::rule() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
@@ -215,7 +216,7 @@ public:
         }
     }
 
-    std::optional<Alts> more_alts() {
+    std::optional<Alts> MetaParser::more_alts() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
@@ -276,7 +277,7 @@ public:
         }
     }
 
-    std::optional<Alts> alts() {
+    std::optional<Alts> MetaParser::alts() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
@@ -331,7 +332,7 @@ public:
         }
     }
 
-    std::optional<Alt> alt() {
+    std::optional<Alt> MetaParser::alt() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
@@ -378,7 +379,7 @@ public:
         }
     }
 
-    std::optional<Strings> items() {
+    std::optional<Strings> MetaParser::items() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
@@ -425,7 +426,7 @@ public:
         }
     }
 
-    std::optional<String> item() {
+    std::optional<String> MetaParser::item() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
@@ -466,7 +467,7 @@ public:
         }
     }
 
-    std::optional<String> type() {
+    std::optional<String> MetaParser::type() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
@@ -497,7 +498,7 @@ public:
         }
     }
 
-    std::optional<String> parts() {
+    std::optional<String> MetaParser::parts() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
@@ -566,7 +567,7 @@ public:
         }
     }
 
-    std::optional<String> part() {
+    std::optional<String> MetaParser::part() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
@@ -675,7 +676,7 @@ public:
         }
     }
 
-    std::optional<String> ws() {
+    std::optional<String> MetaParser::ws() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
@@ -706,7 +707,7 @@ public:
         }
     }
 
-    std::optional<String> nl() {
+    std::optional<String> MetaParser::nl() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
@@ -737,25 +738,3 @@ public:
         }
     }
 
-};
-
-
-
-int main(int argc, char**argv) {
-  std::fstream fin{std::span(argv, size_t(argc))[1], std::fstream::in};
-  std::string content((std::istreambuf_iterator<char>(fin)),
-                      (std::istreambuf_iterator<char>()));
-  fin.close();
-    
-  Tokenizer t{content};
-MetaParser p{t};
-auto nodes = p.start();
-  if (nodes) {
-    for (const auto& child : nodes.value()) {
-        std::cout << child << "\n";
-    }
-  } else {
-    std::cout << "Could not parse content.\n";
-  }
-}
-    
