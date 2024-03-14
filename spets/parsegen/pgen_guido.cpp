@@ -214,6 +214,9 @@ int main(int argc, char**argv) {
             return stream;
         }
 
+        rules = maybe_rules.value();
+        std::cout << rules << "\n";
+
         stream << R"(
 #pragma once
 
@@ -231,7 +234,7 @@ int main(int argc, char**argv) {
     stream << "~" << name << "Parser() = default;\n\n";
 
         for (const auto& rule : rules) {
-            stream << rule.return_type << " " << rule.name << "()\n";
+            stream << rule.return_type << " " << rule.name << "();\n";
         }
         stream << "};\n";
         return stream;

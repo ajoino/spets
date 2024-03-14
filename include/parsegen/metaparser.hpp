@@ -14,4 +14,17 @@ MetaParser& operator=(const MetaParser&) = default;
 MetaParser& operator=(MetaParser&&) noexcept = default;
 ~MetaParser() = default;
 
+Rules start();
+Rules rules();
+Rule rule();
+Alts more_alts();
+Alts alts();
+Alt alt();
+Strings items();
+String item();
+String type();
+String parts();
+String part();
+String ws();
+String nl();
 };

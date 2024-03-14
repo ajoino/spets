@@ -17,17 +17,17 @@ set_target_properties(parsegen PROPERTIES EXCLUDE_FROM_ALL TRUE)
 #     DEPENDS parsegen
 # )
 
-add_custom_command(
-    TARGET parsegen
-    POST_BUILD
-    COMMAND parsegen Meta
-        ${CMAKE_SOURCE_DIR}/spets/parsegen/metagrammar.peg
-        ${CMAKE_SOURCE_DIR}/spets/parsegen/metaparser.cpp
-        ${CMAKE_SOURCE_DIR}/include/parsegen/metaparser.hpp
-    BYPRODUCTS ${CMAKE_SOURCE_DIR}/parsegen/metaparser.cpp
-    COMMENT "Generate metaparser source files"
-    DEPENDS parsegen
-)
+# add_custom_command(
+#     TARGET parsegen
+#     POST_BUILD
+#     COMMAND parsegen Meta
+#         ${CMAKE_SOURCE_DIR}/spets/parsegen/metagrammar.peg
+#         ${CMAKE_SOURCE_DIR}/spets/parsegen/metaparser.cpp
+#         ${CMAKE_SOURCE_DIR}/include/parsegen/metaparser.hpp
+#     BYPRODUCTS ${CMAKE_SOURCE_DIR}/parsegen/metaparser.cpp
+#     COMMENT "Generate metaparser source files"
+#     DEPENDS parsegen
+# )
 
 add_executable(parser ${CMAKE_SOURCE_DIR}/spets/parsegen/generated_parser.cpp)
 add_dependencies(parser parsercommon lexer parsegen)
