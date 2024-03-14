@@ -21,6 +21,10 @@ struct Item {
 struct Alt {
     std::vector<std::string> items;
     std::optional<std::string> action;
+
+    Alt() = default;
+    Alt(std::vector<std::string> items) : items{std::move(items)} {};
+    Alt(std::vector<std::string> items, std::optional<std::string> action) : items{std::move(items)}, action{std::move(action)} {};
 };
 
 struct Rule {
