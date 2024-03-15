@@ -89,7 +89,6 @@ public:
             }
             local_items.emplace_back(name, return_type, expect_value, count);
         }
-        std::cout << "items_: " << global_items << "\n";
         token_counter = 0;
         name_counter.clear();
 
@@ -130,7 +129,7 @@ public:
     }
 
     void generate_rule(const Rule& rule) {
-        stream << "    std::optional<" << rule.return_type << "> " << rule.name << "() {\n\n";
+        stream << "    std::optional<" << rule.return_type << "> " << name << "Parser::" << rule.name << "() {\n\n";
         stream << "        // inner_func does the actual parsing but is called later by\n";
         stream << "        // to enable memoization\n";
         stream << "        auto inner_func = [&, this]() -> std::optional<" << rule.return_type << "> {\n";
@@ -169,39 +168,17 @@ public:
 
 #include <parser/node.hpp>
 #include <tokenizer/lexer.hpp>
+#include <parsegen/metaparser.hpp>
 #include <parser/parser.hpp>
 #include <parser/parsing_helpers.hpp>
 
 #include <parsegen/rule.hpp>
     
-)preamble";
-        stream << "class " << name << "Parser : public Parser {\npublic:\n";
+)preamble" << "\n\n";
         for (const auto& rule : rules) {
             generate_rule(rule);
         }
-        stream << "};\n\n\n";
 
-        stream << R"c++(
-int main(int argc, char**argv) {
-  std::fstream fin{std::span(argv, size_t(argc))[1], std::fstream::in};
-  std::string content((std::istreambuf_iterator<char>(fin)),
-                      (std::istreambuf_iterator<char>()));
-  fin.close();
-    
-  Tokenizer t{content};)c++" << "\n";
-
-  stream << name << "Parser p{t};\n";
-
-  stream << R"c++(auto nodes = p.start();
-  if (nodes) {
-    for (const auto& child : nodes.value()) {
-        std::cout << child << "\n";
-    }
-  } else {
-    std::cout << "Could not parse content.\n";
-  }
-}
-    )c++";
         return stream;
     }
 
@@ -234,7 +211,7 @@ int main(int argc, char**argv) {
     stream << "~" << name << "Parser() = default;\n\n";
 
         for (const auto& rule : rules) {
-            stream << rule.return_type << " " << rule.name << "();\n";
+            stream << "std::optional<" << rule.return_type << "> " << rule.name << "();\n";
         }
         stream << "};\n";
         return stream;

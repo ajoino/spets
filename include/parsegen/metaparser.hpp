@@ -26,5 +26,4 @@ std::optional<String> type();
 std::optional<String> parts();
 std::optional<String> part();
 std::optional<String> ws();
-std::optional<String> nl();
 };

@@ -3,42 +3,55 @@ add_library(rule rule.cpp)
 target_include_directories(rule PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
 add_executable(parsegen pgen_guido.cpp grammar_parser.cpp)
-add_dependencies(parsegen parsercommon lexer)
 target_include_directories(parsegen PRIVATE ${CMAKE_SOURCE_DIR}/include)
 target_link_libraries(parsegen PRIVATE parsercommon lexer rule parsing_helpers -fsanitize=address)
 set_target_properties(parsegen PROPERTIES EXCLUDE_FROM_ALL TRUE)
 
-# add_custom_command(
-#     TARGET parsegen
-#     POST_BUILD
-#     COMMAND ${CMAKE_SOURCE_DIR}/build/spets/parsegen/parsegen ${CMAKE_SOURCE_DIR}/spets/parsegen/test_grammar.peg ${CMAKE_SOURCE_DIR}/spets/parsegen/generated_parser.cpp
-#     BYPRODUCTS ${CMAKE_SOURCE_DIR}/parsegen/generated_parser.cpp
-#     COMMENT "Run parser generator."
-#     DEPENDS parsegen
-# )
+add_custom_command(
+    TARGET parsegen
+    POST_BUILD
+    COMMAND parsegen ARGS Meta
+        ${CMAKE_SOURCE_DIR}/spets/parsegen/metagrammar.peg
+        ${CMAKE_SOURCE_DIR}/spets/parsegen/metaparser_.cpp
+        ${CMAKE_SOURCE_DIR}/include/parsegen/metaparser_.hpp
+    BYPRODUCTS
+        ${CMAKE_SOURCE_DIR}/spets/parsegen/metaparser_.cpp
+        ${CMAKE_SOURCE_DIR}/include/parsegen/metaparser_.hpp
+    COMMENT "Run parser generator."
+)
 
-# add_custom_command(
-#     TARGET parsegen
-#     POST_BUILD
-#     COMMAND parsegen Meta
-#         ${CMAKE_SOURCE_DIR}/spets/parsegen/metagrammar.peg
-#         ${CMAKE_SOURCE_DIR}/spets/parsegen/metaparser.cpp
-#         ${CMAKE_SOURCE_DIR}/include/parsegen/metaparser.hpp
-#     BYPRODUCTS ${CMAKE_SOURCE_DIR}/parsegen/metaparser.cpp
-#     COMMENT "Generate metaparser source files"
-#     DEPENDS parsegen
-# )
-
-add_executable(parser ${CMAKE_SOURCE_DIR}/spets/parsegen/generated_parser.cpp)
-add_dependencies(parser parsercommon lexer parsegen)
-target_include_directories(parser PRIVATE ${CMAKE_SOURCE_DIR}/include -fsanitize=address)
-target_link_libraries(parser PRIVATE parsercommon lexer)
-
-add_executable(metaparser metaparser.cpp)
-add_dependencies(metaparser parsercommon lexer parsegen rule parsing_helpers)
+add_executable(metaparser metaparser_generator.cpp metaparser.cpp)
 target_include_directories(metaparser PRIVATE ${CMAKE_SOURCE_DIR}/include -fsanitize=address)
-target_link_libraries(metaparser PRIVATE parsercommon lexer rule parsing_helpers)
+target_link_libraries(metaparser PUBLIC parsercommon lexer rule parsing_helpers)
 set_target_properties(metaparser PROPERTIES EXCLUDE_FROM_ALL TRUE)
+
+add_custom_command(
+    TARGET metaparser
+    POST_BUILD
+    COMMAND metaparser ARGS Meta
+        ${CMAKE_SOURCE_DIR}/spets/parsegen/metagrammar.peg
+        ${CMAKE_SOURCE_DIR}/spets/parsegen/metaparser_candidate.cpp
+        ${CMAKE_SOURCE_DIR}/include/parsegen/metaparser_candidate.hpp
+    BYPRODUCTS
+        ${CMAKE_SOURCE_DIR}/parsegen/metaparser_candidate.cpp
+        ${CMAKE_SOURCE_DIR}/include/parsegen/metaparser_candidate.hpp
+    COMMENT "Generate metaparser source files"
+    DEPENDS metaparser
+)
+
+add_executable(metaparser_runner metaparser_runner.cpp metaparser_candidate.cpp)
+target_include_directories(metaparser_runner PRIVATE ${CMAKE_SOURCE_DIR}/include -fsanitize=address)
+target_link_libraries(metaparser_runner PRIVATE parsercommon lexer rule parsing_helpers -fsanitize=address)
+set_target_properties(metaparser_runner PROPERTIES EXCLUDE_FROM_ALL TRUE)
+
+add_custom_command(
+    TARGET metaparser_runner
+    POST_BUILD
+    COMMAND metaparser_runner ARGS
+        ${CMAKE_SOURCE_DIR}/spets/parsegen/metagrammar.peg
+    COMMENT "Run metaparser candidate."
+)
+
 
 add_executable(token_inspector token_inspector.cpp)
 target_include_directories(token_inspector PRIVATE ${CMAKE_SOURCE_DIR}/include -fsanitize=address)

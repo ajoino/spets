@@ -1,16 +1,16 @@
 start[Rules] <- rules ENDOFFILE { rules }
 rules[Rules] <- rule rules { prepend_vector(rules, rule) }
     / rule { create_vector(rule) }
-rule[Rule] <- NAME "[" type "]" ws "<-" ws alts NEWLINE INDENT more_alts UNINDENT { Rule(name.value, concat(alts, more_alts)) }
-    / NAME "[" type "]" ws "<-" ws alts NEWLINE { Rule(name.value, alts) }
-    / NAME "[" type "]" ws "<-" ws NEWLINE INDENT more_alts UNINDENT { Rule(name.value, more_alts) }
+rule[Rule] <- NAME LBRACK type RBRACK ws "<-" ws alts NEWLINE INDENT more_alts UNINDENT { Rule(name.value, concat(alts, more_alts), type) }
+    / NAME LBRACK type RBRACK ws "<-" ws alts NEWLINE { Rule(name.value, alts, type) }
+    / NAME LBRACK type RBRACK ws "<-" ws NEWLINE INDENT more_alts UNINDENT { Rule(name.value, more_alts, type) }
 
 more_alts[Alts] <- "/" ws alts NEWLINE more_alts { concat(alts, more_alts) }
     / "/" ws alts NEWLINE { alts }
 
 alts[Alts] <- alts ws "/" ws alt { append_vector(alts, alt) }
-    / alt { create_vector(Alt(alt)) }
-alt[Alt] <- items ws LCURL type RCURL { Alt(items) }
+    / alt { create_vector(alt) }
+alt[Alt] <- items ws LCURL type RCURL { Alt(items, type) }
 
 items[Strings] <- items ws item { append_vector(items, item) }
     / item { create_vector(item) }
@@ -18,10 +18,8 @@ item[String] <- NAME { name.value }
     / STRING { string.value }
 
 type[String] <- parts { parts }
-parts[String] <- LCURL parts RCURL { lcurl.value + parts + rcurl.value }
-    / parts part { parts.append(part) }
+parts[String] <- parts part { parts.append(part) }
     / part { part }
-    / LCURL RCURL { lcurl.value + rcurl.value }
 part[String] <- NAME { name.value }
     / SEMICOLON { semicolon.value }
     / "<" { token.value }
@@ -33,4 +31,3 @@ part[String] <- NAME { name.value }
     / DOT { dot.value }
 
 ws[String] <- WHITESPACE { whitespace.value }
-nl[String] <- NEWLINE { newline.value }

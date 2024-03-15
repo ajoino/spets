@@ -28,7 +28,7 @@
                 rules = maybe_rules.value();
                 endoffile = maybe_endoffile.value();
                 std::cout << "generating alt in rule: start\n";
-                return rules ;
+                return  rules ;
             }
             reset(pos);
             std::cout << "No parse found for start\n";
@@ -63,7 +63,7 @@
                 rule = maybe_rule.value();
                 rules = maybe_rules.value();
                 std::cout << "generating alt in rule: rules\n";
-                return prepend_vector(rules, rule) ;
+                return  prepend_vector(rules, rule) ;
             }
             reset(pos);
             if (true
@@ -71,7 +71,7 @@
             ){
                 rule = maybe_rule.value();
                 std::cout << "generating alt in rule: rules\n";
-                return create_vector(rule) ;
+                return  create_vector(rule) ;
             }
             reset(pos);
             std::cout << "No parse found for rules\n";
@@ -97,16 +97,16 @@
             int pos = mark();
             std::optional<Token> maybe_name;
             Token name;
-            std::optional<Token> maybe_token;
-            Token token;
+            std::optional<Token> maybe_lbrack;
+            Token lbrack;
             std::optional<String> maybe_type;
             String type;
-            std::optional<Token> maybe_token_1;
-            Token token_1;
+            std::optional<Token> maybe_rbrack;
+            Token rbrack;
             std::optional<String> maybe_ws;
             String ws;
-            std::optional<Token> maybe_token_2;
-            Token token_2;
+            std::optional<Token> maybe_token;
+            Token token;
             std::optional<String> maybe_ws_1;
             String ws_1;
             std::optional<Alts> maybe_alts;
@@ -121,11 +121,11 @@
             Token unindent;
             if (true
                 && (maybe_name = expect(TokenType::NAME))
-                && (maybe_token = expect("["))
+                && (maybe_lbrack = expect(TokenType::LBRACK))
                 && (maybe_type = this->type())
-                && (maybe_token_1 = expect("]"))
+                && (maybe_rbrack = expect(TokenType::RBRACK))
                 && (maybe_ws = this->ws())
-                && (maybe_token_2 = expect("<-"))
+                && (maybe_token = expect("<-"))
                 && (maybe_ws_1 = this->ws())
                 && (maybe_alts = this->alts())
                 && (maybe_newline = expect(TokenType::NEWLINE))
@@ -134,11 +134,11 @@
                 && (maybe_unindent = expect(TokenType::UNINDENT))
             ){
                 name = maybe_name.value();
-                token = maybe_token.value();
+                lbrack = maybe_lbrack.value();
                 type = maybe_type.value();
-                token_1 = maybe_token_1.value();
+                rbrack = maybe_rbrack.value();
                 ws = maybe_ws.value();
-                token_2 = maybe_token_2.value();
+                token = maybe_token.value();
                 ws_1 = maybe_ws_1.value();
                 alts = maybe_alts.value();
                 newline = maybe_newline.value();
@@ -146,40 +146,40 @@
                 more_alts = maybe_more_alts.value();
                 unindent = maybe_unindent.value();
                 std::cout << "generating alt in rule: rule\n";
-                return Rule(name.value, concat(alts, more_alts)) ;
+                return  Rule(name.value, concat(alts, more_alts), type) ;
             }
             reset(pos);
             if (true
                 && (maybe_name = expect(TokenType::NAME))
-                && (maybe_token = expect("["))
+                && (maybe_lbrack = expect(TokenType::LBRACK))
                 && (maybe_type = this->type())
-                && (maybe_token_1 = expect("]"))
+                && (maybe_rbrack = expect(TokenType::RBRACK))
                 && (maybe_ws = this->ws())
-                && (maybe_token_2 = expect("<-"))
+                && (maybe_token = expect("<-"))
                 && (maybe_ws_1 = this->ws())
                 && (maybe_alts = this->alts())
                 && (maybe_newline = expect(TokenType::NEWLINE))
             ){
                 name = maybe_name.value();
-                token = maybe_token.value();
+                lbrack = maybe_lbrack.value();
                 type = maybe_type.value();
-                token_1 = maybe_token_1.value();
+                rbrack = maybe_rbrack.value();
                 ws = maybe_ws.value();
-                token_2 = maybe_token_2.value();
+                token = maybe_token.value();
                 ws_1 = maybe_ws_1.value();
                 alts = maybe_alts.value();
                 newline = maybe_newline.value();
                 std::cout << "generating alt in rule: rule\n";
-                return Rule(name.value, alts) ;
+                return  Rule(name.value, alts, type) ;
             }
             reset(pos);
             if (true
                 && (maybe_name = expect(TokenType::NAME))
-                && (maybe_token = expect("["))
+                && (maybe_lbrack = expect(TokenType::LBRACK))
                 && (maybe_type = this->type())
-                && (maybe_token_1 = expect("]"))
+                && (maybe_rbrack = expect(TokenType::RBRACK))
                 && (maybe_ws = this->ws())
-                && (maybe_token_2 = expect("<-"))
+                && (maybe_token = expect("<-"))
                 && (maybe_ws_1 = this->ws())
                 && (maybe_newline = expect(TokenType::NEWLINE))
                 && (maybe_indent = expect(TokenType::INDENT))
@@ -187,18 +187,18 @@
                 && (maybe_unindent = expect(TokenType::UNINDENT))
             ){
                 name = maybe_name.value();
-                token = maybe_token.value();
+                lbrack = maybe_lbrack.value();
                 type = maybe_type.value();
-                token_1 = maybe_token_1.value();
+                rbrack = maybe_rbrack.value();
                 ws = maybe_ws.value();
-                token_2 = maybe_token_2.value();
+                token = maybe_token.value();
                 ws_1 = maybe_ws_1.value();
                 newline = maybe_newline.value();
                 indent = maybe_indent.value();
                 more_alts = maybe_more_alts.value();
                 unindent = maybe_unindent.value();
                 std::cout << "generating alt in rule: rule\n";
-                return Rule(name.value, more_alts) ;
+                return  Rule(name.value, more_alts, type) ;
             }
             reset(pos);
             std::cout << "No parse found for rule\n";
@@ -245,7 +245,7 @@
                 newline = maybe_newline.value();
                 more_alts = maybe_more_alts.value();
                 std::cout << "generating alt in rule: more_alts\n";
-                return concat(alts, more_alts) ;
+                return  concat(alts, more_alts) ;
             }
             reset(pos);
             if (true
@@ -259,7 +259,7 @@
                 alts = maybe_alts.value();
                 newline = maybe_newline.value();
                 std::cout << "generating alt in rule: more_alts\n";
-                return alts ;
+                return  alts ;
             }
             reset(pos);
             std::cout << "No parse found for more_alts\n";
@@ -306,7 +306,7 @@
                 ws_1 = maybe_ws_1.value();
                 alt = maybe_alt.value();
                 std::cout << "generating alt in rule: alts\n";
-                return append_vector(alts, alt) ;
+                return  append_vector(alts, alt) ;
             }
             reset(pos);
             if (true
@@ -314,7 +314,7 @@
             ){
                 alt = maybe_alt.value();
                 std::cout << "generating alt in rule: alts\n";
-                return create_vector(Alt(alt)) ;
+                return  create_vector(alt) ;
             }
             reset(pos);
             std::cout << "No parse found for alts\n";
@@ -361,7 +361,7 @@
                 type = maybe_type.value();
                 rcurl = maybe_rcurl.value();
                 std::cout << "generating alt in rule: alt\n";
-                return Alt(items) ;
+                return  Alt(items, type) ;
             }
             reset(pos);
             std::cout << "No parse found for alt\n";
@@ -400,7 +400,7 @@
                 ws = maybe_ws.value();
                 item = maybe_item.value();
                 std::cout << "generating alt in rule: items\n";
-                return append_vector(items, item) ;
+                return  append_vector(items, item) ;
             }
             reset(pos);
             if (true
@@ -408,7 +408,7 @@
             ){
                 item = maybe_item.value();
                 std::cout << "generating alt in rule: items\n";
-                return create_vector(item) ;
+                return  create_vector(item) ;
             }
             reset(pos);
             std::cout << "No parse found for items\n";
@@ -439,7 +439,7 @@
             ){
                 name = maybe_name.value();
                 std::cout << "generating alt in rule: item\n";
-                return name.value ;
+                return  name.value ;
             }
             reset(pos);
             std::optional<Token> maybe_string;
@@ -449,7 +449,7 @@
             ){
                 string = maybe_string.value();
                 std::cout << "generating alt in rule: item\n";
-                return string.value ;
+                return  string.value ;
             }
             reset(pos);
             std::cout << "No parse found for item\n";
@@ -480,7 +480,7 @@
             ){
                 parts = maybe_parts.value();
                 std::cout << "generating alt in rule: type\n";
-                return parts ;
+                return  parts ;
             }
             reset(pos);
             std::cout << "No parse found for type\n";
@@ -504,24 +504,8 @@
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<String> {
             int pos = mark();
-            std::optional<Token> maybe_lcurl;
-            Token lcurl;
             std::optional<String> maybe_parts;
             String parts;
-            std::optional<Token> maybe_rcurl;
-            Token rcurl;
-            if (true
-                && (maybe_lcurl = expect(TokenType::LCURL))
-                && (maybe_parts = this->parts())
-                && (maybe_rcurl = expect(TokenType::RCURL))
-            ){
-                lcurl = maybe_lcurl.value();
-                parts = maybe_parts.value();
-                rcurl = maybe_rcurl.value();
-                std::cout << "generating alt in rule: parts\n";
-                return lcurl.value + parts + rcurl.value ;
-            }
-            reset(pos);
             std::optional<String> maybe_part;
             String part;
             if (true
@@ -531,7 +515,7 @@
                 parts = maybe_parts.value();
                 part = maybe_part.value();
                 std::cout << "generating alt in rule: parts\n";
-                return parts.append(part) ;
+                return  parts.append(part) ;
             }
             reset(pos);
             if (true
@@ -539,17 +523,7 @@
             ){
                 part = maybe_part.value();
                 std::cout << "generating alt in rule: parts\n";
-                return part ;
-            }
-            reset(pos);
-            if (true
-                && (maybe_lcurl = expect(TokenType::LCURL))
-                && (maybe_rcurl = expect(TokenType::RCURL))
-            ){
-                lcurl = maybe_lcurl.value();
-                rcurl = maybe_rcurl.value();
-                std::cout << "generating alt in rule: parts\n";
-                return lcurl.value + rcurl.value ;
+                return  part ;
             }
             reset(pos);
             std::cout << "No parse found for parts\n";
@@ -580,7 +554,7 @@
             ){
                 name = maybe_name.value();
                 std::cout << "generating alt in rule: part\n";
-                return name.value ;
+                return  name.value ;
             }
             reset(pos);
             std::optional<Token> maybe_semicolon;
@@ -590,7 +564,7 @@
             ){
                 semicolon = maybe_semicolon.value();
                 std::cout << "generating alt in rule: part\n";
-                return semicolon.value ;
+                return  semicolon.value ;
             }
             reset(pos);
             std::optional<Token> maybe_token;
@@ -600,7 +574,7 @@
             ){
                 token = maybe_token.value();
                 std::cout << "generating alt in rule: part\n";
-                return token.value ;
+                return  token.value ;
             }
             reset(pos);
             if (true
@@ -608,7 +582,7 @@
             ){
                 token = maybe_token.value();
                 std::cout << "generating alt in rule: part\n";
-                return token.value ;
+                return  token.value ;
             }
             reset(pos);
             std::optional<Token> maybe_lparen;
@@ -618,7 +592,7 @@
             ){
                 lparen = maybe_lparen.value();
                 std::cout << "generating alt in rule: part\n";
-                return lparen.value ;
+                return  lparen.value ;
             }
             reset(pos);
             std::optional<Token> maybe_rparen;
@@ -628,7 +602,7 @@
             ){
                 rparen = maybe_rparen.value();
                 std::cout << "generating alt in rule: part\n";
-                return rparen.value ;
+                return  rparen.value ;
             }
             reset(pos);
             std::optional<String> maybe_ws;
@@ -638,7 +612,7 @@
             ){
                 ws = maybe_ws.value();
                 std::cout << "generating alt in rule: part\n";
-                return ws ;
+                return  ws ;
             }
             reset(pos);
             std::optional<Token> maybe_comma;
@@ -648,7 +622,7 @@
             ){
                 comma = maybe_comma.value();
                 std::cout << "generating alt in rule: part\n";
-                return comma.value ;
+                return  comma.value ;
             }
             reset(pos);
             std::optional<Token> maybe_dot;
@@ -658,7 +632,7 @@
             ){
                 dot = maybe_dot.value();
                 std::cout << "generating alt in rule: part\n";
-                return dot.value ;
+                return  dot.value ;
             }
             reset(pos);
             std::cout << "No parse found for part\n";
@@ -689,7 +663,7 @@
             ){
                 whitespace = maybe_whitespace.value();
                 std::cout << "generating alt in rule: ws\n";
-                return whitespace.value ;
+                return  whitespace.value ;
             }
             reset(pos);
             std::cout << "No parse found for ws\n";
@@ -698,37 +672,6 @@
 
         std::cout << "Parsing ws\n";
         std::optional<std::any> return_value = memoize("ws", inner_func, mark());
-        if (return_value) {
-            std::cout << " value not null\n";
-            return std::any_cast<std::optional<String>>(return_value.value());
-        } else {
-            std::cout << " value is null\n";
-            return std::nullopt;
-        }
-    }
-
-    std::optional<String> MetaParser::nl() {
-
-        // inner_func does the actual parsing but is called later by
-        // to enable memoization
-        auto inner_func = [&, this]() -> std::optional<String> {
-            int pos = mark();
-            std::optional<Token> maybe_newline;
-            Token newline;
-            if (true
-                && (maybe_newline = expect(TokenType::NEWLINE))
-            ){
-                newline = maybe_newline.value();
-                std::cout << "generating alt in rule: nl\n";
-                return newline.value ;
-            }
-            reset(pos);
-            std::cout << "No parse found for nl\n";
-            return {};
-        };
-
-        std::cout << "Parsing nl\n";
-        std::optional<std::any> return_value = memoize("nl", inner_func, mark());
         if (return_value) {
             std::cout << " value not null\n";
             return std::any_cast<std::optional<String>>(return_value.value());

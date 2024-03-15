@@ -74,7 +74,6 @@ void Parser::setup_lr(const std::string& rule_name, std::shared_ptr<LR>& L) {
         s->head = L->head;
         L->head->involved_set.insert(s->rule);
     }
-    std::cout << "Finished setup_lr call\n";
 }
 
 std::optional<std::any> Parser::lr_answer(
@@ -148,16 +147,7 @@ std::optional<std::any>
 Parser::memoize(const std::string& func_name, const std::function<std::optional<std::any>()>& func, const int pos) {
     std::cout << "Calling memoization routine for rule: " << func_name << " at pos: " << pos << "\n";
     auto key = MemoKey(func_name, pos);
-    // memo[key] = recall(func_name, func, pos);
     recall(func_name, func, pos);
-    for (const auto& [k, m] : memo) {
-        std::cout << "\t" << k << " -> " << m;
-        if (k.pos == pos && k.func_name == func_name) {
-            std::cout << " <- currently under consideration\n";
-        } else {
-            std::cout << "\n";
-        }
-    }
     if (!memo.contains(key)) {
         std::cout << "Memoization cache is empty.\n";
         // Create a new LR and push it onto the rule invocation stack.
@@ -169,7 +159,6 @@ Parser::memoize(const std::string& func_name, const std::function<std::optional<
         memo[key] = MemoValue(lr, pos);
         std::cout << "Calling parsing function for rule: " << func_name << " at pos: " << pos << "\n";
         auto res = func();
-        std::cout << "Result of calling parsing function for rule: " << func_name << " at pos: " << pos << "\n\t";
         // Pop lr off the rule invocation stack
         lr_stack.pop_back();
         memo[key].endpos = mark();
@@ -181,9 +170,7 @@ Parser::memoize(const std::string& func_name, const std::function<std::optional<
         memo[key].res = res;
         return res;
     }
-    std::cout << "Resetting pos to " << memo[key].endpos << "\n";
     reset(memo[key].endpos);
-    std::cout << "pos is now: " << mark() << "\n";
     if (std::holds_alternative<std::shared_ptr<LR>>(memo[key].res)) {
         setup_lr(func_name, std::get<std::shared_ptr<LR>>(memo[key].res));
         std::cout << "Exiting memoize function\n";
@@ -198,7 +185,6 @@ std::optional<Token> Parser::expect(TokenType t) {
         std::cout << "Parsed token: " << token << "\n";
         return tokenizer.get_token();
     }
-    std::cout << "Peeked token: " << token << ", requested token type: " << token_type_to_string(t) << "\n";
     return {};
 }
 
@@ -208,6 +194,5 @@ std::optional<Token> Parser::expect(const std::string& s) {
         std::cout << "Parsed token: " << token << "\n";
         return tokenizer.get_token();
     }
-    std::cout << "Peeked token: " << token << ", string to match \"" << s << "\"\n";
     return {};
 }

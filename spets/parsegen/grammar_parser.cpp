@@ -117,7 +117,7 @@ std::optional<Alt> GrammarParser::alternative() {
     skip_ws();
     std::cout << "leaving alternative at pos: " << mark() << " having parsed: " << std::format("{}", items)
               << " and action: " << action << "\n";
-    return Alt{items, action};
+    return Alt(items, action);
 }
 
 std::optional<std::string> GrammarParser::item() {
