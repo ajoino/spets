@@ -169,12 +169,16 @@ public:
 
 #include <parser/node.hpp>
 #include <tokenizer/lexer.hpp>
-#include <parsegen/metaparser.hpp>
 #include <parser/parser.hpp>
 #include <parser/parsing_helpers.hpp>
 
 #include <parsegen/rule.hpp>
     
+#ifndef METAPARSER_CANDIDATE
+#include <parsegen/metaparser.hpp>
+#else
+#include <parsegen/metaparser_candidate.hpp>
+#endif
 )preamble" << "\n\n";
         for (const auto& rule : rules) {
             generate_rule(rule);

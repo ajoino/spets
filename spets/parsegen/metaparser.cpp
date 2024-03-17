@@ -338,8 +338,8 @@
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<Alt> {
             int pos = mark();
-        std::optional<Items> maybe_items;
-        Items items;
+            std::optional<Items> maybe_items;
+            Items items;
             std::optional<String> maybe_ws;
             String ws;
             std::optional<Token> maybe_lcurl;
@@ -379,11 +379,11 @@
         }
     }
 
-std::optional<Items> MetaParser::items() {
+    std::optional<Items> MetaParser::items() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
-    auto inner_func = [&, this]() -> std::optional<Items> {
+        auto inner_func = [&, this]() -> std::optional<Items> {
             int pos = mark();
             std::optional<Items> maybe_items;
             Items items;
@@ -400,7 +400,7 @@ std::optional<Items> MetaParser::items() {
                 ws = maybe_ws.value();
                 item = maybe_item.value();
                 std::cout << "generating alt in rule: items\n";
-            return  append_vector(items, Item(item)) ;
+                return  append_vector(items, Item(item)) ;
             }
             reset(pos);
             if (true
@@ -408,7 +408,7 @@ std::optional<Items> MetaParser::items() {
             ){
                 item = maybe_item.value();
                 std::cout << "generating alt in rule: items\n";
-            return  create_vector(Item(item)) ;
+                return  create_vector(Item(item)) ;
             }
             reset(pos);
             std::cout << "No parse found for items\n";
@@ -419,7 +419,7 @@ std::optional<Items> MetaParser::items() {
         std::optional<std::any> return_value = memoize("items", inner_func, mark());
         if (return_value) {
             std::cout << " value not null\n";
-        return std::any_cast<std::optional<Items>>(return_value.value());
+            return std::any_cast<std::optional<Items>>(return_value.value());
         } else {
             std::cout << " value is null\n";
             return std::nullopt;

@@ -42,6 +42,7 @@ add_custom_command(
 add_executable(metaparser_runner metaparser_runner.cpp metaparser_candidate.cpp)
 target_include_directories(metaparser_runner PRIVATE ${CMAKE_SOURCE_DIR}/include -fsanitize=address)
 target_link_libraries(metaparser_runner PRIVATE parsercommon lexer rule parsing_helpers -fsanitize=address)
+target_compile_definitions(metaparser_runner PRIVATE METAPARSER_CANDIDATE=1)
 set_target_properties(metaparser_runner PROPERTIES EXCLUDE_FROM_ALL TRUE)
 
 add_custom_command(
