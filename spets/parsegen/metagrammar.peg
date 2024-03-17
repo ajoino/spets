@@ -13,8 +13,10 @@ alts[Alts] <- alts ws "/" ws alt { append_vector(alts, alt) }
 alt[Alt] <- items ws LCURL type RCURL { Alt(items, type) }
 
 items[Items] <- items ws item { append_vector(items, Item(item)) }
-    / item { create_vector(Item(item)) }
-item[String] <- NAME { name.value }
+    / item { create_vector(item) }
+item[Item]  <- NAME ws "=" ws atom { Item(atom, name.value) }
+    / atom { Item(atom) }
+atom[String] <- NAME { name.value }
     / STRING { string.value }
 
 type[String] <- parts { parts }

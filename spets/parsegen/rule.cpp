@@ -75,6 +75,11 @@ std::ostream& operator<<(std::ostream& os, const std::optional<std::vector<Item>
 
 std::string Item::var_name() const {
     std::string count_str = count > 0 ? std::format("_{}", count) : "";
+
+    if (name) {
+        auto name_ = name.value();
+        return name_.append(count_str);
+    }
     // item is all uppercase
     if (!std::ranges::all_of(item, [](char ch) { return ch < 0x41 || ch > 0x5A; })) {
         std::string r{};

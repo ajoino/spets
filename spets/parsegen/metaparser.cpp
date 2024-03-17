@@ -3,12 +3,16 @@
 
 #include <parser/node.hpp>
 #include <tokenizer/lexer.hpp>
-#include <parsegen/metaparser.hpp>
 #include <parser/parser.hpp>
 #include <parser/parsing_helpers.hpp>
 
 #include <parsegen/rule.hpp>
     
+#ifndef METAPARSER_CANDIDATE
+#include <parsegen/metaparser.hpp>
+#else
+#include <parsegen/metaparser_candidate.hpp>
+#endif
 
 
     std::optional<Rules> MetaParser::start() {
@@ -389,8 +393,8 @@
             Items items;
             std::optional<String> maybe_ws;
             String ws;
-            std::optional<String> maybe_item;
-            String item;
+            std::optional<Item> maybe_item;
+            Item item;
             if (true
                 && (maybe_items = this->items())
                 && (maybe_ws = this->ws())
@@ -408,7 +412,7 @@
             ){
                 item = maybe_item.value();
                 std::cout << "generating alt in rule: items\n";
-                return  create_vector(Item(item)) ;
+                return  create_vector(item) ;
             }
             reset(pos);
             std::cout << "No parse found for items\n";
@@ -426,7 +430,62 @@
         }
     }
 
-    std::optional<String> MetaParser::item() {
+    std::optional<Item> MetaParser::item() {
+
+        // inner_func does the actual parsing but is called later by
+        // to enable memoization
+        auto inner_func = [&, this]() -> std::optional<Item> {
+            int pos = mark();
+            std::optional<Token> maybe_name;
+            Token name;
+            std::optional<String> maybe_ws;
+            String ws;
+            std::optional<Token> maybe_token;
+            Token token;
+            std::optional<String> maybe_ws_1;
+            String ws_1;
+            std::optional<String> maybe_atom;
+            String atom;
+            if (true
+                && (maybe_name = expect(TokenType::NAME))
+                && (maybe_ws = this->ws())
+                && (maybe_token = expect("="))
+                && (maybe_ws_1 = this->ws())
+                && (maybe_atom = this->atom())
+            ){
+                name = maybe_name.value();
+                ws = maybe_ws.value();
+                token = maybe_token.value();
+                ws_1 = maybe_ws_1.value();
+                atom = maybe_atom.value();
+                std::cout << "generating alt in rule: item\n";
+                return  Item(atom, name.value) ;
+            }
+            reset(pos);
+            if (true
+                && (maybe_atom = this->atom())
+            ){
+                atom = maybe_atom.value();
+                std::cout << "generating alt in rule: item\n";
+                return  Item(atom) ;
+            }
+            reset(pos);
+            std::cout << "No parse found for item\n";
+            return {};
+        };
+
+        std::cout << "Parsing item\n";
+        std::optional<std::any> return_value = memoize("item", inner_func, mark());
+        if (return_value) {
+            std::cout << " value not null\n";
+            return std::any_cast<std::optional<Item>>(return_value.value());
+        } else {
+            std::cout << " value is null\n";
+            return std::nullopt;
+        }
+    }
+
+    std::optional<String> MetaParser::atom() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
@@ -438,7 +497,7 @@
                 && (maybe_name = expect(TokenType::NAME))
             ){
                 name = maybe_name.value();
-                std::cout << "generating alt in rule: item\n";
+                std::cout << "generating alt in rule: atom\n";
                 return  name.value ;
             }
             reset(pos);
@@ -448,16 +507,16 @@
                 && (maybe_string = expect(TokenType::STRING))
             ){
                 string = maybe_string.value();
-                std::cout << "generating alt in rule: item\n";
+                std::cout << "generating alt in rule: atom\n";
                 return  string.value ;
             }
             reset(pos);
-            std::cout << "No parse found for item\n";
+            std::cout << "No parse found for atom\n";
             return {};
         };
 
-        std::cout << "Parsing item\n";
-        std::optional<std::any> return_value = memoize("item", inner_func, mark());
+        std::cout << "Parsing atom\n";
+        std::optional<std::any> return_value = memoize("atom", inner_func, mark());
         if (return_value) {
             std::cout << " value not null\n";
             return std::any_cast<std::optional<String>>(return_value.value());

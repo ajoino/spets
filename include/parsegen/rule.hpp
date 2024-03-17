@@ -8,12 +8,14 @@
 
 struct Item {
     std::string item;
+    std::optional<std::string> name;
     std::string type;
     std::string expect_value;
     int count{};
 
     Item() = default;
     Item(std::string item) : item{std::move(item)} {};
+    Item(std::string item, std::string name) : item{std::move(item)}, name{std::move(name)} {};
     Item(std::string item, std::string type, std::string expect_value, int count) :
         item{std::move(item)}, type{std::move(type)}, expect_value{std::move(expect_value)}, count{count} {};
     [[nodiscard]] std::string var_name() const;
