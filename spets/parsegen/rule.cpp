@@ -10,7 +10,7 @@ std::ostream& operator<<(std::ostream& os, const Rule& r) {
 std::ostream& operator<<(std::ostream& os, const Alt& a) {
     std::string item_str{};
     for (const auto& item : a.items) {
-        item_str.append(item);
+        item_str.append(item.name);
     }
     return os << std::format("Alt({})", item_str);
 }

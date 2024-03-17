@@ -20,7 +20,7 @@ std::optional<Rule> rule();
 std::optional<Alts> more_alts();
 std::optional<Alts> alts();
 std::optional<Alt> alt();
-std::optional<Strings> items();
+std::optional<Items> items();
 std::optional<String> item();
 std::optional<String> type();
 std::optional<String> parts();
