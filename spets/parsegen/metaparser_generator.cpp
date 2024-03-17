@@ -61,17 +61,17 @@ public:
         std::map<std::string, uint16_t> name_counter;
         std::vector<Item> local_items;
         for (const auto& item : alt.items) {
-            auto name = item.name;
+            auto name = item.item;
             std::cout << "alt item: " << item << "\n";
             std::string return_type = "Node";
-            std::string expect_value = std::format("this->{}()", item.name);
-            if ((item.name.starts_with("'") || item.name.starts_with("\""))) {
+            std::string expect_value = std::format("this->{}()", item.item);
+            if ((item.item.starts_with("'") || item.item.starts_with("\""))) {
                 return_type = "Token";
                 name = "token";
-                expect_value = std::format("expect({})", item.name);
+                expect_value = std::format("expect({})", item.item);
             } else if (all_upper(name)){
                 name = str_tolower(name);
-                expect_value = std::format("expect(TokenType::{})", item.name);
+                expect_value = std::format("expect(TokenType::{})", item.item);
                 return_type = "Token";
             }
             int count{};

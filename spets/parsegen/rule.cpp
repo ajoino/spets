@@ -10,13 +10,13 @@ std::ostream& operator<<(std::ostream& os, const Rule& r) {
 std::ostream& operator<<(std::ostream& os, const Alt& a) {
     std::string item_str{};
     for (const auto& item : a.items) {
-        item_str.append(item.name);
+        item_str.append(item.item);
     }
     return os << std::format("Alt({})", item_str);
 }
 
 std::ostream& operator<<(std::ostream& os, const Item& r) {
-    return os << std::format("Item({}, {}, {}, {}, {}, {})", r.name, r.type, r.count, r.expect_value, r.eval_string(), r.var_name());
+    return os << std::format("Item({}, {}, {}, {}, {}, {})", r.item, r.type, r.count, r.expect_value, r.eval_string(), r.var_name());
 }
 
 std::ostream& operator<<(std::ostream& os, const std::vector<Rule>& rs) { return os << "Rules"; }
@@ -76,15 +76,15 @@ std::ostream& operator<<(std::ostream& os, const std::optional<std::vector<Item>
 std::string Item::var_name() const {
     std::string count_str = count > 0 ? std::format("_{}", count) : "";
     // item is all uppercase
-    if (!std::ranges::all_of(name, [](char ch) { return ch < 0x41 || ch > 0x5A; })) {
+    if (!std::ranges::all_of(item, [](char ch) { return ch < 0x41 || ch > 0x5A; })) {
         std::string r{};
         std::transform(
-            name.begin(), name.end(), r.begin(), [](unsigned char c) { return std::tolower(c); } // correct
+            item.begin(), item.end(), r.begin(), [](unsigned char c) { return std::tolower(c); } // correct
         );
         return r.append(count_str);
     }
 
-    auto name_ = name;
+    auto name_ = item;
     return name_.append(count_str);
 }
 
@@ -94,5 +94,5 @@ std::string Item::eval_string() const {
 }
 
 const bool Item::operator==(const Item& rhs) const {
-    return this->name == rhs.name && this->count == rhs.count;
+    return this->item == rhs.item && this->count == rhs.count;
 }
