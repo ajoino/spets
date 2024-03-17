@@ -16,12 +16,12 @@ struct Item {
     Item() = default;
     Item(std::string item) : item{std::move(item)} {};
     Item(std::string item, std::string name) : item{std::move(item)}, name{std::move(name)} {};
-    Item(std::string item, std::string type, std::string expect_value, int count) :
-        item{std::move(item)}, type{std::move(type)}, expect_value{std::move(expect_value)}, count{count} {};
+    Item(std::string item, std::string name, std::string type, std::string expect_value, int count) :
+        item{std::move(item)}, name{name}, type{std::move(type)}, expect_value{std::move(expect_value)}, count{count} {};
     [[nodiscard]] std::string var_name() const;
     [[nodiscard]] std::string eval_string() const;
     // friend auto operator<=>(const Item&, const Item&) = default;
-    const bool operator==(const Item& rhs) const;
+    bool operator==(const Item& rhs) const;
 };
 
 struct Alt {

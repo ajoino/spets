@@ -16,7 +16,7 @@ std::ostream& operator<<(std::ostream& os, const Alt& a) {
 }
 
 std::ostream& operator<<(std::ostream& os, const Item& r) {
-    return os << std::format("Item({}, {}, {}, {}, {}, {})", r.item, r.type, r.count, r.expect_value, r.eval_string(), r.var_name());
+    return os << std::format("Item({}, {}, {}, {}, {}, {}, {})", r.item, r.name ? r.name.value() : "nullopt", r.type, r.count, r.expect_value, r.eval_string(), r.var_name());
 }
 
 std::ostream& operator<<(std::ostream& os, const std::vector<Rule>& rs) { return os << "Rules"; }
@@ -98,6 +98,6 @@ std::string Item::eval_string() const {
     return var_name().append(".value()");
 }
 
-const bool Item::operator==(const Item& rhs) const {
-    return this->item == rhs.item && this->count == rhs.count;
+bool Item::operator==(const Item& rhs) const {
+    return this->var_name() == rhs.var_name() && this->count == rhs.count;
 }

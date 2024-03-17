@@ -404,7 +404,7 @@
                 ws = maybe_ws.value();
                 item = maybe_item.value();
                 std::cout << "generating alt in rule: items\n";
-                return  append_vector(items, Item(item)) ;
+                return  append_vector(items, item) ;
             }
             reset(pos);
             if (true
@@ -438,25 +438,17 @@
             int pos = mark();
             std::optional<Token> maybe_name;
             Token name;
-            std::optional<String> maybe_ws;
-            String ws;
             std::optional<Token> maybe_token;
             Token token;
-            std::optional<String> maybe_ws_1;
-            String ws_1;
             std::optional<String> maybe_atom;
             String atom;
             if (true
                 && (maybe_name = expect(TokenType::NAME))
-                && (maybe_ws = this->ws())
                 && (maybe_token = expect("="))
-                && (maybe_ws_1 = this->ws())
                 && (maybe_atom = this->atom())
             ){
                 name = maybe_name.value();
-                ws = maybe_ws.value();
                 token = maybe_token.value();
-                ws_1 = maybe_ws_1.value();
                 atom = maybe_atom.value();
                 std::cout << "generating alt in rule: item\n";
                 return  Item(atom, name.value) ;

@@ -61,38 +61,41 @@ public:
         std::map<std::string, uint16_t> name_counter;
         std::vector<Item> local_items;
         for (const auto& item : alt.items) {
-            auto name = item.item;
+            std::string generated_name;
+            if (item.name) {
+                generated_name = item.name.value();
+            } else {
+                generated_name = item.item;
+            }
             std::cout << "alt item: " << item << "\n";
             std::string return_type = "Node";
             std::string expect_value = std::format("this->{}()", item.item);
-            if ((item.item.starts_with("'") || item.item.starts_with("\""))) {
+            if ((generated_name.starts_with("'") || generated_name.starts_with("\""))) {
                 return_type = "Token";
-                name = "token";
+                generated_name = "token";
                 expect_value = std::format("expect({})", item.item);
-            } else if (all_upper(name)){
-                name = str_tolower(name);
+            } else if (all_upper(generated_name)){
+                generated_name = str_tolower(generated_name);
                 expect_value = std::format("expect(TokenType::{})", item.item);
                 return_type = "Token";
             }
             int count{};
             for (const auto& r : rules) {
-                if (r.name == item) {
+                if (r.name == item.item) {
                     return_type = r.return_type;
                     break;
                 }
             }
-            if (return_type == "Token" && name == "token") {
+            if (return_type == "Token" && generated_name == "token") {
+                std::cout << "Increase token count\n";
                 count = token_counter;
                 token_counter++;
             } else {
-                count = name_counter[name];
-                name_counter[name]++;
+                count = name_counter[generated_name];
+                name_counter[generated_name]++;
             }
-            local_items.emplace_back(name, return_type, expect_value, count);
+            local_items.emplace_back(item.item, generated_name, return_type, expect_value, count);
         }
-        token_counter = 0;
-        name_counter.clear();
-
         for (const auto& item : local_items) {
             if (in_vector(global_items, item)) {
                 continue;
@@ -101,8 +104,6 @@ public:
             stream << "            " << item.type << " " << item.var_name() << ";\n";
         }
 
-        token_counter = 0;
-        name_counter.clear();
         stream << "            if (true\n";
         for (const auto& item : local_items) {
             generate_item(item, local_items, token_counter, name_counter);
@@ -139,6 +140,10 @@ public:
         std::vector<Item> items_;
         for (const auto& alt : rule.alts) {
             generate_alt(alt, rule, vars, items_);
+        }
+        std::cout << "items generated in rule " << rule.name << "\n";
+        for (const auto& item : items_) {
+            std::cout << "    " << item << "\n";
         }
         stream << "            std::cout << \"No parse found for " << rule.name << "\\n\";\n";
         stream << "            return {};\n";
