@@ -74,7 +74,7 @@ public:
                 return_type = "Token";
                 generated_name = "token";
                 expect_value = std::format("expect({})", item.item);
-            } else if (all_upper(generated_name)){
+            } else if (all_upper(item.item)){
                 generated_name = str_tolower(generated_name);
                 expect_value = std::format("expect(TokenType::{})", item.item);
                 return_type = "Token";
