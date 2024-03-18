@@ -233,7 +233,7 @@ ScanResult scan_token(Lexer& lexer) {
         }
         return ScanResult{Token::from_lexer(TokenType::COMMENT, lexer), lexer};
     }
-    if (auto res = ctre::starts_with<R"(([_a-zA-Z][_a-zA-Z0-9]*)|([<>*+=/\-|]+))">(lexer.start, lexer.end)) {
+    if (auto res = ctre::starts_with<R"(([_a-zA-Z][_a-zA-Z0-9]*)|([@<>*+=/\-|]+))">(lexer.start, lexer.end)) {
         // Identifiers
         for (int i = 1; i < res.size(); i++) {
             lexer.advance();

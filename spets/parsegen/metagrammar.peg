@@ -1,4 +1,9 @@
-start[Rules] <- rules ENDOFFILE { rules }
+start[Grammar] <- metas rules ENDOFFILE { Grammar(rules, metas) }
+    / rules ENDOFFILE { Grammar(rules) }
+metas[Strings] <- metas meta { metas.append(meta) } 
+    / meta { meta }
+meta[String] <- "@" NAME STRING { string.value }
+
 rules[Rules] <- rule rules { prepend_vector(rules, rule) }
     / rule { create_vector(rule) }
 rule[Rule] <- NAME LBRACK type RBRACK ws "<-" ws alts NEWLINE INDENT more_alts UNINDENT { Rule(name.value, concat(alts, more_alts), type) }
@@ -14,7 +19,7 @@ alt[Alt] <- items ws LCURL type RCURL { Alt(items, type) }
 
 items[Items] <- items ws item { append_vector(items, item) }
     / item { create_vector(item) }
-item[Item]  <- NAME "=" atom { Item(atom, name.value) }
+item[Item] <- NAME "=" atom { Item(atom, name.value) }
     / atom { Item(atom) }
 atom[String] <- NAME { name.value }
     / STRING { string.value }

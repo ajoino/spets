@@ -46,6 +46,11 @@ struct Rule {
     Rule(std::string name, const std::vector<Alt>& alts) : name{std::move(name)}, alts{alts} {};
 };
 
+struct Grammar {
+    std::vector<Rule> rules;
+    std::vector<std::string> metas;
+};
+
 using Rules = std::vector<Rule>;
 using Alts = std::vector<Alt>;
 using Items = std::vector<Item>;
