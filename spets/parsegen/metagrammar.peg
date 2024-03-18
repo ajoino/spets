@@ -1,7 +1,7 @@
 start[Grammar] <- metas rules ENDOFFILE { Grammar(rules, metas) }
     / rules ENDOFFILE { Grammar(rules) }
-metas[Strings] <- metas meta { metas.append(meta) } 
-    / meta { meta }
+metas[Strings] <- metas meta { append_vector(metas, meta) }
+    / meta { create_vector(meta) }
 meta[String] <- "@" NAME STRING { string.value }
 
 rules[Rules] <- rule rules { prepend_vector(rules, rule) }

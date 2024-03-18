@@ -9,10 +9,10 @@
 #include <vector>
 
 #include <parsegen/grammar_parser.hpp>
-#include <parsegen/metaparser.hpp>
 #include <parsegen/rule.hpp>
-#include <parser/parsing_helpers.hpp>
+#include <parsegen/metaparser.hpp>
 #include <tokenizer/lexer.hpp>
+#include <parser/parsing_helpers.hpp>
 
 std::string str_tolower(std::string s) {
     std::transform(
@@ -33,11 +33,9 @@ class Generator {
     std::string name;
     std::stringstream stream;
     uint indentation = 0;
-    Grammar grammar;
     std::vector<Rule> rules;
 
 public:
-
     Generator(std::string name) : name{std::move(name)} {};
 
     void inc_indentation() noexcept { indentation++; }
@@ -57,8 +55,7 @@ public:
         stream << "                && (maybe_" << item.var_name() << " = " << item.expect_value << ")\n";
     }
 
-    void
-    generate_alt(const Alt& alt, const Rule& rule, std::vector<std::string>& vars, std::vector<Item>& global_items) {
+    void generate_alt(const Alt& alt, const Rule& rule, std::vector<std::string>& vars, std::vector<Item>& global_items) {
         std::vector<std::string> items;
         uint16_t token_counter = 0;
         std::map<std::string, uint16_t> name_counter;
@@ -77,7 +74,7 @@ public:
                 return_type = "Token";
                 generated_name = "token";
                 expect_value = std::format("expect({})", item.item);
-            } else if (all_upper(item.item)) {
+            } else if (all_upper(item.item)){
                 generated_name = str_tolower(generated_name);
                 expect_value = std::format("expect(TokenType::{})", item.item);
                 return_type = "Token";
@@ -152,12 +149,10 @@ public:
         stream << "            return {};\n";
         stream << "        };\n\n";
         stream << "        std::cout << \"Parsing " << rule.name << "\\n\";\n";
-        stream << "        std::optional<std::any> return_value = memoize(\"" << rule.name
-               << "\", inner_func, mark());\n";
+        stream << "        std::optional<std::any> return_value = memoize(\"" << rule.name << "\", inner_func, mark());\n";
         stream << "        if (return_value) {\n";
         stream << "            std::cout << \" value not null\\n\";\n";
-        stream << "            return std::any_cast<std::optional<" << rule.return_type
-               << ">>(return_value.value());\n";
+        stream << "            return std::any_cast<std::optional<" << rule.return_type << ">>(return_value.value());\n";
         stream << "        } else {\n";
         stream << "            std::cout << \" value is null\\n\";\n";
         stream << "            return std::nullopt;\n";
@@ -165,16 +160,16 @@ public:
         stream << "    }\n\n";
     }
 
-    void generate_grammar(const Grammar& grammar) {}
-
     std::stringstream& generate_parser(const std::optional<Grammar>& maybe_grammar) {
         // clear stringstream
         stream.str(std::string{});
+
         if (!maybe_grammar) {
             std::cout << "Cannot generate parser from no rules.\n";
             return stream;
         }
-        grammar = maybe_grammar.value();
+        std::cout << "THIS DOES HAPPEN RIGHT???";
+        rules = maybe_grammar.value().rules;
         stream << R"preamble(#include <optional>
 #include <fstream>
 
@@ -190,9 +185,8 @@ public:
 #else
 #include <parsegen/metaparser_candidate.hpp>
 #endif
-)preamble"
-               << "\n\n";
-        for (const auto& rule : grammar.rules) {
+)preamble" << "\n\n";
+        for (const auto& rule : rules) {
             generate_rule(rule);
         }
 
@@ -208,7 +202,7 @@ public:
             return stream;
         }
 
-        grammar = maybe_grammar.value();
+        rules = maybe_grammar.value().rules;
         std::cout << rules << "\n";
 
         stream << R"(
@@ -216,19 +210,18 @@ public:
 
 #include <tokenizer/lexer.hpp>
 #include <parser/parser.hpp>
-#include <parsegen/rule.hpp>)"
-               << "\n";
-        stream << "class  " << name << "Parser : public Parser {\n";
+#include <parsegen/rule.hpp>)" << "\n";
+        stream << "class  "<< name << "Parser : public Parser {\n";
         stream << "public:\n\n";
         stream << R"()";
         stream << name << "Parser(const Tokenizer& t) : Parser{t} {};\n";
-        stream << name << "Parser(const " << name << "Parser&) = default;\n";
-        stream << name << "Parser(" << name << "Parser&&) noexcept = default;\n";
-        stream << name << "Parser& operator=(const " << name << "Parser&) = default;\n";
-        stream << name << "Parser& operator=(" << name << "Parser&&) noexcept = default;\n";
-        stream << "~" << name << "Parser() = default;\n\n";
+    stream << name << "Parser(const " << name << "Parser&) = default;\n";
+    stream << name << "Parser(" << name << "Parser&&) noexcept = default;\n";
+    stream << name << "Parser& operator=(const " << name << "Parser&) = default;\n";
+    stream << name << "Parser& operator=(" << name << "Parser&&) noexcept = default;\n";
+    stream << "~" << name << "Parser() = default;\n\n";
 
-        for (const auto& rule : grammar.rules) {
+        for (const auto& rule : rules) {
             stream << "std::optional<" << rule.return_type << "> " << rule.name << "();\n";
         }
         stream << "};\n";
@@ -247,9 +240,13 @@ int main(int argc, char** argv) {
 
     MetaParser p{t};
 
-    auto grammar = p.start();
+    std::optional<Grammar> grammar = p.start();
+    std::cout << std::flush;
+    std::cout << typeid(grammar).name() << "\n";
+    std::cout << grammar.value().rules;
+    std::cout << "DOES THIS PRINT???!?!\n";
     if (grammar) {
-        std::cout << grammar.value();
+        std::cout << grammar.value().rules;
         std::fstream fout{args[3], std::fstream::out};
         fout << Generator(std::string(args[1])).generate_parser(grammar).rdbuf();
         fout.close();
@@ -258,6 +255,6 @@ int main(int argc, char** argv) {
         fout.close();
         return 0;
     }
-    std::cout << "Could not generated parser.\n";
+    std::cout << "Could not generate parser.\n";
     return 1;
 }

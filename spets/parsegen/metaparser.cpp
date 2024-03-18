@@ -15,16 +15,30 @@
 #endif
 
 
-    std::optional<Rules> MetaParser::start() {
+    std::optional<Grammar> MetaParser::start() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
-        auto inner_func = [&, this]() -> std::optional<Rules> {
+        auto inner_func = [&, this]() -> std::optional<Grammar> {
             int pos = mark();
+            std::optional<Strings> maybe_metas;
+            Strings metas;
             std::optional<Rules> maybe_rules;
             Rules rules;
             std::optional<Token> maybe_endoffile;
             Token endoffile;
+            if (true
+                && (maybe_metas = this->metas())
+                && (maybe_rules = this->rules())
+                && (maybe_endoffile = expect(TokenType::ENDOFFILE))
+            ){
+                metas = maybe_metas.value();
+                rules = maybe_rules.value();
+                endoffile = maybe_endoffile.value();
+                std::cout << "generating alt in rule: start\n";
+                return  Grammar(rules, metas) ;
+            }
+            reset(pos);
             if (true
                 && (maybe_rules = this->rules())
                 && (maybe_endoffile = expect(TokenType::ENDOFFILE))
@@ -32,7 +46,7 @@
                 rules = maybe_rules.value();
                 endoffile = maybe_endoffile.value();
                 std::cout << "generating alt in rule: start\n";
-                return  rules ;
+                return  Grammar(rules) ;
             }
             reset(pos);
             std::cout << "No parse found for start\n";
@@ -43,7 +57,89 @@
         std::optional<std::any> return_value = memoize("start", inner_func, mark());
         if (return_value) {
             std::cout << " value not null\n";
-            return std::any_cast<std::optional<Rules>>(return_value.value());
+            return std::any_cast<std::optional<Grammar>>(return_value.value());
+        } else {
+            std::cout << " value is null\n";
+            return std::nullopt;
+        }
+    }
+
+    std::optional<Strings> MetaParser::metas() {
+
+        // inner_func does the actual parsing but is called later by
+        // to enable memoization
+        auto inner_func = [&, this]() -> std::optional<Strings> {
+            int pos = mark();
+            std::optional<Strings> maybe_metas;
+            Strings metas;
+            std::optional<String> maybe_meta;
+            String meta;
+            if (true
+                && (maybe_metas = this->metas())
+                && (maybe_meta = this->meta())
+            ){
+                metas = maybe_metas.value();
+                meta = maybe_meta.value();
+                std::cout << "generating alt in rule: metas\n";
+                return  append_vector(metas, meta) ;
+            }
+            reset(pos);
+            if (true
+                && (maybe_meta = this->meta())
+            ){
+                meta = maybe_meta.value();
+                std::cout << "generating alt in rule: metas\n";
+                return  create_vector(meta) ;
+            }
+            reset(pos);
+            std::cout << "No parse found for metas\n";
+            return {};
+        };
+
+        std::cout << "Parsing metas\n";
+        std::optional<std::any> return_value = memoize("metas", inner_func, mark());
+        if (return_value) {
+            std::cout << " value not null\n";
+            return std::any_cast<std::optional<Strings>>(return_value.value());
+        } else {
+            std::cout << " value is null\n";
+            return std::nullopt;
+        }
+    }
+
+    std::optional<String> MetaParser::meta() {
+
+        // inner_func does the actual parsing but is called later by
+        // to enable memoization
+        auto inner_func = [&, this]() -> std::optional<String> {
+            int pos = mark();
+            std::optional<Token> maybe_token;
+            Token token;
+            std::optional<Token> maybe_name;
+            Token name;
+            std::optional<Token> maybe_string;
+            Token string;
+            if (true
+                && (maybe_token = expect("@"))
+                && (maybe_name = expect(TokenType::NAME))
+                && (maybe_string = expect(TokenType::STRING))
+            ){
+                token = maybe_token.value();
+                name = maybe_name.value();
+                string = maybe_string.value();
+                std::cout << "generating alt in rule: meta\n";
+                return  string.value ;
+            }
+            reset(pos);
+            std::cout << "No parse found for meta\n";
+            return {};
+        };
+
+        std::cout << "Parsing meta\n";
+        std::optional<std::any> return_value = memoize("meta", inner_func, mark());
+        if (return_value) {
+            std::cout << " value not null\n";
+            return std::any_cast<std::optional<String>>(return_value.value());
         } else {
             std::cout << " value is null\n";
             return std::nullopt;

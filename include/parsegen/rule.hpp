@@ -35,6 +35,7 @@ struct Alt {
 
 struct Rule {
     std::string name;
+
     std::vector<Alt> alts;
     std::string return_type = "Node";
 
@@ -49,6 +50,10 @@ struct Rule {
 struct Grammar {
     std::vector<Rule> rules;
     std::vector<std::string> metas;
+
+    Grammar() = default;
+    Grammar(std::vector<Rule> rules) : rules{std::move(rules)} {};
+    Grammar(std::vector<Rule> rules, std::vector<std::string> metas) : rules{std::move(rules)}, metas{std::move(metas)} {};
 };
 
 using Rules = std::vector<Rule>;

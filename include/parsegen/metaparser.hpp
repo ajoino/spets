@@ -14,7 +14,9 @@ MetaParser& operator=(const MetaParser&) = default;
 MetaParser& operator=(MetaParser&&) noexcept = default;
 ~MetaParser() = default;
 
-std::optional<Rules> start();
+std::optional<Grammar> start();
+std::optional<Strings> metas();
+std::optional<String> meta();
 std::optional<Rules> rules();
 std::optional<Rule> rule();
 std::optional<Alts> more_alts();

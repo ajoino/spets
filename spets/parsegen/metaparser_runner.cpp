@@ -2,12 +2,15 @@
 #include <iostream>
 #include <span>
 
+#ifndef METAPARSER_CANDIDATE
 #include <parsegen/metaparser.hpp>
+#else
+#include <parsegen/metaparser_candidate.hpp>
+#endif
 #include <tokenizer/lexer.hpp>
 
 int main(int argc, char** argv) {
     auto args = std::span(argv, size_t(argc));
-    std::cout << R"(HEHEHEHEHEHELLOLOLOLOLOLOLOLOLOLOLOL???!?!?!?!?!?!!!!!??!!?)";
     std::fstream fin{args[1], std::fstream::in};
     std::string content((std::istreambuf_iterator<char>(fin)), (std::istreambuf_iterator<char>()));
     fin.close();
@@ -18,9 +21,9 @@ int main(int argc, char** argv) {
 
     MetaParser p{t};
 
-    auto rules = p.start();
-    if (rules) {
-        std::cout << rules.value() << "\n";
+    auto grammar = p.start();
+    if (grammar) {
+        std::cout << grammar.value().rules << "\n";
         return 0;
     }
     std::cout << "Could not generated parser.\n";
