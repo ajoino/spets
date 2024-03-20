@@ -5,6 +5,8 @@
 #include <parser/parser.hpp>
 #include <parsegen/rule.hpp>
 class  MetaParser : public Parser {
+int synthetic_rule_counter{};
+Rules synthetic_rules;
 public:
 
 MetaParser(const Tokenizer& t) : Parser{t} {};
@@ -14,7 +16,14 @@ MetaParser& operator=(const MetaParser&) = default;
 MetaParser& operator=(MetaParser&&) noexcept = default;
 ~MetaParser() = default;
 
-std::optional<Grammar> start();
+
+std::string synthetic_rule(Alts alts) {
+    std::string rule_name = std::string("_synthetic_rule_") + std::to_string(synthetic_rule_counter);
+    synthetic_rule_counter++;
+    synthetic_rules.push_back(Rule(rule_name, alts));
+    return rule_name;
+}
+        std::optional<Grammar> start();
 std::optional<Strings> metas();
 std::optional<String> meta();
 std::optional<Rules> rules();

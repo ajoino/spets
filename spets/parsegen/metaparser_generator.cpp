@@ -221,6 +221,8 @@ public:
 #include <parsegen/rule.hpp>)"
                << "\n";
         stream << "class  " << name << "Parser : public Parser {\n";
+        stream << "int synthetic_rule_counter{};\n";
+        stream << "Rules synthetic_rules;\n";
         stream << "public:\n\n";
         stream << R"()";
         stream << name << "Parser(const Tokenizer& t) : Parser{t} {};\n";
@@ -229,6 +231,15 @@ public:
         stream << name << "Parser& operator=(const " << name << "Parser&) = default;\n";
         stream << name << "Parser& operator=(" << name << "Parser&&) noexcept = default;\n";
         stream << "~" << name << "Parser() = default;\n\n";
+
+        stream << R"(
+std::string synthetic_rule(Alts alts) {
+    std::string rule_name = std::string("_synthetic_rule_") + std::to_string(synthetic_rule_counter);
+    synthetic_rule_counter++;
+    synthetic_rules.push_back(Rule(rule_name, alts));
+    return rule_name;
+}
+        )";
 
         for (const auto& rule : rules) {
             stream << "std::optional<" << rule.return_type << "> " << rule.name << "();\n";

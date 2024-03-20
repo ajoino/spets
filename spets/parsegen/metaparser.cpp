@@ -610,6 +610,24 @@
                 return  string.value ;
             }
             reset(pos);
+            std::optional<Token> maybe_token;
+            Token token;
+            std::optional<Alts> maybe_alts;
+            Alts alts;
+            std::optional<Token> maybe_token_1;
+            Token token_1;
+            if (true
+                && (maybe_token = expect("("))
+                && (maybe_alts = this->alts())
+                && (maybe_token_1 = expect(")"))
+            ){
+                token = maybe_token.value();
+                alts = maybe_alts.value();
+                token_1 = maybe_token_1.value();
+                std::cout << "generating alt in rule: atom\n";
+                return  synthetic_rule(alts) ;
+            }
+            reset(pos);
             std::cout << "No parse found for atom\n";
             return {};
         };

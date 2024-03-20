@@ -33,6 +33,7 @@ item[Item] <- NAME "=" atom { Item(atom, name.value) }
     / atom { Item(atom) }
 atom[String] <- NAME { name.value }
     / STRING { string.value }
+    / "(" alts ")" { synthetic_rule(alts) }
 
 type[String] <- parts { parts }
 parts[String] <- parts part { parts.append(part) }
