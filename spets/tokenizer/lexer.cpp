@@ -241,7 +241,7 @@ ScanResult scan_token(Lexer& lexer) {
         return ScanResult{Token::from_lexer(TokenType::NAME, lexer), lexer};
     }
     if (auto res = ctre::starts_with<
-            R"(("""[\w+\-*/()=:<>\[\]@]*""")|("[\w+\-*/()=:<>\[\]@]*"))">(
+            R"((""".*""")|("[^"]*"))">(
             lexer.start, lexer.end
         )) {
         // String literals

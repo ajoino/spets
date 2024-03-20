@@ -9,10 +9,10 @@
 #include <vector>
 
 #include <parsegen/grammar_parser.hpp>
-#include <parsegen/rule.hpp>
 #include <parsegen/metaparser.hpp>
-#include <tokenizer/lexer.hpp>
+#include <parsegen/rule.hpp>
 #include <parser/parsing_helpers.hpp>
+#include <tokenizer/lexer.hpp>
 
 std::string str_tolower(std::string s) {
     std::transform(
@@ -36,6 +36,7 @@ class Generator {
     std::vector<Rule> rules;
 
 public:
+
     Generator(std::string name) : name{std::move(name)} {};
 
     void inc_indentation() noexcept { indentation++; }
@@ -55,7 +56,8 @@ public:
         stream << "                && (maybe_" << item.var_name() << " = " << item.expect_value << ")\n";
     }
 
-    void generate_alt(const Alt& alt, const Rule& rule, std::vector<std::string>& vars, std::vector<Item>& global_items) {
+    void
+    generate_alt(const Alt& alt, const Rule& rule, std::vector<std::string>& vars, std::vector<Item>& global_items) {
         std::vector<std::string> items;
         uint16_t token_counter = 0;
         std::map<std::string, uint16_t> name_counter;
@@ -74,7 +76,7 @@ public:
                 return_type = "Token";
                 generated_name = "token";
                 expect_value = std::format("expect({})", item.item);
-            } else if (all_upper(item.item)){
+            } else if (all_upper(item.item)) {
                 generated_name = str_tolower(generated_name);
                 expect_value = std::format("expect(TokenType::{})", item.item);
                 return_type = "Token";
@@ -149,10 +151,12 @@ public:
         stream << "            return {};\n";
         stream << "        };\n\n";
         stream << "        std::cout << \"Parsing " << rule.name << "\\n\";\n";
-        stream << "        std::optional<std::any> return_value = memoize(\"" << rule.name << "\", inner_func, mark());\n";
+        stream << "        std::optional<std::any> return_value = memoize(\"" << rule.name
+               << "\", inner_func, mark());\n";
         stream << "        if (return_value) {\n";
         stream << "            std::cout << \" value not null\\n\";\n";
-        stream << "            return std::any_cast<std::optional<" << rule.return_type << ">>(return_value.value());\n";
+        stream << "            return std::any_cast<std::optional<" << rule.return_type
+               << ">>(return_value.value());\n";
         stream << "        } else {\n";
         stream << "            std::cout << \" value is null\\n\";\n";
         stream << "            return std::nullopt;\n";
@@ -170,6 +174,7 @@ public:
         }
         std::cout << "THIS DOES HAPPEN RIGHT???";
         rules = maybe_grammar.value().rules;
+        auto grammar = maybe_grammar.value();
         stream << R"preamble(#include <optional>
 #include <fstream>
 
@@ -177,15 +182,18 @@ public:
 #include <tokenizer/lexer.hpp>
 #include <parser/parser.hpp>
 #include <parser/parsing_helpers.hpp>
-
-#include <parsegen/rule.hpp>
-    
-#ifndef METAPARSER_CANDIDATE
-#include <parsegen/metaparser.hpp>
-#else
-#include <parsegen/metaparser_candidate.hpp>
-#endif
-)preamble" << "\n\n";
+)preamble"
+               << "\n\n";
+        if (!grammar.metas.empty()) {
+            stream << "//subheader\n";
+            std::string meta_content;
+            if (grammar.metas.at(0).starts_with(R"(""")")) {
+                meta_content = std::string(grammar.metas.at(0).begin() + 3, grammar.metas.at(0).end() - 3);
+            } else {
+                meta_content = std::string(grammar.metas.at(0).begin() + 1, grammar.metas.at(0).end() - 1);
+            }
+            stream << meta_content << "\n\n";
+        }
         for (const auto& rule : rules) {
             generate_rule(rule);
         }
@@ -210,16 +218,17 @@ public:
 
 #include <tokenizer/lexer.hpp>
 #include <parser/parser.hpp>
-#include <parsegen/rule.hpp>)" << "\n";
-        stream << "class  "<< name << "Parser : public Parser {\n";
+#include <parsegen/rule.hpp>)"
+               << "\n";
+        stream << "class  " << name << "Parser : public Parser {\n";
         stream << "public:\n\n";
         stream << R"()";
         stream << name << "Parser(const Tokenizer& t) : Parser{t} {};\n";
-    stream << name << "Parser(const " << name << "Parser&) = default;\n";
-    stream << name << "Parser(" << name << "Parser&&) noexcept = default;\n";
-    stream << name << "Parser& operator=(const " << name << "Parser&) = default;\n";
-    stream << name << "Parser& operator=(" << name << "Parser&&) noexcept = default;\n";
-    stream << "~" << name << "Parser() = default;\n\n";
+        stream << name << "Parser(const " << name << "Parser&) = default;\n";
+        stream << name << "Parser(" << name << "Parser&&) noexcept = default;\n";
+        stream << name << "Parser& operator=(const " << name << "Parser&) = default;\n";
+        stream << name << "Parser& operator=(" << name << "Parser&&) noexcept = default;\n";
+        stream << "~" << name << "Parser() = default;\n\n";
 
         for (const auto& rule : rules) {
             stream << "std::optional<" << rule.return_type << "> " << rule.name << "();\n";

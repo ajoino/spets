@@ -6,6 +6,9 @@
 #include <parser/parser.hpp>
 #include <parser/parsing_helpers.hpp>
 
+
+//subheader
+
 #include <parsegen/rule.hpp>
     
 #ifndef METAPARSER_CANDIDATE
@@ -117,16 +120,24 @@
             Token token;
             std::optional<Token> maybe_name;
             Token name;
+            std::optional<String> maybe_ws;
+            String ws;
             std::optional<Token> maybe_string;
             Token string;
+            std::optional<Token> maybe_newline;
+            Token newline;
             if (true
                 && (maybe_token = expect("@"))
                 && (maybe_name = expect(TokenType::NAME))
+                && (maybe_ws = this->ws())
                 && (maybe_string = expect(TokenType::STRING))
+                && (maybe_newline = expect(TokenType::NEWLINE))
             ){
                 token = maybe_token.value();
                 name = maybe_name.value();
+                ws = maybe_ws.value();
                 string = maybe_string.value();
+                newline = maybe_newline.value();
                 std::cout << "generating alt in rule: meta\n";
                 return  string.value ;
             }
