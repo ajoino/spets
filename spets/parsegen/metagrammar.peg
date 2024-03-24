@@ -33,7 +33,7 @@ item[NamedItem] <- NAME "=" atom { NamedItem(atom, name.value) }
     / atom { NamedItem(atom) }
 atom[Plain] <- NAME { name.value }
     / STRING { string.value }
-    / "(" alts ")" { Group(alts) }
+    / "(" alts ")" { Alts(alts) }
 
 type[String] <- parts { parts }
 parts[String] <- parts part { parts.append(part) }

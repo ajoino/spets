@@ -7,6 +7,9 @@
 #include <vector>
 #include <variant>
 
+using String = std::string;
+using Strings = std::vector<std::string>;
+
 struct NamedItem {
     std::string item;
     std::optional<std::string> name;
@@ -24,6 +27,7 @@ struct NamedItem {
     // friend auto operator<=>(const Item&, const Item&) = default;
     bool operator==(const NamedItem& rhs) const;
 };
+using NamedItems = std::vector<NamedItem>;
 
 struct Alt {
     std::vector<NamedItem> items;
@@ -33,11 +37,17 @@ struct Alt {
     Alt(std::vector<NamedItem> items) : items{std::move(items)} {};
     Alt(std::vector<NamedItem> items, const std::string& action) : items{std::move(items)}, action{action} {};
 };
+using Alts = std::vector<Alt>;
 
 struct Group {
-    std::vector<Alt> alts;
+    Alts alts;
 };
+using Plain = std::variant<String, Alts>;
 
+struct Lookahead {
+    bool positive;
+    Plain atom;
+};
 
 struct Rule {
     std::string name;
@@ -52,6 +62,7 @@ struct Rule {
         name{std::move(name)}, alts{alts}, return_type{std::move(return_type)} {};
     Rule(std::string name, const std::vector<Alt>& alts) : name{std::move(name)}, alts{alts} {};
 };
+using Rules = std::vector<Rule>;
 
 struct Grammar {
     std::vector<Rule> rules;
@@ -61,13 +72,6 @@ struct Grammar {
     Grammar(std::vector<Rule> rules) : rules{std::move(rules)} {};
     Grammar(std::vector<Rule> rules, std::vector<std::string> metas) : rules{std::move(rules)}, metas{std::move(metas)} {};
 };
-
-using Rules = std::vector<Rule>;
-using Alts = std::vector<Alt>;
-using NamedItems = std::vector<NamedItem>;
-using String = std::string;
-using Strings = std::vector<std::string>;
-using Plain = std::variant<std::string, Group>;
 
 std::ostream& operator<<(std::ostream& os, const Rule& r);
 std::ostream& operator<<(std::ostream& os, const Alt& r);
