@@ -5,33 +5,39 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <variant>
 
-struct Item {
+struct NamedItem {
     std::string item;
     std::optional<std::string> name;
     std::string type;
     std::string expect_value;
     int count{};
 
-    Item() = default;
-    Item(std::string item) : item{std::move(item)} {};
-    Item(std::string item, std::string name) : item{std::move(item)}, name{std::move(name)} {};
-    Item(std::string item, std::string name, std::string type, std::string expect_value, int count) :
+    NamedItem() = default;
+    NamedItem(std::string item) : item{std::move(item)} {};
+    NamedItem(std::string item, std::string name) : item{std::move(item)}, name{std::move(name)} {};
+    NamedItem(std::string item, std::string name, std::string type, std::string expect_value, int count) :
         item{std::move(item)}, name{name}, type{std::move(type)}, expect_value{std::move(expect_value)}, count{count} {};
     [[nodiscard]] std::string var_name() const;
     [[nodiscard]] std::string eval_string() const;
     // friend auto operator<=>(const Item&, const Item&) = default;
-    bool operator==(const Item& rhs) const;
+    bool operator==(const NamedItem& rhs) const;
 };
 
 struct Alt {
-    std::vector<Item> items;
+    std::vector<NamedItem> items;
     std::optional<std::string> action;
 
     Alt() = default;
-    Alt(std::vector<Item> items) : items{std::move(items)} {};
-    Alt(std::vector<Item> items, const std::string& action) : items{std::move(items)}, action{action} {};
+    Alt(std::vector<NamedItem> items) : items{std::move(items)} {};
+    Alt(std::vector<NamedItem> items, const std::string& action) : items{std::move(items)}, action{action} {};
 };
+
+struct Group {
+    std::vector<Alt> alts;
+};
+
 
 struct Rule {
     std::string name;
@@ -58,16 +64,17 @@ struct Grammar {
 
 using Rules = std::vector<Rule>;
 using Alts = std::vector<Alt>;
-using Items = std::vector<Item>;
+using NamedItems = std::vector<NamedItem>;
 using String = std::string;
 using Strings = std::vector<std::string>;
+using Plain = std::variant<std::string, Group>;
 
 std::ostream& operator<<(std::ostream& os, const Rule& r);
 std::ostream& operator<<(std::ostream& os, const Alt& r);
-std::ostream& operator<<(std::ostream& os, const Item& r);
+std::ostream& operator<<(std::ostream& os, const NamedItem& r);
 std::ostream& operator<<(std::ostream& os, const std::vector<Rule>& rs);
 std::ostream& operator<<(std::ostream& os, const std::vector<Alt>& as);
-std::ostream& operator<<(std::ostream& os, const std::vector<Item>& as);
+std::ostream& operator<<(std::ostream& os, const std::vector<NamedItem>& as);
 
 std::ostream& operator<<(std::ostream& os, const std::optional<Rule>& r);
 std::ostream& operator<<(std::ostream& os, const std::optional<Alt>& r);

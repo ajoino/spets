@@ -127,4 +127,7 @@ public:
     std::optional<Token> expect(TokenType t);
 
     std::optional<Token> expect(const std::string& s);
+
+    template <typename R, typename ...Args>
+    bool lookahead(bool positive, std::function<std::optional<R>(Args...)> func, Args... args);
 };

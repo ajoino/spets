@@ -50,18 +50,18 @@ public:
     void put(const std::string& input) { stream << std::string(" ", indentation) << input; }
 
     void generate_item(
-        const Item& item, std::vector<Item>& items, uint16_t& token_counter,
+        const NamedItem& item, std::vector<NamedItem>& items, uint16_t& token_counter,
         std::map<std::string, uint16_t>& name_counter
     ) {
         stream << "                && (maybe_" << item.var_name() << " = " << item.expect_value << ")\n";
     }
 
     void
-    generate_alt(const Alt& alt, const Rule& rule, std::vector<std::string>& vars, std::vector<Item>& global_items) {
+    generate_alt(const Alt& alt, const Rule& rule, std::vector<std::string>& vars, std::vector<NamedItem>& global_items) {
         std::vector<std::string> items;
         uint16_t token_counter = 0;
         std::map<std::string, uint16_t> name_counter;
-        std::vector<Item> local_items;
+        std::vector<NamedItem> local_items;
         for (const auto& item : alt.items) {
             std::string generated_name;
             if (item.name) {
@@ -139,7 +139,7 @@ public:
         stream << "        auto inner_func = [&, this]() -> std::optional<" << rule.return_type << "> {\n";
         stream << "            int pos = mark();\n";
         std::vector<std::string> vars;
-        std::vector<Item> items_;
+        std::vector<NamedItem> items_;
         for (const auto& alt : rule.alts) {
             generate_alt(alt, rule, vars, items_);
         }

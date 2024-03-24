@@ -449,8 +449,8 @@
         // to enable memoization
         auto inner_func = [&, this]() -> std::optional<Alt> {
             int pos = mark();
-            std::optional<Items> maybe_items;
-            Items items;
+            std::optional<NamedItems> maybe_items;
+            NamedItems items;
             std::optional<String> maybe_ws;
             String ws;
             std::optional<Token> maybe_lcurl;
@@ -490,18 +490,18 @@
         }
     }
 
-    std::optional<Items> MetaParser::items() {
+    std::optional<NamedItems> MetaParser::items() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
-        auto inner_func = [&, this]() -> std::optional<Items> {
+        auto inner_func = [&, this]() -> std::optional<NamedItems> {
             int pos = mark();
-            std::optional<Items> maybe_items;
-            Items items;
+            std::optional<NamedItems> maybe_items;
+            NamedItems items;
             std::optional<String> maybe_ws;
             String ws;
-            std::optional<Item> maybe_item;
-            Item item;
+            std::optional<NamedItem> maybe_item;
+            NamedItem item;
             if (true
                 && (maybe_items = this->items())
                 && (maybe_ws = this->ws())
@@ -530,18 +530,18 @@
         std::optional<std::any> return_value = memoize("items", inner_func, mark());
         if (return_value) {
             std::cout << " value not null\n";
-            return std::any_cast<std::optional<Items>>(return_value.value());
+            return std::any_cast<std::optional<NamedItems>>(return_value.value());
         } else {
             std::cout << " value is null\n";
             return std::nullopt;
         }
     }
 
-    std::optional<Item> MetaParser::item() {
+    std::optional<NamedItem> MetaParser::item() {
 
         // inner_func does the actual parsing but is called later by
         // to enable memoization
-        auto inner_func = [&, this]() -> std::optional<Item> {
+        auto inner_func = [&, this]() -> std::optional<NamedItem> {
             int pos = mark();
             std::optional<Token> maybe_name;
             Token name;
@@ -558,7 +558,7 @@
                 token = maybe_token.value();
                 atom = maybe_atom.value();
                 std::cout << "generating alt in rule: item\n";
-                return  Item(atom, name.value) ;
+                return  NamedItem(atom, name.value) ;
             }
             reset(pos);
             if (true
@@ -566,7 +566,7 @@
             ){
                 atom = maybe_atom.value();
                 std::cout << "generating alt in rule: item\n";
-                return  Item(atom) ;
+                return  NamedItem(atom) ;
             }
             reset(pos);
             std::cout << "No parse found for item\n";
@@ -577,7 +577,7 @@
         std::optional<std::any> return_value = memoize("item", inner_func, mark());
         if (return_value) {
             std::cout << " value not null\n";
-            return std::any_cast<std::optional<Item>>(return_value.value());
+            return std::any_cast<std::optional<NamedItem>>(return_value.value());
         } else {
             std::cout << " value is null\n";
             return std::nullopt;
