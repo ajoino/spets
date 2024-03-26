@@ -9,6 +9,17 @@
 
 using String = std::string;
 using Strings = std::vector<std::string>;
+struct Alt;
+using Alts = std::vector<Alt>;
+struct Group {
+    Alts alts;
+};
+using Plain = std::variant<String, Group>;
+
+struct Item {
+    Plain item;
+};
+
 
 struct NamedItem {
     std::string item;
@@ -37,12 +48,7 @@ struct Alt {
     Alt(std::vector<NamedItem> items) : items{std::move(items)} {};
     Alt(std::vector<NamedItem> items, const std::string& action) : items{std::move(items)}, action{action} {};
 };
-using Alts = std::vector<Alt>;
 
-struct Group {
-    Alts alts;
-};
-using Plain = std::variant<String, Alts>;
 
 struct Lookahead {
     bool positive;

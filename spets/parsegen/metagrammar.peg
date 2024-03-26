@@ -25,15 +25,16 @@ more_alts[Alts] <- "/" ws alts NEWLINE more_alts { concat(alts, more_alts) }
 
 alts[Alts] <- alts ws "/" ws alt { append_vector(alts, alt) }
     / alt { create_vector(alt) }
-alt[Alt] <- items ws LCURL type RCURL { Alt(items, type) }
+alt[Alt] <- named_items ws LCURL type RCURL { Alt(named_items, type) }
 
-items[NamedItems] <- items ws item { append_vector(items, item) }
-    / item { create_vector(item) }
-item[NamedItem] <- NAME "=" atom { NamedItem(atom, name.value) }
+named_items[NamedItems] <- named_items ws named_item { append_vector(named_items, named_item) }
+    / named_item { create_vector(item) }
+named_item[NamedItem] <- NAME "=" atom { NamedItem(atom, name.value) }
     / atom { NamedItem(atom) }
+item[Item] <- atom { Item(atom) }
 atom[Plain] <- NAME { name.value }
     / STRING { string.value }
-    / "(" alts ")" { Alts(alts) }
+    / "(" alts ")" { Group(alts) }
 
 type[String] <- parts { parts }
 parts[String] <- parts part { parts.append(part) }

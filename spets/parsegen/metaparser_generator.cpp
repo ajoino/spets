@@ -49,6 +49,9 @@ public:
 
     void put(const std::string& input) { stream << std::string(" ", indentation) << input; }
 
+    void generate_group() {
+        
+    }
     void generate_item(
         const NamedItem& item, std::vector<NamedItem>& items, uint16_t& token_counter,
         std::map<std::string, uint16_t>& name_counter
