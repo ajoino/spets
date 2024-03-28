@@ -6,6 +6,7 @@
 #include <sstream>
 #include <string>
 #include <utility>
+#include <variant>
 #include <vector>
 
 #include <parsegen/grammar_parser.hpp>
@@ -32,8 +33,10 @@ bool all_upper(const std::string& s) {
 class Generator {
     std::string name;
     std::stringstream stream;
+    std::stringstream synthetic_rules_stream;
     uint indentation = 0;
-    std::vector<Rule> rules;
+    Rules rules;
+    Rules synthetic_rules;
 
 public:
 
@@ -49,57 +52,71 @@ public:
 
     void put(const std::string& input) { stream << std::string(" ", indentation) << input; }
 
-    void generate_group() {
-        
+    NamedItem generate_group_rule(std::map<std::string, uint16_t>& name_counter, Rule parent_rule) {
+        std::string name = "synthetic_rule";
+        uint16_t count = name_counter["synthetic_rule"];
+        name_counter["synthetic_rule"]++;
+        name += std::string{"_"} + std::to_string(count);
+
+
+
+        return {};
     }
-    void generate_item(
+
+    void generate_named_item(
         const NamedItem& item, std::vector<NamedItem>& items, uint16_t& token_counter,
         std::map<std::string, uint16_t>& name_counter
     ) {
         stream << "                && (maybe_" << item.var_name() << " = " << item.expect_value << ")\n";
     }
 
-    void
-    generate_alt(const Alt& alt, const Rule& rule, std::vector<std::string>& vars, std::vector<NamedItem>& global_items) {
+    void generate_alt(
+        const Alt& alt, const Rule& rule, std::vector<std::string>& vars, std::vector<NamedItem>& global_items
+    ) {
         std::vector<std::string> items;
         uint16_t token_counter = 0;
         std::map<std::string, uint16_t> name_counter;
         std::vector<NamedItem> local_items;
-        for (const auto& item : alt.items) {
-            std::string generated_name;
-            if (item.name) {
-                generated_name = item.name.value();
+        for (const auto& named_item : alt.items) {
+            if (std::holds_alternative<Group>(named_item.item.atom)) {
+                // Unsure how to get the correct type of the synthetic rules, will come back to this later.
             } else {
-                generated_name = item.item;
-            }
-            std::cout << "alt item: " << item << "\n";
-            std::string return_type = "Node";
-            std::string expect_value = std::format("this->{}()", item.item);
-            if ((generated_name.starts_with("'") || generated_name.starts_with("\""))) {
-                return_type = "Token";
-                generated_name = "token";
-                expect_value = std::format("expect({})", item.item);
-            } else if (all_upper(item.item)) {
-                generated_name = str_tolower(generated_name);
-                expect_value = std::format("expect(TokenType::{})", item.item);
-                return_type = "Token";
-            }
-            int count{};
-            for (const auto& r : rules) {
-                if (r.name == item.item) {
-                    return_type = r.return_type;
-                    break;
+                std::string generated_name;
+                auto atom = std::get<String>(named_item.item.atom);
+                if (named_item.name) {
+                    generated_name = named_item.name.value();
+                } else {
+                    generated_name = atom;
                 }
+                std::cout << "alt item: " << named_item << "\n";
+                std::string return_type = "Node";
+                std::string expect_value = std::format("this->{}()", atom);
+                if ((generated_name.starts_with("'") || generated_name.starts_with("\""))) {
+                    return_type = "Token";
+                    generated_name = "token";
+                    expect_value = std::format("expect({})", atom);
+                } else if (all_upper(atom)) {
+                    generated_name = str_tolower(generated_name);
+                    expect_value = std::format("expect(TokenType::{})", atom);
+                    return_type = "Token";
+                }
+                int count{};
+                for (const auto& r : rules) {
+                    if (r.name == atom) {
+                        return_type = r.return_type;
+                        break;
+                    }
+                }
+                if (return_type == "Token" && generated_name == "token") {
+                    std::cout << "Increase token count\n";
+                    count = token_counter;
+                    token_counter++;
+                } else {
+                    count = name_counter[generated_name];
+                    name_counter[generated_name]++;
+                }
+                local_items.emplace_back(named_item.item, generated_name, return_type, expect_value, count);
             }
-            if (return_type == "Token" && generated_name == "token") {
-                std::cout << "Increase token count\n";
-                count = token_counter;
-                token_counter++;
-            } else {
-                count = name_counter[generated_name];
-                name_counter[generated_name]++;
-            }
-            local_items.emplace_back(item.item, generated_name, return_type, expect_value, count);
         }
         for (const auto& item : local_items) {
             if (in_vector(global_items, item)) {
@@ -111,7 +128,7 @@ public:
 
         stream << "            if (true\n";
         for (const auto& item : local_items) {
-            generate_item(item, local_items, token_counter, name_counter);
+            generate_named_item(item, local_items, token_counter, name_counter);
         }
         stream << "            ){\n";
         for (const auto& item : local_items) {

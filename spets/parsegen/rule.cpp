@@ -2,6 +2,7 @@
 #include <format>
 #include <parsegen/rule.hpp>
 #include <ranges>
+#include <variant>
 
 std::ostream& operator<<(std::ostream& os, const Rule& r) {
     return os << std::format("Rule({}, {})", r.name, r.return_type);
@@ -9,14 +10,15 @@ std::ostream& operator<<(std::ostream& os, const Rule& r) {
 
 std::ostream& operator<<(std::ostream& os, const Alt& a) {
     std::string item_str{};
-    for (const auto& item : a.items) {
-        item_str.append(item.item);
-    }
+    // for (const auto& item : a.items) {
+    //     item_str.append(item.name ? item.name : "std::nullopt");
+    // }
     return os << std::format("Alt({})", item_str);
 }
 
 std::ostream& operator<<(std::ostream& os, const NamedItem& r) {
-    return os << std::format("Item({}, {}, {}, {}, {}, {}, {})", r.item, r.name ? r.name.value() : "nullopt", r.type, r.count, r.expect_value, r.eval_string(), r.var_name());
+    // return os << std::format("Item({}, {}, {}, {}, {}, {}, {})", r.item, r.name ? r.name.value() : "nullopt", r.type, r.count, r.expect_value, r.eval_string(), r.var_name());
+    return os << "Item()";
 }
 
 std::ostream& operator<<(std::ostream& os, const std::vector<Rule>& rs) { return os << "Rules"; }
@@ -81,15 +83,16 @@ std::string NamedItem::var_name() const {
         return name_.append(count_str);
     }
     // item is all uppercase
-    if (!std::ranges::all_of(item, [](char ch) { return ch < 0x41 || ch > 0x5A; })) {
+    if (std::holds_alternative<std::string>(item.atom) && !std::ranges::all_of(std::get<std::string>(item.atom), [](char ch) { return ch < 0x41 || ch > 0x5A; })) {
         std::string r{};
+        auto i = std::get<std::string>(item.atom);
         std::transform(
-            item.begin(), item.end(), r.begin(), [](unsigned char c) { return std::tolower(c); } // correct
+            i.begin(), i.end(), r.begin(), [](unsigned char c) { return std::tolower(c); } // correct
         );
         return r.append(count_str);
     }
 
-    auto name_ = item;
+    auto name_ = std::get<std::string>(item.atom);
     return name_.append(count_str);
 }
 

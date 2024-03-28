@@ -28,9 +28,9 @@ alts[Alts] <- alts ws "/" ws alt { append_vector(alts, alt) }
 alt[Alt] <- named_items ws LCURL type RCURL { Alt(named_items, type) }
 
 named_items[NamedItems] <- named_items ws named_item { append_vector(named_items, named_item) }
-    / named_item { create_vector(item) }
-named_item[NamedItem] <- NAME "=" atom { NamedItem(atom, name.value) }
-    / atom { NamedItem(atom) }
+    / named_item { create_vector(named_item) }
+named_item[NamedItem] <- NAME "=" item { NamedItem(item, name.value) }
+    / item { NamedItem(item) }
 item[Item] <- atom { Item(atom) }
 atom[Plain] <- NAME { name.value }
     / STRING { string.value }
